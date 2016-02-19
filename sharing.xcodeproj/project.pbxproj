@@ -1,0 +1,365 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		DB881C4A1C602DC000A2D0EA /* UniversalSharing */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = DB881C4B1C602DC000A2D0EA /* Build configuration list for PBXAggregateTarget "UniversalSharing" */;
+			buildPhases = (
+				DB881C4E1C6030A400A2D0EA /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = UniversalSharing;
+			productName = UniversalSharing;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		DB5F3EB91C7005C4003DA1C3 /* NtwIntf.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */; };
+		DB5F3EC31C711FA6003DA1C3 /* ShareMgr.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EC21C711FA6003DA1C3 /* ShareMgr.m */; };
+		DB5F3EC81C713C25003DA1C3 /* MessageDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EC71C713C25003DA1C3 /* MessageDecoder.m */; };
+		DB5F3EE61C726E14003DA1C3 /* FriendDetails.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EE51C726E14003DA1C3 /* FriendDetails.m */; };
+		DB5F3EE91C726EAD003DA1C3 /* AddFriendViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EE81C726EAD003DA1C3 /* AddFriendViewController.m */; };
+		DB5F3EF01C72C5CA003DA1C3 /* ContactsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EEE1C72C5CA003DA1C3 /* ContactsViewController.m */; };
+		DB881C3E1C5F0E4A00A2D0EA /* sharing.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB881C3D1C5F0E4A00A2D0EA /* sharing.h */; };
+		DB881C401C5F0E4A00A2D0EA /* sharing.m in Sources */ = {isa = PBXBuildFile; fileRef = DB881C3F1C5F0E4A00A2D0EA /* sharing.m */; };
+		DB881C481C5F896E00A2D0EA /* MessageTranslator.m in Sources */ = {isa = PBXBuildFile; fileRef = DB881C471C5F896E00A2D0EA /* MessageTranslator.m */; };
+		DB881C791C664A4500A2D0EA /* SHKeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = DB881C781C664A4500A2D0EA /* SHKeychainItemWrapper.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DB881C381C5F0E4A00A2D0EA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				DB881C3E1C5F0E4A00A2D0EA /* sharing.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DB5F3EB71C7005C3003DA1C3 /* NtwIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NtwIntf.h; sourceTree = "<group>"; };
+		DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NtwIntf.m; sourceTree = "<group>"; };
+		DB5F3EC11C711F86003DA1C3 /* ShareMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShareMgr.h; sourceTree = "<group>"; };
+		DB5F3EC21C711FA6003DA1C3 /* ShareMgr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShareMgr.m; sourceTree = "<group>"; };
+		DB5F3EC61C713C25003DA1C3 /* MessageDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageDecoder.h; sourceTree = "<group>"; };
+		DB5F3EC71C713C25003DA1C3 /* MessageDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageDecoder.m; sourceTree = "<group>"; };
+		DB5F3EE41C726E14003DA1C3 /* FriendDetails.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FriendDetails.h; sourceTree = "<group>"; };
+		DB5F3EE51C726E14003DA1C3 /* FriendDetails.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FriendDetails.m; sourceTree = "<group>"; };
+		DB5F3EE71C726EAD003DA1C3 /* AddFriendViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddFriendViewController.h; sourceTree = "<group>"; };
+		DB5F3EE81C726EAD003DA1C3 /* AddFriendViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddFriendViewController.m; sourceTree = "<group>"; };
+		DB5F3EEA1C726EF7003DA1C3 /* AddFriendViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddFriendViewController.xib; sourceTree = "<group>"; };
+		DB5F3EEE1C72C5CA003DA1C3 /* ContactsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContactsViewController.m; sourceTree = "<group>"; };
+		DB5F3EEF1C72C5CA003DA1C3 /* ContactsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactsViewController.h; sourceTree = "<group>"; };
+		DB881C3A1C5F0E4A00A2D0EA /* libsharing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsharing.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB881C3D1C5F0E4A00A2D0EA /* sharing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sharing.h; sourceTree = "<group>"; };
+		DB881C3F1C5F0E4A00A2D0EA /* sharing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = sharing.m; sourceTree = "<group>"; };
+		DB881C461C5F896E00A2D0EA /* MessageTranslator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageTranslator.h; sourceTree = "<group>"; };
+		DB881C471C5F896E00A2D0EA /* MessageTranslator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageTranslator.m; sourceTree = "<group>"; };
+		DB881C491C60285400A2D0EA /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Consts.h; sourceTree = "<group>"; };
+		DB881C771C664A4500A2D0EA /* SHKeychainItemWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHKeychainItemWrapper.h; sourceTree = "<group>"; };
+		DB881C781C664A4500A2D0EA /* SHKeychainItemWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHKeychainItemWrapper.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DB881C371C5F0E4A00A2D0EA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DB881C311C5F0E4A00A2D0EA = {
+			isa = PBXGroup;
+			children = (
+				DB881C3C1C5F0E4A00A2D0EA /* sharing */,
+				DB881C3B1C5F0E4A00A2D0EA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DB881C3B1C5F0E4A00A2D0EA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DB881C3A1C5F0E4A00A2D0EA /* libsharing.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DB881C3C1C5F0E4A00A2D0EA /* sharing */ = {
+			isa = PBXGroup;
+			children = (
+				DB5F3EC61C713C25003DA1C3 /* MessageDecoder.h */,
+				DB5F3EE71C726EAD003DA1C3 /* AddFriendViewController.h */,
+				DB5F3EEE1C72C5CA003DA1C3 /* ContactsViewController.m */,
+				DB5F3EEF1C72C5CA003DA1C3 /* ContactsViewController.h */,
+				DB5F3EE81C726EAD003DA1C3 /* AddFriendViewController.m */,
+				DB5F3EEA1C726EF7003DA1C3 /* AddFriendViewController.xib */,
+				DB5F3EE41C726E14003DA1C3 /* FriendDetails.h */,
+				DB5F3EE51C726E14003DA1C3 /* FriendDetails.m */,
+				DB5F3EC71C713C25003DA1C3 /* MessageDecoder.m */,
+				DB5F3EB71C7005C3003DA1C3 /* NtwIntf.h */,
+				DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */,
+				DB5F3EC21C711FA6003DA1C3 /* ShareMgr.m */,
+				DB5F3EC11C711F86003DA1C3 /* ShareMgr.h */,
+				DB881C771C664A4500A2D0EA /* SHKeychainItemWrapper.h */,
+				DB881C781C664A4500A2D0EA /* SHKeychainItemWrapper.m */,
+				DB881C3D1C5F0E4A00A2D0EA /* sharing.h */,
+				DB881C3F1C5F0E4A00A2D0EA /* sharing.m */,
+				DB881C461C5F896E00A2D0EA /* MessageTranslator.h */,
+				DB881C491C60285400A2D0EA /* Consts.h */,
+				DB881C471C5F896E00A2D0EA /* MessageTranslator.m */,
+			);
+			path = sharing;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DB881C391C5F0E4A00A2D0EA /* sharing */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB881C431C5F0E4A00A2D0EA /* Build configuration list for PBXNativeTarget "sharing" */;
+			buildPhases = (
+				DB881C361C5F0E4A00A2D0EA /* Sources */,
+				DB881C371C5F0E4A00A2D0EA /* Frameworks */,
+				DB881C381C5F0E4A00A2D0EA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = sharing;
+			productName = sharing;
+			productReference = DB881C3A1C5F0E4A00A2D0EA /* libsharing.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DB881C321C5F0E4A00A2D0EA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = Sinacama;
+				TargetAttributes = {
+					DB881C391C5F0E4A00A2D0EA = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					DB881C4A1C602DC000A2D0EA = {
+						CreatedOnToolsVersion = 7.2;
+					};
+				};
+			};
+			buildConfigurationList = DB881C351C5F0E4A00A2D0EA /* Build configuration list for PBXProject "sharing" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = DB881C311C5F0E4A00A2D0EA;
+			productRefGroup = DB881C3B1C5F0E4A00A2D0EA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DB881C391C5F0E4A00A2D0EA /* sharing */,
+				DB881C4A1C602DC000A2D0EA /* UniversalSharing */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		DB881C4E1C6030A400A2D0EA /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# define output folder environment variable\nUNIVERSAL_OUTPUTFOLDER=${BUILD_DIR}/${CONFIGURATION}-universal\n\n# Step 1. Build Device and Simulator versions\nxcodebuild -target sharing ONLY_ACTIVE_ARCH=NO -configuration ${CONFIGURATION} -sdk iphoneos  BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\"\nxcodebuild -target sharing -configuration ${CONFIGURATION} -sdk iphonesimulator -arch i386 BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\"\n\n# make sure the output directory exists\nmkdir -p \"${UNIVERSAL_OUTPUTFOLDER}\"\n\n# Step 2. Create universal binary file using lipo\nlipo -create -output \"${UNIVERSAL_OUTPUTFOLDER}/lib${PROJECT_NAME}.a\" \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/lib${PROJECT_NAME}.a\" \"${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/lib${PROJECT_NAME}.a\"\n\n# Last touch. copy the header files. Just for convenience\ncp -R \"${BUILD_DIR}/${CONFIGURATION}-iphoneos/include\" \"${UNIVERSAL_OUTPUTFOLDER}/\"";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DB881C361C5F0E4A00A2D0EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB5F3EE61C726E14003DA1C3 /* FriendDetails.m in Sources */,
+				DB881C401C5F0E4A00A2D0EA /* sharing.m in Sources */,
+				DB881C481C5F896E00A2D0EA /* MessageTranslator.m in Sources */,
+				DB5F3EC81C713C25003DA1C3 /* MessageDecoder.m in Sources */,
+				DB5F3EB91C7005C4003DA1C3 /* NtwIntf.m in Sources */,
+				DB881C791C664A4500A2D0EA /* SHKeychainItemWrapper.m in Sources */,
+				DB5F3EE91C726EAD003DA1C3 /* AddFriendViewController.m in Sources */,
+				DB5F3EF01C72C5CA003DA1C3 /* ContactsViewController.m in Sources */,
+				DB5F3EC31C711FA6003DA1C3 /* ShareMgr.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		DB881C411C5F0E4A00A2D0EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		DB881C421C5F0E4A00A2D0EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DB881C441C5F0E4A00A2D0EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		DB881C451C5F0E4A00A2D0EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		DB881C4C1C602DC000A2D0EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		DB881C4D1C602DC000A2D0EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DB881C351C5F0E4A00A2D0EA /* Build configuration list for PBXProject "sharing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB881C411C5F0E4A00A2D0EA /* Debug */,
+				DB881C421C5F0E4A00A2D0EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DB881C431C5F0E4A00A2D0EA /* Build configuration list for PBXNativeTarget "sharing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB881C441C5F0E4A00A2D0EA /* Debug */,
+				DB881C451C5F0E4A00A2D0EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DB881C4B1C602DC000A2D0EA /* Build configuration list for PBXAggregateTarget "UniversalSharing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB881C4C1C602DC000A2D0EA /* Debug */,
+				DB881C4D1C602DC000A2D0EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DB881C321C5F0E4A00A2D0EA /* Project object */;
+}
