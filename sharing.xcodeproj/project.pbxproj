@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		DB00E5881C8156A400E898F7 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB00E5871C8156A400E898F7 /* HomeViewController.m */; };
 		DB5F3EB91C7005C4003DA1C3 /* NtwIntf.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */; };
 		DB5F3EC31C711FA6003DA1C3 /* ShareMgr.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EC21C711FA6003DA1C3 /* ShareMgr.m */; };
 		DB5F3EC81C713C25003DA1C3 /* MessageDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EC71C713C25003DA1C3 /* MessageDecoder.m */; };
@@ -47,6 +48,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DB00E5861C8156A400E898F7 /* HomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
+		DB00E5871C8156A400E898F7 /* HomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
 		DB5F3EB71C7005C3003DA1C3 /* NtwIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NtwIntf.h; sourceTree = "<group>"; };
 		DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NtwIntf.m; sourceTree = "<group>"; };
 		DB5F3EC11C711F86003DA1C3 /* ShareMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShareMgr.h; sourceTree = "<group>"; };
@@ -108,6 +111,8 @@
 				DB5F3EEA1C726EF7003DA1C3 /* AddFriendViewController.xib */,
 				DB5F3EE41C726E14003DA1C3 /* FriendDetails.h */,
 				DB5F3EE51C726E14003DA1C3 /* FriendDetails.m */,
+				DB00E5861C8156A400E898F7 /* HomeViewController.h */,
+				DB00E5871C8156A400E898F7 /* HomeViewController.m */,
 				DB5F3EC71C713C25003DA1C3 /* MessageDecoder.m */,
 				DB5F3EB71C7005C3003DA1C3 /* NtwIntf.h */,
 				DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */,
@@ -203,6 +208,7 @@
 				DB5F3EE61C726E14003DA1C3 /* FriendDetails.m in Sources */,
 				DB881C401C5F0E4A00A2D0EA /* sharing.m in Sources */,
 				DB881C481C5F896E00A2D0EA /* MessageTranslator.m in Sources */,
+				DB00E5881C8156A400E898F7 /* HomeViewController.m in Sources */,
 				DB5F3EC81C713C25003DA1C3 /* MessageDecoder.m in Sources */,
 				DB5F3EB91C7005C4003DA1C3 /* NtwIntf.m in Sources */,
 				DB881C791C664A4500A2D0EA /* SHKeychainItemWrapper.m in Sources */,
