@@ -32,6 +32,8 @@
 		DB881C401C5F0E4A00A2D0EA /* sharing.m in Sources */ = {isa = PBXBuildFile; fileRef = DB881C3F1C5F0E4A00A2D0EA /* sharing.m */; };
 		DB881C481C5F896E00A2D0EA /* MessageTranslator.m in Sources */ = {isa = PBXBuildFile; fileRef = DB881C471C5F896E00A2D0EA /* MessageTranslator.m */; };
 		DB881C791C664A4500A2D0EA /* SHKeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = DB881C781C664A4500A2D0EA /* SHKeychainItemWrapper.m */; };
+		DBD16B371C976C4700052A03 /* AppShrUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD16B361C976C4700052A03 /* AppShrUtil.m */; };
+		DBD16B3C1C98319700052A03 /* InAppPurchase.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD16B3A1C98319700052A03 /* InAppPurchase.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -71,6 +73,10 @@
 		DB881C491C60285400A2D0EA /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Consts.h; sourceTree = "<group>"; };
 		DB881C771C664A4500A2D0EA /* SHKeychainItemWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHKeychainItemWrapper.h; sourceTree = "<group>"; };
 		DB881C781C664A4500A2D0EA /* SHKeychainItemWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHKeychainItemWrapper.m; sourceTree = "<group>"; };
+		DBD16B351C976C4700052A03 /* AppShrUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppShrUtil.h; sourceTree = "<group>"; };
+		DBD16B361C976C4700052A03 /* AppShrUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppShrUtil.m; sourceTree = "<group>"; };
+		DBD16B3A1C98319700052A03 /* InAppPurchase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InAppPurchase.m; sourceTree = "<group>"; };
+		DBD16B3B1C98319700052A03 /* InAppPurchase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InAppPurchase.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +117,10 @@
 				DB5F3EEA1C726EF7003DA1C3 /* AddFriendViewController.xib */,
 				DB5F3EE41C726E14003DA1C3 /* FriendDetails.h */,
 				DB5F3EE51C726E14003DA1C3 /* FriendDetails.m */,
+				DBD16B351C976C4700052A03 /* AppShrUtil.h */,
+				DBD16B361C976C4700052A03 /* AppShrUtil.m */,
+				DBD16B3A1C98319700052A03 /* InAppPurchase.m */,
+				DBD16B3B1C98319700052A03 /* InAppPurchase.h */,
 				DB00E5861C8156A400E898F7 /* HomeViewController.h */,
 				DB00E5871C8156A400E898F7 /* HomeViewController.m */,
 				DB5F3EC71C713C25003DA1C3 /* MessageDecoder.m */,
@@ -213,6 +223,8 @@
 				DB5F3EB91C7005C4003DA1C3 /* NtwIntf.m in Sources */,
 				DB881C791C664A4500A2D0EA /* SHKeychainItemWrapper.m in Sources */,
 				DB5F3EE91C726EAD003DA1C3 /* AddFriendViewController.m in Sources */,
+				DBD16B371C976C4700052A03 /* AppShrUtil.m in Sources */,
+				DBD16B3C1C98319700052A03 /* InAppPurchase.m in Sources */,
 				DB5F3EF01C72C5CA003DA1C3 /* ContactsViewController.m in Sources */,
 				DB5F3EC31C711FA6003DA1C3 /* ShareMgr.m in Sources */,
 			);
