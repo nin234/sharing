@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "UIKit/UIKit.h"
+#import "ShareMgr.h"
 
 @interface AppShrUtil : NSObject
 
@@ -15,5 +16,8 @@
 
 -(void) setPurchsdTokens:(NSString *)trid;
 -(void) registerForRemoteNotifications;
+-(void) didRegisterForRemoteNotification:(NSData *)deviceToken;
+
+@property (nonatomic, retain) ShareMgr *pShrMgr;
 
 @end

@@ -11,6 +11,7 @@
 @implementation AppShrUtil
 
 @synthesize purchased;
+@synthesize pShrMgr;
 
 -(void) setPurchsdTokens:(NSString *) trid
 {
@@ -44,6 +45,37 @@
     return;
 }
 
+-(void) didRegisterForRemoteNotification:(NSData *)deviceToken
+{
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    NSData *tokenNow = [kvlocal dataForKey:@"NotToken"];
+    NSLog(@"Did register for remote notification with token %@ tokenNow=%@", deviceToken, tokenNow);
+    bool bChange = false;
+    if (tokenNow == nil)
+    {
+        [kvlocal setObject:deviceToken forKey:@"NotToken"];
+        bChange = true;
+    }
+    else
+    {
+        if (![deviceToken isEqualToData:tokenNow])
+        {
+            [kvlocal setObject:deviceToken forKey:@"NotToken"];
+            bChange = true;
+        }
+    }
+    
+    if (bChange && purchased)
+    {
+        NSString *dToken = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+        
+        dToken = [dToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSLog(@"device token %@", dToken);
+        [pShrMgr storeDeviceToken:dToken];
+    }
+
+    return;
+}
 
 
 @end
