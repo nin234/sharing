@@ -12,6 +12,8 @@
 
 @synthesize purchased;
 @synthesize pShrMgr;
+@synthesize window;
+@synthesize tabBarController;
 
 -(void) setPurchsdTokens:(NSString *) trid
 {
@@ -44,6 +46,14 @@
     [[UIApplication sharedApplication] registerForRemoteNotifications];
     return;
 }
+
+-(void) showShareView
+{
+    
+    [self.window setRootViewController:self.tabBarController];
+    return;
+}
+
 
 -(void) didRegisterForRemoteNotification:(NSData *)deviceToken
 {
