@@ -8,12 +8,15 @@
 
 #import "AppShrUtil.h"
 
+
 @implementation AppShrUtil
 
 @synthesize purchased;
 @synthesize pShrMgr;
 @synthesize window;
 @synthesize tabBarController;
+@synthesize navViewController;
+@synthesize selFrndCntrl;
 
 -(void) setPurchsdTokens:(NSString *) trid
 {
@@ -29,6 +32,11 @@
     if (self)
     {
         purchased = false;
+        NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+        BOOL purch = [kvlocal boolForKey:@"Purchased"];
+        if (purch == YES)
+            purchased = true;
+
     }
     return nil;
 }
@@ -85,6 +93,32 @@
     }
 
     return;
+}
+
+-(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl
+{
+   tabBarController = [[UITabBarController alloc] init];
+    HomeViewController *homeCntrl = [[HomeViewController alloc] init];
+    [homeCntrl setDelegate:self];
+    UIImage *imageHome = [UIImage imageNamed:@"802-dog-house@2x.png"];
+    UIImage *imageHomeSel = [UIImage imageNamed:@"895-dog-house-selected@2x.png"];
+    homeCntrl.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:imageHome selectedImage:imageHomeSel];
+    selFrndCntrl = [[ContactsViewController alloc] initWithNibName:nil bundle:nil];
+    selFrndCntrl.pShrMgr = pShrMgr;
+
+    selFrndCntrl.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemContacts tag:0];
+    UINavigationController *selFrndNavCntrl = [[UINavigationController alloc] initWithRootViewController:selFrndCntrl];
+    
+    NSArray* controllers = [NSArray arrayWithObjects:mainVwNavCntrl, selFrndNavCntrl, homeCntrl, nil];
+    
+    tabBarController.viewControllers = controllers;
+    return;
+}
+
+-(void) switchRootView
+{
+    [self.window setRootViewController:self.navViewController];
+    tabBarController.selectedIndex = 0;
 }
 
 

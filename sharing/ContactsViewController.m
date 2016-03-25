@@ -24,6 +24,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 @synthesize friendList;
 @synthesize bModeShare;
 @synthesize pShrMgr;
+@synthesize delegate;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -138,7 +139,29 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 
 -(void) shareNow
 {
+    NSString *shareStr = [[NSString alloc] init];
+    NSUInteger cnt = [frndDic count];
+    bool bFnd = false;
+    for (NSUInteger i=0; i < cnt ; ++i)
+    {
+        NSNumber *numbr = [seletedItems objectAtIndex:i];
+        if ([numbr boolValue] == YES)
+        {
+            FriendDetails *frnd = [rownoFrndDetail objectForKey:[NSNumber numberWithUnsignedInteger:i]];
+            if (frnd != nil)
+            {
+                shareStr = [shareStr stringByAppendingString:frnd.name];
+                shareStr = [shareStr stringByAppendingString:@";"];
+                bFnd = true;
+            }
+        }
+        
+    }
     
+    if (!bFnd)
+        return;
+    [delegate shareNow:shareStr];
+    return;
 }
 
 
