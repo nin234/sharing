@@ -95,7 +95,7 @@
     return;
 }
 
--(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl
+-(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl ContactsDelegate:(id)delegate
 {
    tabBarController = [[UITabBarController alloc] init];
     HomeViewController *homeCntrl = [[HomeViewController alloc] init];
@@ -105,7 +105,7 @@
     homeCntrl.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:imageHome selectedImage:imageHomeSel];
     selFrndCntrl = [[ContactsViewController alloc] initWithNibName:nil bundle:nil];
     selFrndCntrl.pShrMgr = pShrMgr;
-
+    selFrndCntrl.delegate = delegate;
     selFrndCntrl.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemContacts tag:0];
     UINavigationController *selFrndNavCntrl = [[UINavigationController alloc] initWithRootViewController:selFrndCntrl];
     

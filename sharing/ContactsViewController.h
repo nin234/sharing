@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "SHKeychainItemWrapper.h"
 
-@protocol ContactViewControllerDelegate <NSObject>
+@protocol ContactsViewControllerDelegate <NSObject>
 
 -(void) shareNow:(NSString *) shareStr;
 
@@ -32,7 +32,7 @@
 @property  (nonatomic, retain) id pShrMgr;
 
 @property (nonatomic, strong) NSMutableDictionary *frndDic;
-@property (nonatomic, weak) id<ContactViewControllerDelegate> delegate;
+@property (nonatomic, weak) id<ContactsViewControllerDelegate> delegate;
 
 -(void) shareNow;
 
