@@ -91,6 +91,33 @@
     return;
 }
 
+-(void) shareItem:(NSString *) list listName:(NSString *)name
+{
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl shareItemMsg:self.share_id shareList:list listName:name msgLen:&len];
+    [self putMsgInQ:pMsgToSend msgLen:len];
+    return;
+}
+
+-(void) archiveItem:(NSString *) item itemName: (NSString *) name
+{
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl archiveItemMsg:self.share_id itemName:name item:item msgLen:&len];
+    [self putMsgInQ:pMsgToSend msgLen:len];
+    return;
+}
+
+-(void) getItems
+{
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
+    [self putMsgInQ:pMsgToSend msgLen:len];
+    return;
+}
+
 
 -(void) putMsgInQ :(char*) pMsgToSend msgLen:(int) len
 {

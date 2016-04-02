@@ -37,5 +37,8 @@
 -(void) storeDeviceToken:(NSString *)token;
 -(void) putMsgInQ :(char*) pMsgToSend msgLen:(int) len;
 - (instancetype)init;
+-(void) shareItem:(NSString *) list listName: (NSString *) name;
+-(void) archiveItem:(NSString *) item itemName: (NSString *) name;
+-(void) getItems;
 
 @end

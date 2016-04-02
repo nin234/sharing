@@ -12,6 +12,12 @@
 
 @implementation MessageTranslator
 
+
+-(char *) getItems:(long long)shareId msgLen:(int *)len
+{
+    return [self getItems:shareId msgLen:len msgId:GET_ITEMS];
+}
+
 -(char *) getItems:(long long)shareId msgLen:(int *)len msgId:(int)msgid
 {
     NSUUID *devId = [[UIDevice currentDevice] identifierForVendor];
@@ -99,6 +105,51 @@
     
 }
 
+-(char *) shareItemMsg:(long long) shareId shareList: (NSString *) shareLst listName:(NSString *)name msgLen:(int *)len
+{
+    int nameLen = (int)[name length] + 1;
+    int listLen = (int) [shareLst length] +1;
+    int msglen = 4*sizeof(int) + nameLen + listLen + sizeof(long long);
+    *len = msglen;
+    int shareListMsgId = SHARE_ITEM_MSG;
+    char *pStoreLst = (char *)malloc(msglen);
+    memcpy(pStoreLst, &msglen, sizeof(int));
+    memcpy(pStoreLst+sizeof(int), &shareListMsgId, sizeof(int));
+    memcpy(pStoreLst + 2*sizeof(int), &shareId, sizeof(long long));
+    int namelenoffset = 2*sizeof(int) + sizeof(long long);
+    memcpy(pStoreLst+ namelenoffset, &nameLen, sizeof(int));
+    int listlenoffset = namelenoffset+sizeof(int);
+    memcpy(pStoreLst+listlenoffset, &listLen, sizeof(int));
+    int nameoffset = listlenoffset + sizeof(int);
+    [name getCString:(pStoreLst+nameoffset) maxLength:nameLen encoding:NSASCIIStringEncoding];
+    int shareoff = nameoffset+nameLen;
+    [shareLst getCString:(pStoreLst+shareoff) maxLength:listLen encoding:NSASCIIStringEncoding];
+    return pStoreLst;
+}
+
+-(char *) archiveItemMsg:(long long) shareId  itemName:(NSString *)name item:(NSString*) storeLst msgLen:(int *) len
+{
+    if (!shareId)
+        return NULL;
+        int storeLen = (int)[storeLst length] + 1;
+    int msglen = storeLen + 2*sizeof(int) + sizeof(long long);
+    char *pStoreLst = (char *)malloc(msglen);
+    memcpy(pStoreLst, &msglen, sizeof(int));
+    int storeLstMsgId = ARCHIVE_ITEM_MSG;
+    memcpy(pStoreLst + sizeof(int), &storeLstMsgId, sizeof(int));
+    memcpy(pStoreLst + 2*sizeof(int), &shareId, sizeof(long long));
+    int nameLen = (int)[name length];
+    int nameoffset = 2*sizeof(int)+sizeof(long long);
+    memcpy(pStoreLst + nameoffset, &nameLen, sizeof(int));
+    int templLstLen = (int)([storeLst length] - nameLen);
+    int storelenoffset = 3*sizeof(int)+sizeof(long long);
+    memcpy(pStoreLst + storelenoffset, &templLstLen, sizeof(int));
+    int storelstoffset = 4*sizeof(int)+sizeof(long long);
+    [storeLst getCString:(pStoreLst + storelstoffset) maxLength:storeLen encoding:NSASCIIStringEncoding];
+    *len = msglen;
+    return pStoreLst;
+    
+}
 
 
 @end
