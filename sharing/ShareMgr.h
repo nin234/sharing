@@ -17,10 +17,14 @@
 @interface ShareMgr : NSThread<UIAlertViewDelegate>
 {
     NSCondition *dataToSend;
-    char *pMsgsToSend[BUFFER_BOUND];
-    int lenMsgsToSend[BUFFER_BOUND];
+    NSData *pMsgsToSend[BUFFER_BOUND];
+    NSURL *pImgsToSend[BUFFER_BOUND];
+    bool upOrDown[BUFFER_BOUND];
     int sendIndx;
     int insrtIndx;
+    int picIndx;
+    int picInsrtIndx;
+    int waitTime;
 }
 
 @property (nonatomic) long long share_id;
@@ -36,9 +40,12 @@
 -(void) updateFriendList;
 -(void) storeDeviceToken:(NSString *)token;
 -(void) putMsgInQ :(char*) pMsgToSend msgLen:(int) len;
+-(void) putPicInQ :(NSURL *)pPicToSend;
 - (instancetype)init;
 -(void) shareItem:(NSString *) list listName: (NSString *) name;
 -(void) archiveItem:(NSString *) item itemName: (NSString *) name;
+
+-(void) sharePicture:(NSURL *)picUrl;
 -(void) getItems;
 
 @end

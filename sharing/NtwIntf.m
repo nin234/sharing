@@ -9,6 +9,8 @@
 #import "NtwIntf.h"
 
 @implementation NtwIntf
+@synthesize connectAddr;
+@synthesize connectPort;
 
 -(instancetype) init
 {
@@ -18,7 +20,7 @@
     return self;
 }
 
--(bool) sendMsg:(const char *)pMsg length:(int) len
+-(bool) sendMsg:(NSData *)pMsg
 {
     if (!isConnected)
     {
@@ -28,10 +30,12 @@
             return false;
         }
     }
+    NSUInteger len = [pMsg length];
     
-    if (write(cfd, pMsg, len) != len)
+    if (write(cfd, [pMsg bytes], len) != len)
     {
         NSLog(@"Failed to send message to server");
+        close(cfd);
         return false;
     }
     NSLog(@"Send message to server");
@@ -43,7 +47,8 @@
 
 -(bool) getResp:(char*) buffer buflen:(int)blen msglen:(ssize_t*)len
 {
-    
+   if (!isConnected)
+       return false;
     *len = recvfrom(cfd, buffer, blen, 0, NULL, NULL);
     if (*len >0)
         return true;
@@ -67,7 +72,12 @@
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_NUMERICSERV;
-    int ret = getaddrinfo("easygroclist.ddns.net", "16791", &hints, &result);
+    
+    char conaddr[256];
+    [connectAddr getCString:conaddr maxLength:256 encoding:NSASCIIStringEncoding];
+    char conport[128];
+    [connectPort getCString:conport maxLength:128 encoding:NSASCIIStringEncoding];
+    int ret = getaddrinfo(conaddr, conport, &hints, &result);
     if ( ret)
     {
         NSLog(@"getaddrinfo failed %s", gai_strerror(ret));
@@ -83,13 +93,25 @@
         }
         close(cfd);
     }
-    
-    if (rp == NULL)
+        if (rp == NULL)
     {
         NSLog(@"Could not connect socket to any address");
         return false;
     }
-    
+    int flags = fcntl(cfd, F_GETFL, 0);
+    if (flags <0)
+    {
+        NSLog(@"Could not get flags for socket");
+        close(cfd);
+        return false;
+    }
+    flags |= O_NONBLOCK;
+    if (fcntl(cfd, F_SETFL, flags) == -1)
+    {
+        NSLog(@"Setting non blocking mode for socket failed");
+        return false;
+    }
+
     isConnected = true;
     return true;
     

@@ -100,6 +100,13 @@
     return;
 }
 
+
+-(void) sharePicture:(NSURL *)picUrl
+{
+    [self putPicInQ:picUrl];
+    return;
+}
+
 -(void) archiveItem:(NSString *) item itemName: (NSString *) name
 {
     char *pMsgToSend = NULL;
@@ -118,6 +125,20 @@
     return;
 }
 
+-(void) putPicInQ:(NSURL *)pPicToSend
+{
+    if (pPicToSend)
+    {
+        [dataToSend lock];
+        ++picInsrtIndx;
+        if (picInsrtIndx == BUFFER_BOUND)
+            picInsrtIndx =0;
+        pImgsToSend[picInsrtIndx] = pPicToSend;
+        [dataToSend signal];
+        [dataToSend unlock];
+    }
+    return;
+}
 
 -(void) putMsgInQ :(char*) pMsgToSend msgLen:(int) len
 {
@@ -127,8 +148,8 @@
         ++insrtIndx;
         if (insrtIndx == BUFFER_BOUND)
             insrtIndx =0;
-        pMsgsToSend[insrtIndx] = pMsgToSend;
-        lenMsgsToSend[insrtIndx] = len;
+        pMsgsToSend[insrtIndx] = [NSData dataWithBytes:pMsgToSend length:len];
+        free(pMsgToSend);
         [dataToSend signal];
         [dataToSend unlock];
     }
@@ -145,6 +166,11 @@
         
         sendIndx =0;
         insrtIndx =0;
+        picIndx =0;
+        picInsrtIndx =0;
+        waitTime = 5;
+        for (int i=0; i < BUFFER_BOUND; ++i)
+            upOrDown[i] = false;
         
         kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
         
@@ -164,43 +190,57 @@
 
 -(void) main
 {
+    NSData *pMsgToSend;
+    NSURL *pImgToSend;
     for(;;)
     {
         [dataToSend lock];
-        
-        [dataToSend wait];
-        
-        [dataToSend unlock];
-        
-        if(sendIndx == insrtIndx)
-            continue;
-        while (sendIndx != insrtIndx)
+        pMsgToSend = NULL;
+        pImgToSend = NULL;
+        if (sendIndx == insrtIndx || picIndx == picInsrtIndx)
         {
-            ++sendIndx;
-            if (sendIndx == BUFFER_BOUND)
-                sendIndx = 0;
-            [self sendMsgAndProcessResponse];
+            // NSLog(@"Waiting for work\n");
+            NSDate *checkTime = [NSDate dateWithTimeIntervalSinceNow:waitTime];
+            [dataToSend waitUntilDate:checkTime];
         }
+        if (sendIndx != insrtIndx)
+        {
+            pMsgToSend = pMsgsToSend[sendIndx];
+            ++sendIndx;
+        }
+        
+        if (picIndx != picInsrtIndx)
+        {
+            pImgToSend = pImgsToSend[picIndx];
+            ++picIndx;
+        }
+        [dataToSend unlock];
+        if (pMsgToSend)
+            [self sendMsg:pMsgToSend];
+        if (pImgToSend)
+            [self sendPic:pImgToSend];
+        [self processResponse];
     }
     
     return;
 }
 
--(void) sendMsgAndProcessResponse
+-(void) sendPic :(NSURL *)picUrl
 {
-    if (![pNtwIntf sendMsg:pMsgsToSend[sendIndx] length:lenMsgsToSend[sendIndx]])
-    {
-        sendIndx = insrtIndx;
-        dispatch_async(dispatch_get_main_queue(),
-                       ^{
-                           UIAlertView *pAvw = [[UIAlertView alloc] initWithTitle:@"Share Failed" message:@"Failed to share item, try again later" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                           [pAvw show];
-                           
-                       });
-        
-    }
-    else
-    {
+    char *pMsgToSend = NULL;
+    int len =0;
+    NSArray *pathcomps = [picUrl pathComponents];
+    NSString *picName = [pathcomps lastObject];
+    NSData *picData = [NSData dataWithContentsOfURL:picUrl];
+    [self.pTransl sharePicMetaDataMsg:self.share_id name:picName picLength:[picData length] msgLen:&len];
+    [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len]];
+    [self sendMsg:picData];
+ 
+    return;
+}
+
+-(void) processResponse
+{
     ssize_t len;
     char rcvbuf[RCV_BUF_LEN];
     bool more = true;
@@ -215,9 +255,23 @@
             break;
         }
     }
-    
- }
+
+}
+
+-(void) sendMsg:(NSData *)pMsg
+{
+    if (![pNtwIntf sendMsg:pMsg])
+    {
         
+        dispatch_async(dispatch_get_main_queue(),
+                       ^{
+                           UIAlertView *pAvw = [[UIAlertView alloc] initWithTitle:@"Share Failed" message:@"Failed to share/download item, try again later" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                           [pAvw show];
+                           
+                       });
+        
+    }
+    
     //char *pMsg =
     return;
 }

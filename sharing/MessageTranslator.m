@@ -18,6 +18,7 @@
     return [self getItems:shareId msgLen:len msgId:GET_ITEMS];
 }
 
+
 -(char *) getItems:(long long)shareId msgLen:(int *)len msgId:(int)msgid
 {
     NSUUID *devId = [[UIDevice currentDevice] identifierForVendor];
@@ -73,7 +74,7 @@
     int msglen = devTknLen + devIdLen + 16;
     char *pGetIdMsg = (char *)malloc(msglen);
     memcpy(pGetIdMsg, &msglen, sizeof(int));
-    int storeDevTknMsgId = STORE_EASYGROC_DEVICE_TKN_MSG;
+    int storeDevTknMsgId = STORE_DEVICE_TKN_MSG;
     memcpy(pGetIdMsg+4, &storeDevTknMsgId, sizeof(int));
     memcpy(pGetIdMsg+8, &shareId, sizeof(long long));
     [token getCString:(pGetIdMsg+16) maxLength:devTknLen encoding:NSASCIIStringEncoding];
@@ -103,6 +104,26 @@
     *len = msglen;
     return pStoreFrndMsg;
     
+}
+
+-(char *) sharePicMetaDataMsg:(long long) shareId name:(NSString *)picName picLength:(NSUInteger) length msgLen:(int *)len
+{
+    int nameLen = (int)[picName length] + 1;
+    int msglen = 4*sizeof(int) + nameLen  + sizeof(long long);
+    *len = msglen;
+    msglen += length;
+    int sharePicMetaMsgId = PIC_METADATA_MSG;
+    char *pStoreMsg = (char *)malloc(msglen);
+    memcpy(pStoreMsg, &msglen, sizeof(int));
+    memcpy(pStoreMsg+sizeof(int), &sharePicMetaMsgId, sizeof(int));
+    memcpy(pStoreMsg + 2*sizeof(int), &shareId, sizeof(long long));
+    int namelenoffset = 2*sizeof(int) + sizeof(long long);
+    memcpy(pStoreMsg+ namelenoffset, &nameLen, sizeof(int));
+    
+    int nameoffset = namelenoffset + sizeof(int);
+    [picName getCString:(pStoreMsg+nameoffset) maxLength:nameLen encoding:NSASCIIStringEncoding];
+        return pStoreMsg;
+
 }
 
 -(char *) shareItemMsg:(long long) shareId shareList: (NSString *) shareLst listName:(NSString *)name msgLen:(int *)len

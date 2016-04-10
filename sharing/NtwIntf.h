@@ -19,8 +19,10 @@
 }
 
 -(instancetype) init;
+@property (nonatomic, retain) NSString *connectAddr;
+@property (nonatomic, retain) NSString *connectPort;
 
--(bool) sendMsg:(const char *)pMsg length:(int) len;
+-(bool) sendMsg:(NSData *)pMsg;
 -(bool) connect;
 -(void) disconnect;
 -(bool) getResp:(char*) buffer buflen:(int) blen msglen:(ssize_t*)len;
