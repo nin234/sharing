@@ -19,6 +19,7 @@
     NSCondition *dataToSend;
     NSData *pMsgsToSend[BUFFER_BOUND];
     NSURL *pImgsToSend[BUFFER_BOUND];
+    NSString *pImgsMetaData[BUFFER_BOUND];
     bool upOrDown[BUFFER_BOUND];
     int sendIndx;
     int insrtIndx;
@@ -40,12 +41,12 @@
 -(void) updateFriendList;
 -(void) storeDeviceToken:(NSString *)token;
 -(void) putMsgInQ :(char*) pMsgToSend msgLen:(int) len;
--(void) putPicInQ :(NSURL *)pPicToSend;
+-(void) putPicInQ :(NSURL *)pPicToSend metaStr:(NSString *) picMetaStr;
 - (instancetype)init;
 -(void) shareItem:(NSString *) list listName: (NSString *) name;
 -(void) archiveItem:(NSString *) item itemName: (NSString *) name;
 
--(void) sharePicture:(NSURL *)picUrl;
+-(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr;
 -(void) getItems;
 
 @end

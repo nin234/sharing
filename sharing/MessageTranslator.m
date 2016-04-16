@@ -106,12 +106,13 @@
     
 }
 
--(char *) sharePicMetaDataMsg:(long long) shareId name:(NSString *)picName picLength:(NSUInteger) length msgLen:(int *)len
+-(char *) sharePicMetaDataMsg:(long long) shareId name:(NSString *)picName picLength:(NSUInteger) length metaStr:(NSString *)picMetaStr msgLen:(int *)len
 {
     int nameLen = (int)[picName length] + 1;
-    int msglen = 4*sizeof(int) + nameLen  + sizeof(long long);
+    int metaStrLen = (int)[picMetaStr length]+ 1;
+    int msglen = 5*sizeof(int) + nameLen  + sizeof(long long) + metaStrLen;
     *len = msglen;
-    msglen += length;
+    
     int sharePicMetaMsgId = PIC_METADATA_MSG;
     char *pStoreMsg = (char *)malloc(msglen);
     memcpy(pStoreMsg, &msglen, sizeof(int));
@@ -122,6 +123,13 @@
     
     int nameoffset = namelenoffset + sizeof(int);
     [picName getCString:(pStoreMsg+nameoffset) maxLength:nameLen encoding:NSASCIIStringEncoding];
+    int lenghtoffset = nameoffset + nameLen;
+    int piclen = (int) length;
+    memcpy(pStoreMsg + lenghtoffset, &piclen, sizeof(int));
+    int metastrlenoffset = lenghtoffset + sizeof(int);
+    memcpy(pStoreMsg + metastrlenoffset, &metaStrLen, sizeof(int));
+    int metastroffset = metastrlenoffset+sizeof(int);
+     [picMetaStr getCString:(pStoreMsg+metastroffset) maxLength:metaStrLen encoding:NSASCIIStringEncoding];
         return pStoreMsg;
 
 }

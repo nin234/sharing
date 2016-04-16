@@ -101,9 +101,9 @@
 }
 
 
--(void) sharePicture:(NSURL *)picUrl
+-(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr
 {
-    [self putPicInQ:picUrl];
+    [self putPicInQ:picUrl metaStr:picMetaStr];
     return;
 }
 
@@ -125,7 +125,7 @@
     return;
 }
 
--(void) putPicInQ:(NSURL *)pPicToSend
+-(void) putPicInQ:(NSURL *)pPicToSend metaStr:(NSString *)picMetaStr
 {
     if (pPicToSend)
     {
@@ -134,6 +134,7 @@
         if (picInsrtIndx == BUFFER_BOUND)
             picInsrtIndx =0;
         pImgsToSend[picInsrtIndx] = pPicToSend;
+        pImgsMetaData[picInsrtIndx] = picMetaStr;
         [dataToSend signal];
         [dataToSend unlock];
     }
@@ -192,11 +193,13 @@
 {
     NSData *pMsgToSend;
     NSURL *pImgToSend;
+    NSString *pImgMetaData;
     for(;;)
     {
         [dataToSend lock];
         pMsgToSend = NULL;
         pImgToSend = NULL;
+        pImgMetaData = NULL;
         if (sendIndx == insrtIndx || picIndx == picInsrtIndx)
         {
             // NSLog(@"Waiting for work\n");
@@ -212,28 +215,32 @@
         if (picIndx != picInsrtIndx)
         {
             pImgToSend = pImgsToSend[picIndx];
+            pImgMetaData = pImgsMetaData[picIndx];
             ++picIndx;
         }
         [dataToSend unlock];
         if (pMsgToSend)
             [self sendMsg:pMsgToSend];
         if (pImgToSend)
-            [self sendPic:pImgToSend];
+        {
+            [self sendPic:pImgToSend metaStr:pImgMetaData];
+        }
         [self processResponse];
     }
     
     return;
 }
 
--(void) sendPic :(NSURL *)picUrl
+-(void) sendPic :(NSURL *)picUrl metaStr:(NSString *)picMetaStr
 {
     char *pMsgToSend = NULL;
     int len =0;
     NSArray *pathcomps = [picUrl pathComponents];
     NSString *picName = [pathcomps lastObject];
     NSData *picData = [NSData dataWithContentsOfURL:picUrl];
-    [self.pTransl sharePicMetaDataMsg:self.share_id name:picName picLength:[picData length] msgLen:&len];
+    [self.pTransl sharePicMetaDataMsg:self.share_id name:picName picLength:[picData length]  metaStr:picMetaStr msgLen:&len];
     [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len]];
+    free(pMsgToSend);
     [self sendMsg:picData];
  
     return;

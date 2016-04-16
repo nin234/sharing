@@ -18,7 +18,7 @@
 -(char *) updateFriendListRequest: (long long) shareId  msgLen :(int *) len;
 -(char *) getItems:(long long) shareId msgLen:(int *)len msgId:(int) msgid;
 -(char *) shareItemMsg:(long long) shareId shareList:(NSString *) shareLst  listName: (NSString* ) name msgLen:(int *)len;
--(char *) sharePicMetaDataMsg:(long long) shareId name:(NSString *)picName picLength:(NSUInteger) length msgLen:(int *)len;
+-(char *) sharePicMetaDataMsg:(long long) shareId name:(NSString *)picName picLength:(NSUInteger) length metaStr:(NSString* ) picMetaStr msgLen:(int *)len;
 
 -(char *) archiveItemMsg:(long long) shareId  itemName:(NSString *)name item:(NSString*) storeLst msgLen:(int *) len;
 -(char *) getItems:(long long) shareId msgLen:(int *)len;
