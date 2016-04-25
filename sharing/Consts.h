@@ -28,10 +28,11 @@
 #define STORE_DEVICE_TKN_MSG 11
 #define STORE_DEVICE_TKN_RPLY_MSG 12
 #define GET_ITEMS 13
-#define PIC_METADATA_MSG 14
-#define PIC_METADATA_RPLY_MSG 15
-#define PIC_MSG 16
-#define PIC_RPLY_MSG 17
+#define GET_ITEMS_RPLY_MSG 14
+#define PIC_METADATA_MSG 15
+#define PIC_METADATA_RPLY_MSG 16
+#define PIC_MSG 17
+#define PIC_RPLY_MSG 18
 
 
 #endif /* Consts_h */
