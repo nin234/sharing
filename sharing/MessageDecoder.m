@@ -180,13 +180,16 @@
         }
         break;
             
+            
         default:
-            bRet = false;
+            bRet = true;
             break;
     }
     
     return bRet;
 }
+
+
 
 -(bool) processStoreIdMessage:(char *)buffer msglen:(ssize_t)mlen
 {

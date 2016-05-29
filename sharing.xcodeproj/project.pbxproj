@@ -109,7 +109,6 @@
 		DB881C3C1C5F0E4A00A2D0EA /* sharing */ = {
 			isa = PBXGroup;
 			children = (
-				DB5F3EC61C713C25003DA1C3 /* MessageDecoder.h */,
 				DB5F3EE71C726EAD003DA1C3 /* AddFriendViewController.h */,
 				DB5F3EEE1C72C5CA003DA1C3 /* ContactsViewController.m */,
 				DB5F3EEF1C72C5CA003DA1C3 /* ContactsViewController.h */,
@@ -123,6 +122,7 @@
 				DBD16B3B1C98319700052A03 /* InAppPurchase.h */,
 				DB00E5861C8156A400E898F7 /* HomeViewController.h */,
 				DB00E5871C8156A400E898F7 /* HomeViewController.m */,
+				DB5F3EC61C713C25003DA1C3 /* MessageDecoder.h */,
 				DB5F3EC71C713C25003DA1C3 /* MessageDecoder.m */,
 				DB5F3EB71C7005C3003DA1C3 /* NtwIntf.h */,
 				DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */,
