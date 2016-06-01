@@ -18,6 +18,7 @@
 @synthesize pNtwIntf;
 @synthesize pTransl;
 @synthesize pDecoder;
+@synthesize shrMgrDelegate;
 
 
 -(void) storeDeviceToken:(NSString *)token
@@ -235,16 +236,56 @@
 {
     char *pMsgToSend = NULL;
     int len =0;
-    NSArray *pathcomps = [picUrl pathComponents];
-    NSString *picName = [pathcomps lastObject];
+    
     NSData *picData = [NSData dataWithContentsOfURL:picUrl];
-    [self.pTransl sharePicMetaDataMsg:self.share_id name:picName picLength:[picData length]  metaStr:picMetaStr msgLen:&len];
+   
+    pMsgToSend = [self.pTransl sharePicMetaDataMsg:self.share_id name:picUrl picLength:[picData length]  metaStr:picMetaStr msgLen:&len];
     [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len]];
     free(pMsgToSend);
     [self sendMsg:picData];
  
     return;
 }
+
+-(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName picLen:(long long) len
+{
+    
+    picSaveUrl  = [shrMgrDelegate getPicUrl:shareId picName:name itemName:iName];
+    picLen = len;
+    picSoFar = 0;
+    if (picSaveUrl == nil)
+    {
+        NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@", name, iName);
+        return;
+    }
+    NSError *error;
+    pFilHdl = [NSFileHandle fileHandleForWritingToURL:picSaveUrl error:&error];
+    if (pFilHdl == nil)
+        NSLog(@"Cannot open file handle for url=%@ , error=%@", picSaveUrl, error);
+    return;
+}
+
+-(void) storePicData:(NSData *)picData
+{
+    if(pFilHdl != nil)
+    {
+        [pFilHdl seekToEndOfFile];
+        [pFilHdl writeData:picData];
+        picSoFar += [picData length];
+        if (picSoFar >= picLen)
+        {
+            NSLog(@"Closing file descriptor as Image transfer complete ");
+            [pFilHdl closeFile];
+            pFilHdl = nil;
+            picSoFar =0;
+            picLen = 0;
+            
+        }
+        
+    }
+    return;
+}
+
 
 -(void) processResponse
 {

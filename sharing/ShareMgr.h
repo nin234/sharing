@@ -13,9 +13,15 @@
 #import "MessageDecoder.h"
 #include "Consts.h"
 
+@protocol ShareMgrDelegate <NSObject>
+
+-(NSURL *) getPicUrl:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName;
+
+@end
 
 @interface ShareMgr : NSThread<UIAlertViewDelegate>
 {
+    
     NSCondition *dataToSend;
     NSData *pMsgsToSend[BUFFER_BOUND];
     NSURL *pImgsToSend[BUFFER_BOUND];
@@ -26,6 +32,11 @@
     int picIndx;
     int picInsrtIndx;
     int waitTime;
+    NSURL *picSaveUrl;
+    long long picLen;
+    long long picSoFar;
+    NSFileHandle *pFilHdl;
+
 }
 
 @property (nonatomic) long long share_id;
@@ -35,6 +46,7 @@
 @property  (nonatomic, retain) id pTransl;
 @property (nonatomic, retain) id pDecoder;
 
+@property (nonatomic, weak) id<ShareMgrDelegate> shrMgrDelegate;
 
 -(void) getIdIfRequired;
 -(void) storedTrndIdInCloud;
@@ -48,5 +60,8 @@
 
 -(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr;
 -(void) getItems;
+-(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName picLen:(long long) len;
+-(void) storePicData:(NSData *)picData;
+
 
 @end

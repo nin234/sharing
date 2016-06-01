@@ -160,6 +160,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     
     if (!bFnd)
         return;
+    
     [delegate shareNow:shareStr];
     return;
 }

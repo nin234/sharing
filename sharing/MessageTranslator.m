@@ -106,10 +106,24 @@
     
 }
 
--(char *) sharePicMetaDataMsg:(long long) shareId name:(NSString *)picName picLength:(NSUInteger) length metaStr:(NSString *)picMetaStr msgLen:(int *)len
+-(char *) sharePicMetaDataMsg:(long long) shareId name:(NSURL *)picUrl picLength:(NSUInteger) length metaStr:(NSString *)picMetaStr msgLen:(int *)len
 {
+    NSArray *pathcomps = [picUrl pathComponents];
+    NSString *picName = [pathcomps lastObject];
+    NSArray *pArr = [picMetaStr componentsSeparatedByString:@";"];
+    NSUInteger cnt = [pArr count];
+    NSString *objName = [pArr objectAtIndex:cnt-1];
+    NSString *picMetaStr1 = [[NSString alloc] init];
+    for (NSUInteger i=0; i < cnt-1; ++i)
+    {
+        picMetaStr1 = [picMetaStr1 stringByAppendingString:[pArr objectAtIndex:i]];
+        picMetaStr1 = [picMetaStr1 stringByAppendingString:@";"];
+    }
+    picName = [picName stringByAppendingString:@";"];
+    picName = [picName stringByAppendingString:objName];
+    
     int nameLen = (int)[picName length] + 1;
-    int metaStrLen = (int)[picMetaStr length]+ 1;
+    int metaStrLen = (int)[picMetaStr1 length]+ 1;
     int msglen = 5*sizeof(int) + nameLen  + sizeof(long long) + metaStrLen;
     *len = msglen;
     
@@ -129,7 +143,7 @@
     int metastrlenoffset = lenghtoffset + sizeof(int);
     memcpy(pStoreMsg + metastrlenoffset, &metaStrLen, sizeof(int));
     int metastroffset = metastrlenoffset+sizeof(int);
-     [picMetaStr getCString:(pStoreMsg+metastroffset) maxLength:metaStrLen encoding:NSASCIIStringEncoding];
+     [picMetaStr1 getCString:(pStoreMsg+metastroffset) maxLength:metaStrLen encoding:NSASCIIStringEncoding];
         return pStoreMsg;
 
 }

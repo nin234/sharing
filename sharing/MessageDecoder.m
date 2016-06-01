@@ -180,6 +180,18 @@
         }
         break;
             
+        case PIC_METADATA_MSG:
+        {
+            bRet = [self processPicMetaDataMessage:buffer msglen:mlen];
+        }
+            break;
+            
+        case PIC_MSG:
+        {
+            bRet = [self processPicMessage:buffer msglen:mlen];
+        }
+            break;
+
             
         default:
             bRet = true;
@@ -187,6 +199,48 @@
     }
     
     return bRet;
+}
+
+-(bool) processPicMessage:(char *)buffer msglen:(ssize_t)mlen
+{
+    int msgLen;
+    memcpy(buffer, &msgLen, sizeof(int));
+    int header = 2*sizeof(int);
+    msgLen -= 2*sizeof(int);
+    NSData *picDat = [NSData dataWithBytes:buffer + header length:msgLen];
+    
+    [self.pShrMgr storePicData:picDat];
+    return true;
+}
+
+-(bool) processPicMetaDataMessage:(char *)buffer msglen:(ssize_t)mlen
+{
+    
+    long long shareId;
+    memcpy(buffer + 2*sizeof(int), &shareId, sizeof(long long));
+    int picNameLenOffset = 2*sizeof(int) + sizeof(long);
+    int picNameLen;
+    long long picLen;
+    memcpy(buffer+ picNameLenOffset, &picNameLen, sizeof(int));
+    int picNameOffset = picNameLenOffset+sizeof(int);
+    NSString *picNameArr = [NSString stringWithCString:(buffer + picNameOffset) encoding:NSASCIIStringEncoding];
+    int picLenOffset = picNameOffset+picNameLen;
+    memcpy(buffer + picLenOffset, &picLen, sizeof(long long));
+    NSArray *pArr = [picNameArr componentsSeparatedByString:@";"];
+    NSUInteger cnt = [pArr count];
+    if (cnt != 2)
+    {
+        NSLog(@"Invalid picName %@", picNameArr);
+        return false;
+    }
+    NSString *picName = [pArr objectAtIndex:0];
+    NSString  *itemName = [pArr objectAtIndex:1];
+    
+    [self.pShrMgr setPicDetails:shareId picName:picName itemName:itemName picLen:picLen];
+    
+    
+    
+    return true;
 }
 
 

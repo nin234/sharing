@@ -13,7 +13,7 @@
 #define RCV_BUF_LEN 4096
 #define MSG_AGGR_BUF_LEN 8192
 
-
+ #define MAX_BUF 16384
 
 #define GET_SHARE_ID_MSG 1
 #define GET_SHARE_ID_RPLY_MSG 2
