@@ -148,6 +148,33 @@
 
 }
 
+-(NSData *) sharePicMsg:(NSData *) picData dataIndx:(NSUInteger *)indx
+{
+    NSUInteger picLen = [picData length];
+    if (*indx >= picLen)
+        return nil;
+    char buf[MAX_BUF];
+    int msgLen = MAX_BUF;
+    memcpy(buf, &msgLen, sizeof(int));
+    int msgId = PIC_MSG;
+    memcpy(buf+sizeof(int), &msgId, sizeof(int));
+   
+    int spaceInBuf = MAX_BUF - 2*sizeof(int);
+    NSUInteger toSent = picLen - *indx;
+    NSUInteger canSent = spaceInBuf;
+    if (toSent < spaceInBuf)
+        canSent = toSent;
+    NSRange aR;
+    aR.location = *indx;
+    aR.length = canSent;
+    [picData getBytes:buf+2*sizeof(int) range:aR];
+    NSData *pPicDataChunkToSend = [NSData dataWithBytes:buf length:canSent+2*sizeof(int)];
+    
+    *indx += canSent;
+    return pPicDataChunkToSend ;
+    
+}
+
 -(char *) shareItemMsg:(long long) shareId shareList: (NSString *) shareLst listName:(NSString *)name msgLen:(int *)len
 {
     int nameLen = (int)[name length] + 1;

@@ -16,6 +16,7 @@
 @protocol ShareMgrDelegate <NSObject>
 
 -(NSURL *) getPicUrl:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName;
+-(void) storeThumbNailImage:(NSURL *)picUrl;
 
 @end
 

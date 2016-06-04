@@ -242,7 +242,14 @@
     pMsgToSend = [self.pTransl sharePicMetaDataMsg:self.share_id name:picUrl picLength:[picData length]  metaStr:picMetaStr msgLen:&len];
     [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len]];
     free(pMsgToSend);
-    [self sendMsg:picData];
+    NSUInteger indx = 0;
+    for (;;)
+    {
+        NSData *pPicToSend = [pTransl sharePicMsg:picData dataIndx:&indx];
+        if (pPicToSend == nil)
+            break;
+        [self sendMsg:pPicToSend];
+    }
  
     return;
 }
@@ -279,6 +286,7 @@
             pFilHdl = nil;
             picSoFar =0;
             picLen = 0;
+            [shrMgrDelegate storeThumbNailImage:picSaveUrl];
             
         }
         
