@@ -52,11 +52,22 @@
     *len = recvfrom(cfd, buffer, blen, 0, NULL, NULL);
     if (*len >0)
         return true;
-    else
+    else if (*len ==0)
     {
         close(cfd);
         isConnected = false;
         NSLog(@"Failed to receive message %zd %d", *len, errno);
+        return false;
+    }
+    else
+    {
+        if (errno != EAGAIN)
+        {
+            close(cfd);
+            isConnected = false;
+            NSLog(@"Failed to receive message %zd %d", *len, errno);
+        }
+        
         return false;
     }
     return true;

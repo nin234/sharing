@@ -66,8 +66,8 @@
                 break;
             memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, len-bufIndx);
             [self decodeMessage:aggrbuf msglen:len];
-            bufIndx =0;
             remaining -= len - bufIndx;
+            bufIndx =0;
         }
     }
 
@@ -144,6 +144,7 @@
             {
                 bMore = true;
                 memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, remaining);
+                bufIndx += remaining;
             }
             else
             {
@@ -217,15 +218,15 @@
 {
     
     long long shareId;
-    memcpy(buffer + 2*sizeof(int), &shareId, sizeof(long long));
+    memcpy(&shareId,  buffer + 2*sizeof(int), sizeof(long long));
     int picNameLenOffset = 2*sizeof(int) + sizeof(long);
     int picNameLen;
     long long picLen;
-    memcpy(buffer+ picNameLenOffset, &picNameLen, sizeof(int));
+    memcpy(&picNameLen, buffer+ picNameLenOffset,  sizeof(int));
     int picNameOffset = picNameLenOffset+sizeof(int);
     NSString *picNameArr = [NSString stringWithCString:(buffer + picNameOffset) encoding:NSASCIIStringEncoding];
     int picLenOffset = picNameOffset+picNameLen;
-    memcpy(buffer + picLenOffset, &picLen, sizeof(long long));
+    memcpy(&picLen, buffer + picLenOffset, sizeof(long long));
     NSArray *pArr = [picNameArr componentsSeparatedByString:@";"];
     NSUInteger cnt = [pArr count];
     if (cnt != 2)

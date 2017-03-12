@@ -10,8 +10,8 @@
 #define Consts_h
 
 #define BUFFER_BOUND 100
-#define RCV_BUF_LEN 4096
-#define MSG_AGGR_BUF_LEN 8192
+#define RCV_BUF_LEN 16384
+#define MSG_AGGR_BUF_LEN 32768
 
  #define MAX_BUF 16384
 

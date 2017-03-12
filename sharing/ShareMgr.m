@@ -56,6 +56,7 @@
 {
     char *pMsgToSend = NULL;
     int len =0;
+    /*
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
     
     NSString *transactionId = [kvlocal objectForKey:@"TransactionId"];
@@ -77,6 +78,12 @@
     else
     {
                 pMsgToSend = [pTransl createIdRequest:transactionId msgLen:&len];
+    }
+     */
+    
+    if (!share_id)
+    {
+        pMsgToSend = [pTransl createIdRequest:@"1000" msgLen:&len];
     }
     
     [self putMsgInQ:pMsgToSend msgLen:len];
