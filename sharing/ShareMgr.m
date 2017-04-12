@@ -108,6 +108,14 @@
     return;
 }
 
+-(void) shareTemplItem:(NSString *) list listName: (NSString *) name
+{
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl shareTemplItemMsg:self.share_id shareList:list listName:name msgLen:&len];
+    [self putMsgInQ:pMsgToSend msgLen:len];
+}
+
 
 -(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr
 {

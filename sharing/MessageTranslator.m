@@ -175,13 +175,12 @@
     
 }
 
--(char *) shareItemMsg:(long long) shareId shareList: (NSString *) shareLst listName:(NSString *)name msgLen:(int *)len
+-(char *) shareMsg:(long long) shareId shareList:(NSString *) shareLst  listName: (NSString* ) name msgLen:(int *)len msgId:(int) shareListMsgId
 {
     int nameLen = (int)[name length] + 1;
     int listLen = (int) [shareLst length] +1;
     int msglen = 4*sizeof(int) + nameLen + listLen + sizeof(long long);
     *len = msglen;
-    int shareListMsgId = SHARE_ITEM_MSG;
     char *pStoreLst = (char *)malloc(msglen);
     memcpy(pStoreLst, &msglen, sizeof(int));
     memcpy(pStoreLst+sizeof(int), &shareListMsgId, sizeof(int));
@@ -195,6 +194,17 @@
     int shareoff = nameoffset+nameLen;
     [shareLst getCString:(pStoreLst+shareoff) maxLength:listLen encoding:NSASCIIStringEncoding];
     return pStoreLst;
+}
+
+-(char *) shareTemplItemMsg:(long long) shareId shareList:(NSString *) shareLst  listName: (NSString* ) name msgLen:(int *)len
+{
+    return [self shareMsg:shareId shareList:shareLst listName:name msgLen:len msgId:SHARE_TEMPL_ITEM_MSG];
+    
+}
+
+-(char *) shareItemMsg:(long long) shareId shareList: (NSString *) shareLst listName:(NSString *)name msgLen:(int *)len
+{
+    return [self shareMsg:shareId shareList:shareLst listName:name msgLen:len msgId:SHARE_ITEM_MSG];
 }
 
 -(char *) archiveItemMsg:(long long) shareId  itemName:(NSString *)name item:(NSString*) storeLst msgLen:(int *) len

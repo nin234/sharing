@@ -57,6 +57,7 @@
 -(void) putPicInQ :(NSURL *)pPicToSend metaStr:(NSString *) picMetaStr;
 - (instancetype)init;
 -(void) shareItem:(NSString *) list listName: (NSString *) name;
+-(void) shareTemplItem:(NSString *) list listName: (NSString *) name;
 -(void) archiveItem:(NSString *) item itemName: (NSString *) name;
 
 -(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr;

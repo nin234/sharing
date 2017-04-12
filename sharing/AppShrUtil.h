@@ -26,6 +26,7 @@
 -(void) registerForRemoteNotifications;
 -(void) didRegisterForRemoteNotification:(NSData *)deviceToken;
 -(void) showShareView;
+-(void) showTemplShareView;
 -(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl ContactsDelegate:(id)delegate;
 
 

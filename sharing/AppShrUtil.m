@@ -62,6 +62,14 @@
     return;
 }
 
+-(void) showTemplShareView
+{
+    
+    [self.window setRootViewController:self.tabBarController];
+    return;
+}
+
+
 
 -(void) didRegisterForRemoteNotification:(NSData *)deviceToken
 {
