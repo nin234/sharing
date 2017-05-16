@@ -67,8 +67,7 @@
 -(char *) storeDeviceToken: (long long) shareId deviceToken:(NSString *)token msgLen:(int *)len
 {
     int devTknLen = (int) [token length] +1;
-    NSUUID *devId = [[UIDevice currentDevice] identifierForVendor];
-    NSString *devIdStr = [devId UUIDString];
+    NSString *devIdStr = @"ios";
     int devIdLen = (int)[devIdStr length] +1;
     
     int msglen = devTknLen + devIdLen + 16;
