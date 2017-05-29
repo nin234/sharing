@@ -204,7 +204,7 @@
 
 -(bool) processPicMessage:(char *)buffer msglen:(ssize_t)mlen
 {
-    int msgLen;
+    int msgLen=0;
     memcpy(buffer, &msgLen, sizeof(int));
     int header = 2*sizeof(int);
     msgLen -= 2*sizeof(int);
