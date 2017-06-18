@@ -36,7 +36,7 @@
         BOOL purch = [kvlocal boolForKey:@"Purchased"];
         if (purch == YES)
             purchased = true;
-
+        return self;
     }
     return nil;
 }
@@ -57,14 +57,14 @@
 
 -(void) showShareView
 {
-    
+    NSLog(@"showShareView setting tabBarController as the root view controller %s %d", __FILE__, __LINE__);
     [self.window setRootViewController:self.tabBarController];
     return;
 }
 
 -(void) showTemplShareView
 {
-    
+    NSLog(@"showTemplShareView setting tabBarController as the root view controller %s %d", __FILE__, __LINE__);
     [self.window setRootViewController:self.tabBarController];
     return;
 }
@@ -91,7 +91,7 @@
         }
     }
     
-    if (bChange && purchased)
+    if (bChange)
     {
         NSString *dToken = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
         

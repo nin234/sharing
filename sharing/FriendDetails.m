@@ -29,7 +29,7 @@
     
         name = [arr objectAtIndex:0];
         deviceId = [arr objectAtIndex:1];
-        deviceType = [arr objectAtIndex:2];
+        
     }
     
     return self;
