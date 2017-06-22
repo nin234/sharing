@@ -12,6 +12,7 @@
 #import "MessageTranslator.h"
 #import "MessageDecoder.h"
 #include "Consts.h"
+#include <sys/time.h>
 
 @protocol ShareMgrDelegate <NSObject>
 
@@ -24,6 +25,7 @@
 {
     
     NSCondition *dataToSend;
+    NSData *pGetIdReq;
     NSData *pMsgsToSend[BUFFER_BOUND];
     NSURL *pImgsToSend[BUFFER_BOUND];
     NSString *pImgsMetaData[BUFFER_BOUND];
@@ -37,6 +39,8 @@
     long long picLen;
     long long picSoFar;
     NSFileHandle *pFilHdl;
+    struct timeval nextIdReqTime;
+     long tdelta;
 
 }
 

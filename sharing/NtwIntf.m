@@ -34,11 +34,11 @@
     
     if (write(cfd, [pMsg bytes], len) != len)
     {
-        NSLog(@"Failed to send message to server");
+        NSLog(@"Failed to send message to server %s %d", __FILE__, __LINE__);
         close(cfd);
         return false;
     }
-    NSLog(@"Send message to server");
+    NSLog(@"Send message to server %s %d", __FILE__, __LINE__);
     
 
     return true;
@@ -75,13 +75,16 @@
 
 -(bool) connect
 {
+    NSLog(@"Connecting to server %s %d", __FILE__, __LINE__);
     struct addrinfo hints;
     struct addrinfo *result, *rp;
+    memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;
     hints.ai_addr = NULL;
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol   = 0;
     hints.ai_flags = AI_NUMERICSERV;
     
     char conaddr[256];
@@ -91,7 +94,7 @@
     int ret = getaddrinfo(conaddr, conport, &hints, &result);
     if ( ret)
     {
-        NSLog(@"getaddrinfo failed %s", gai_strerror(ret));
+        NSLog(@"getaddrinfo failed for %s %s %s",conaddr, conport,  gai_strerror(ret));
         return false;
     }
     for (rp = result; rp != NULL; rp = rp->ai_next)
@@ -100,6 +103,7 @@
         if (cfd == -1)
             continue;
         if (connect(cfd, rp->ai_addr, rp->ai_addrlen) != -1) {
+            NSLog(@"Connected to %s %d conport=%s %s %d ", inet_ntoa(((struct sockaddr_in*)rp->ai_addr)->sin_addr), ((struct sockaddr_in*)rp->ai_addr)->sin_port, conport, __FILE__, __LINE__);
             break;
         }
         close(cfd);
@@ -122,7 +126,7 @@
         NSLog(@"Setting non blocking mode for socket failed");
         return false;
     }
-
+    NSLog(@"Connected to server %s %d", __FILE__, __LINE__);
     isConnected = true;
     return true;
     

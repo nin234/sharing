@@ -83,10 +83,12 @@
     
     if (!share_id)
     {
+        NSLog(@"Creating share_id request");
         pMsgToSend = [pTransl createIdRequest:@"1000" msgLen:&len];
+       pGetIdReq=  [NSData dataWithBytes:pMsgToSend length:len];
     }
     
-    [self putMsgInQ:pMsgToSend msgLen:len];
+    
         return;
 }
 
@@ -146,11 +148,11 @@
     if (pPicToSend)
     {
         [dataToSend lock];
+        pImgsToSend[picInsrtIndx] = pPicToSend;
+        pImgsMetaData[picInsrtIndx] = picMetaStr;
         ++picInsrtIndx;
         if (picInsrtIndx == BUFFER_BOUND)
             picInsrtIndx =0;
-        pImgsToSend[picInsrtIndx] = pPicToSend;
-        pImgsMetaData[picInsrtIndx] = picMetaStr;
         [dataToSend signal];
         [dataToSend unlock];
     }
@@ -162,10 +164,10 @@
     if (pMsgToSend)
     {
         [dataToSend lock];
+        pMsgsToSend[insrtIndx] = [NSData dataWithBytes:pMsgToSend length:len];
         ++insrtIndx;
         if (insrtIndx == BUFFER_BOUND)
             insrtIndx =0;
-        pMsgsToSend[insrtIndx] = [NSData dataWithBytes:pMsgToSend length:len];
         free(pMsgToSend);
         [dataToSend signal];
         [dataToSend unlock];
@@ -178,9 +180,12 @@
     self = [super init];
     if (self)
     {
+        pGetIdReq = NULL;
         dataToSend = [[NSCondition alloc] init];
-        pNtwIntf = [[NtwIntf alloc] init];
+        gettimeofday(&nextIdReqTime, NULL);
         
+        pNtwIntf = [[NtwIntf alloc] init];
+        tdelta = 5;
         sendIndx =0;
         insrtIndx =0;
         picIndx =0;
@@ -192,12 +197,15 @@
         kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
         
         
-        NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
+       /* NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
+        
         if (share_id_str != nil)
             share_id = [share_id_str intValue];
         else
+         */
             share_id = 0;
-        [self getIdIfRequired];
+        
+        
         friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
         if (friendList != nil)
             NSLog(@"Friendlist %@", friendList);
@@ -205,11 +213,35 @@
     return self;
 }
 
+-(void ) sendGetIdRequest
+{
+    if (pGetIdReq)
+    {
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        if (now.tv_sec > nextIdReqTime.tv_sec)
+        {
+            if (![pNtwIntf sendMsg:pGetIdReq])
+            {
+                nextIdReqTime.tv_sec = now.tv_sec + tdelta;
+                tdelta *=2;
+                NSLog (@"Failed to send get Id request setting next attempt at %ld", nextIdReqTime.tv_sec);
+            }
+            else
+            {
+                NSLog (@"Successfully send get Id request at %ld", nextIdReqTime.tv_sec);
+                pGetIdReq = NULL;
+            }
+        }
+    }
+}
+
 -(void) main
 {
     NSData *pMsgToSend;
     NSURL *pImgToSend;
     NSString *pImgMetaData;
+    [self getIdIfRequired];
     for(;;)
     {
         [dataToSend lock];
@@ -225,7 +257,10 @@
         if (sendIndx != insrtIndx)
         {
             pMsgToSend = pMsgsToSend[sendIndx];
+            NSLog(@"Sending message at Index=%d insrtIndx=%d", sendIndx, insrtIndx);
             ++sendIndx;
+            if (sendIndx == BUFFER_BOUND)
+                sendIndx =0;
         }
         
         if (picIndx != picInsrtIndx)
@@ -233,6 +268,8 @@
             pImgToSend = pImgsToSend[picIndx];
             pImgMetaData = pImgsMetaData[picIndx];
             ++picIndx;
+            if (picIndx == BUFFER_BOUND)
+                picIndx = 0;
         }
         [dataToSend unlock];
         if (pMsgToSend)
@@ -241,6 +278,7 @@
         {
             [self sendPic:pImgToSend metaStr:pImgMetaData];
         }
+        [self sendGetIdRequest];
         [self processResponse];
     }
     
@@ -342,6 +380,7 @@
                        });
         
     }
+    
     
     //char *pMsg =
     return;
