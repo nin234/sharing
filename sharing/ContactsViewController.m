@@ -216,12 +216,12 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
             NSNumber* numbr = [seletedItems objectAtIndex:indexPath.row];
             if ([numbr boolValue] == YES)
             {
-                  cell.textLabel.text= @"\u2705ME";
+                  cell.textLabel.text= @"\u2705  ME";
 
             }
             else
             {
-                cell.textLabel.text = @"\u2B1CME";   
+                cell.textLabel.text = @"\u2B1C  ME";
             }
 
             
