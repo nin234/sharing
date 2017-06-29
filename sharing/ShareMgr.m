@@ -197,14 +197,15 @@
         kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
         
         
-       /* NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
-        
+       NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
+     /*
         if (share_id_str != nil)
             share_id = [share_id_str intValue];
         else
-         */
+      */
             share_id = 0;
         
+        NSLog (@"Share id value %lld", share_id);
         
         friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
         if (friendList != nil)
