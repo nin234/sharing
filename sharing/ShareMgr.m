@@ -97,7 +97,7 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [pTransl updateFriendListRequest:share_id msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len];
+    [self putMsgInQ:pMsgToSend msgLen:len upd:true];
     return;
 }
 
@@ -159,12 +159,30 @@
     return;
 }
 
+-(void) putMsgInQ :(char*) pMsgToSend msgLen:(int) len upd:(bool) upord
+{
+    if (pMsgToSend)
+    {
+        [dataToSend lock];
+        pMsgsToSend[insrtIndx] = [NSData dataWithBytes:pMsgToSend length:len];
+        upOrDown[insrtIndx] = upord;
+        ++insrtIndx;
+        if (insrtIndx == BUFFER_BOUND)
+            insrtIndx =0;
+        free(pMsgToSend);
+        [dataToSend signal];
+        [dataToSend unlock];
+    }
+    return;
+}
+
 -(void) putMsgInQ :(char*) pMsgToSend msgLen:(int) len
 {
     if (pMsgToSend)
     {
         [dataToSend lock];
         pMsgsToSend[insrtIndx] = [NSData dataWithBytes:pMsgToSend length:len];
+        upOrDown[insrtIndx] = false;
         ++insrtIndx;
         if (insrtIndx == BUFFER_BOUND)
             insrtIndx =0;
@@ -241,6 +259,7 @@
     NSData *pMsgToSend;
     NSURL *pImgToSend;
     NSString *pImgMetaData;
+    bool upd;
     [self getIdIfRequired];
     for(;;)
     {
@@ -248,6 +267,7 @@
         pMsgToSend = NULL;
         pImgToSend = NULL;
         pImgMetaData = NULL;
+        upd = false;
         if (sendIndx == insrtIndx || picIndx == picInsrtIndx)
         {
             // NSLog(@"Waiting for work\n");
@@ -257,7 +277,8 @@
         if (sendIndx != insrtIndx)
         {
             pMsgToSend = pMsgsToSend[sendIndx];
-            NSLog(@"Sending message at Index=%d insrtIndx=%d", sendIndx, insrtIndx);
+            upd = upOrDown[sendIndx];
+            NSLog(@"Sending message at Index=%d insrtIndx=%d upd=%d", sendIndx, insrtIndx, upd);
             ++sendIndx;
             if (sendIndx == BUFFER_BOUND)
                 sendIndx =0;
@@ -273,7 +294,7 @@
         }
         [dataToSend unlock];
         if (pMsgToSend)
-            [self sendMsg:pMsgToSend];
+            [self sendMsg:pMsgToSend upd:upd];
         if (pImgToSend)
         {
             [self sendPic:pImgToSend metaStr:pImgMetaData];
@@ -293,7 +314,7 @@
     NSData *picData = [NSData dataWithContentsOfURL:picUrl];
    
     pMsgToSend = [self.pTransl sharePicMetaDataMsg:self.share_id name:picUrl picLength:[picData length]  metaStr:picMetaStr msgLen:&len];
-    [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len]];
+    [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len] upd:false];
     free(pMsgToSend);
     NSUInteger indx = 0;
     for (;;)
@@ -301,7 +322,7 @@
         NSData *pPicToSend = [pTransl sharePicMsg:picData dataIndx:&indx];
         if (pPicToSend == nil)
             break;
-        [self sendMsg:pPicToSend];
+        [self sendMsg:pPicToSend upd:false];
     }
  
     return;
@@ -367,15 +388,18 @@
 
 }
 
--(void) sendMsg:(NSData *)pMsg
+-(void) sendMsg:(NSData *)pMsg upd:(bool) upord
 {
     if (![pNtwIntf sendMsg:pMsg])
     {
         
         dispatch_async(dispatch_get_main_queue(),
                        ^{
-                           UIAlertView *pAvw = [[UIAlertView alloc] initWithTitle:@"Share Failed" message:@"Failed to share/download item, try again later" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                           [pAvw show];
+                           if (!upord)
+                           {
+                               UIAlertView *pAvw = [[UIAlertView alloc] initWithTitle:@"Share Failed" message:@"Failed to share/download item, try again later" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                               [pAvw show];
+                           }
                            
                        });
         

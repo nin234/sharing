@@ -32,9 +32,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
         if (self)
         {
             bModeShare = false;
-            seletedItems = [[NSMutableArray alloc] init];
-            kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
-            frndDic = [[NSMutableDictionary alloc] init];
+           
         }
 
     
@@ -43,6 +41,9 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 
 -(void) populateData
 {
+    seletedItems = [[NSMutableArray alloc] init];
+    kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
+    frndDic = [[NSMutableDictionary alloc] init];
     share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
     friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
     if (friendList != nil  && [friendList length] > 0)
@@ -100,16 +101,9 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     return;
 }
 
-- (void)viewDidLoad
+-(void) viewWillAppear:(BOOL)animated
 {
-    [super viewDidLoad];
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
+    [super viewWillAppear:animated];
     NSString *title = @"Contacts";
     self.navigationItem.title = [NSString stringWithString:title];
     [self populateData];
@@ -122,7 +116,11 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     }
     UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addContact) ];
     self.navigationItem.rightBarButtonItem = pBarItem1;
-    
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
 }
 
 
@@ -358,6 +356,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     
     frndViewController =  [frndViewController  initWithNibName:nil bundle:nil];
     frndViewController.state = eAddFrndStateDisplay;
+    frndViewController.pShrMgr = pShrMgr;
     
     [self.navigationController pushViewController:frndViewController animated:YES];
 }

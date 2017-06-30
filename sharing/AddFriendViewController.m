@@ -129,7 +129,7 @@
     {
         if (frnd != nil && [frnd length] >0)
         {
-            NSRange aR = [frnd rangeOfString:oldName];
+            NSRange aR = [frnd rangeOfString:userName];
             if (aR.location == NSNotFound)
             {
                 newList = [newList stringByAppendingFormat:@"%@;", frnd];
@@ -167,7 +167,7 @@
 -(void) setDisplayNavBar
 {
     NSString* title = @"Contact Details";
-    UIBarButtonItem* pBarItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(contactsEdit) ];
+    UIBarButtonItem* pBarItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(contactsEdit) ];
     self.navigationItem.title = title;
     self.navigationItem.rightBarButtonItem = pBarItem;
     self.navigationItem.leftBarButtonItem = nil;
@@ -184,12 +184,13 @@
         frndDet.name  = userName;
         if (nickName != nil)
             frndDet.nickName =nickName;
+        else
+            frndDet.nickName = userName;
         [frndDic setObject:frndDet forKey:userName];
         state = eAddFrndStateDisplay;
         [self addFriendInList];
-        [self.tableView reloadData];
-        [self setDisplayNavBar];
     }
+    [self.navigationController popViewControllerAnimated:YES];
     return;
 }
 
@@ -222,26 +223,22 @@
 
 }
 
+-(void) actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    
+    NSLog(@"Clicked button at index %ld %s %d", (long)buttonIndex, __FILE__, __LINE__);
+    if (buttonIndex == 0)
+    {
+        [self contactsEditDone];
+    }
+    
+}
 -(void) contactsEditDone
 {
-    state = eAddFrndStateDisplay;
     if (userName != nil)
     {
-      if (oldName != nil && [userName isEqualToString:oldName] == NO)
-          [frndDic removeObjectForKey:oldName];
-        [self deleteFriendInList];
-        FriendDetails *frndDet = [[FriendDetails alloc] init];
-        frndDet.name  = userName;
-        if (nickName != nil)
-            frndDet.nickName =nickName;
-        [frndDic setObject:frndDet forKey:userName];
-        [self addFriendInList];
-        [self.tableView reloadData];
-         [self setDisplayNavBar];
-    }
-    else if (oldName != nil)
-    {
-        [frndDic removeObjectForKey:oldName];
+        NSLog(@"Deleting contact %@ %s %d", userName, __FILE__, __LINE__);
+        [frndDic removeObjectForKey:userName];
         [self deleteFriendInList];
         [self.navigationController popViewControllerAnimated:YES];
     }
@@ -255,15 +252,12 @@
 
 -(void) contactsEdit
 {
-    state = eAddFrndStateEdit;
-    oldName = userName;
-    NSString* title = @"Edit Contact";
-    UIBarButtonItem *pBarItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(contactsEditDone) ];
-    UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(contactsEditCancel) ];
+    //printf("Launch UIActionSheet");
+    NSLog(@"Touched delete contact button %s %d", __FILE__, __LINE__);
+    UIActionSheet *pSh = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Contact" otherButtonTitles:nil];
+    [pSh showInView:self.tableView];
+    [pSh setDelegate:self];
     
-    self.navigationItem.title = title;
-    self.navigationItem.rightBarButtonItem = pBarItem;
-    self.navigationItem.leftBarButtonItem = pBarItem1;
 }
 
 -(void) loadView
@@ -284,15 +278,6 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void) actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex != actionSheet.cancelButtonIndex)
-    {
-        [frndDic removeObjectForKey:oldName];
-        [self deleteFriendInList];
-        [self.navigationController popViewControllerAnimated:YES];
-    }
-}
 
 #pragma mark - Table view data source
 
