@@ -110,9 +110,9 @@
 			isa = PBXGroup;
 			children = (
 				DB5F3EE71C726EAD003DA1C3 /* AddFriendViewController.h */,
+				DB5F3EE81C726EAD003DA1C3 /* AddFriendViewController.m */,
 				DB5F3EEE1C72C5CA003DA1C3 /* ContactsViewController.m */,
 				DB5F3EEF1C72C5CA003DA1C3 /* ContactsViewController.h */,
-				DB5F3EE81C726EAD003DA1C3 /* AddFriendViewController.m */,
 				DB5F3EEA1C726EF7003DA1C3 /* AddFriendViewController.xib */,
 				DB5F3EE41C726E14003DA1C3 /* FriendDetails.h */,
 				DB5F3EE51C726E14003DA1C3 /* FriendDetails.m */,

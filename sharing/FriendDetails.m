@@ -22,13 +22,13 @@
     {
         NSArray *arr = [str componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@":"]];
         NSUInteger cnt = [arr count];
-        if (cnt ==4)
+        if (cnt >1)
         {
-            nickName = [arr objectAtIndex:3];
+            nickName = [arr objectAtIndex:1];
         }
     
         name = [arr objectAtIndex:0];
-        deviceId = [arr objectAtIndex:1];
+        
         
     }
     

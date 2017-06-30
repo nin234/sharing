@@ -34,6 +34,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
             bModeShare = false;
             seletedItems = [[NSMutableArray alloc] init];
             kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
+            frndDic = [[NSMutableDictionary alloc] init];
         }
 
     
@@ -51,7 +52,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
         NSUInteger cnt = [friends count];
         if(cnt >1)
         {
-            for (NSUInteger i=0; i < cnt-1; ++i)
+            for (NSUInteger i=1; i < cnt-1; ++i)
             {
                 NSString *frndStr = [friends objectAtIndex:i];
                 if (frndStr != nil && [frndStr length] > 0)
@@ -131,6 +132,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     AddFriendViewController *frndViewController = [AddFriendViewController alloc];
     frndViewController.frndDic = frndDic;
     frndViewController.pShrMgr = pShrMgr;
+    frndViewController.state = eAddFrndStateAdd;
     frndViewController =  [frndViewController  initWithNibName:nil bundle:nil];
         
     [self.navigationController pushViewController:frndViewController animated:YES];
@@ -181,7 +183,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-
+    NSLog(@"Number of contacts %lu %s %d", 1 + [frndDic count], __FILE__, __LINE__);
     return 1 + [frndDic count];
 }
 
@@ -266,6 +268,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
         else
         {
             cell.textLabel.text = labtxt;
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
     }
     return cell;
@@ -342,16 +345,19 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     {
         frndViewController.userName = share_id_str;
         frndViewController.nickName = @"ME";
+        frndViewController.bCanDelete = false;
     }
     else
     {
         FriendDetails *item = [rownoFrndDetail objectForKey:[NSNumber numberWithUnsignedInteger:indexPath.row-1]];
         frndViewController.userName = item.name;
+        frndViewController.bCanDelete = true;
         if (item.nickName != nil)
             frndViewController.nickName = item.nickName;
     }
     
     frndViewController =  [frndViewController  initWithNibName:nil bundle:nil];
+    frndViewController.state = eAddFrndStateDisplay;
     
     [self.navigationController pushViewController:frndViewController animated:YES];
 }

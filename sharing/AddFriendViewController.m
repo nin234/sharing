@@ -23,6 +23,7 @@
 @synthesize nickName;
 @synthesize displayMe;
 @synthesize pShrMgr;
+@synthesize bCanDelete;
 
 
 //The states of AddFriendViewController
@@ -84,9 +85,9 @@
         case eAddFrndStateDisplay:
         {
             title = @"Contact Details";
-            if (!displayMe)
+            if (bCanDelete)
             {
-                pBarItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(contactsEdit) ];
+                pBarItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(contactsEdit) ];
             }
         }
         break;
@@ -112,6 +113,7 @@
         self.navigationItem.rightBarButtonItem = pBarItem;
     if (pBarItem1 != nil)
         self.navigationItem.leftBarButtonItem = pBarItem1;
+   
     return;
     
 }
@@ -326,24 +328,48 @@
     }
     else
     {
-        sectionHeaderView.textLabel.text = @"Name";
+        if (state == eAddFrndStateAdd)
+        {
+            sectionHeaderView.textLabel.text = @"Name (Optional)";
+        }
+        else
+        {
+            sectionHeaderView.textLabel.text = @"Name";
+        }
     }
     
     return sectionHeaderView;
     
 }
 
-
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
-    if (section <1)
-        return 60.0;
-    if (section == 1)
-        return 70.0;
+#pragma mark - TextField delegate , fns
+- (BOOL)textFieldShouldReturn:(UITextField *)theTextField {
     
-    return 30.0;
+    [theTextField resignFirstResponder];
+    
+    return YES;
 }
 
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    
+    return YES;
+}
+
+
+
+-(BOOL) textFieldShouldBeginEditing:(UITextField *)textField
+{
+    
+    return YES;
+}
+
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
+    
+
+    return YES;
+}
 
 - (void)textChanged:(id)sender
 {
@@ -363,74 +389,6 @@
     return;
 }
 
-
-
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-     CGRect mainScrn = [UIScreen mainScreen].applicationFrame;
-    static NSString *CellIdentifier = @"AddFriendCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil)
-    {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-    }
-    else
-    {
-        NSArray *pVws = [cell.contentView subviews];
-        NSUInteger cnt = [pVws count];
-        for (NSUInteger i=0; i < cnt; ++i)
-        {
-            [[pVws objectAtIndex:i] removeFromSuperview];
-        }
-        cell.imageView.image = nil;
-        cell.textLabel.text = nil;
-        cell.accessoryType = UITableViewCellAccessoryNone;
-    }
-    if (indexPath.section == 0 && indexPath.row ==0)
-    {
-        if (state == eAddFrndStateDisplay)
-        {
-            if (userName != nil)
-                cell.textLabel.text = userName;
-        }
-        else
-        {
-            UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, mainScrn.size.width, tableView.rowHeight)];
-            textField.delegate = self;
-            [textField addTarget:self action:@selector(textChanged:) forControlEvents:UIControlEventEditingChanged];
-            if (userName != nil)
-                textField.text = userName;
-            [cell.contentView addSubview:textField];
-        }
-        
-    }
-    else if (indexPath.section == 1)
-    {
-        if (state == eAddFrndStateDisplay)
-        {
-            if (nickName != nil)
-                cell.textLabel.text = nickName;
-        }
-        else
-        {
-
-            UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, mainScrn.size.width, tableView.rowHeight)];
-            textField.delegate = self;
-            [textField addTarget:self action:@selector(textChanged:) forControlEvents:UIControlEventEditingChanged];
-            if (nickName != nil)
-                textField.text = nickName;
-            [cell.contentView addSubview:textField];
-        }
-    }
-    else if (indexPath.section == 2 && !indexPath.row && state == eAddFrndStateEdit)
-    {
-        cell.textLabel.text = @"Edit Contact";
-    }
-    
-    
-    return cell;
-}
 
 
 
@@ -490,6 +448,90 @@
 */
 
 #pragma mark - Table view delegate
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CGRect mainScrn = [UIScreen mainScreen].applicationFrame;
+    static NSString *CellIdentifier = @"AddFriendCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    }
+    else
+    {
+        NSArray *pVws = [cell.contentView subviews];
+        NSUInteger cnt = [pVws count];
+        for (NSUInteger i=0; i < cnt; ++i)
+        {
+            [[pVws objectAtIndex:i] removeFromSuperview];
+        }
+        cell.imageView.image = nil;
+        cell.textLabel.text = nil;
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
+    if (indexPath.section == 0 && indexPath.row ==0)
+    {
+        if (state == eAddFrndStateDisplay)
+        {
+            if (userName != nil)
+                cell.textLabel.text = userName;
+        }
+        else
+        {
+            UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, mainScrn.size.width, 25)];
+            NSLog(@"Textframe height %f", self.tableView.rowHeight);
+            textField.delegate = self;
+            [textField addTarget:self action:@selector(textChanged:) forControlEvents:UIControlEventEditingChanged];
+            if (userName != nil)
+                textField.text = userName;
+            textField.keyboardType = UIKeyboardTypeNumberPad;
+            textField.userInteractionEnabled = YES;
+            [cell.contentView addSubview:textField];
+        }
+        
+    }
+    else if (indexPath.section == 1)
+    {
+        if (state == eAddFrndStateDisplay)
+        {
+            if (nickName != nil)
+                cell.textLabel.text = nickName;
+        }
+        else
+        {
+            
+            UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, mainScrn.size.width, 25)];
+            textField.delegate = self;
+            [textField addTarget:self action:@selector(textChanged:) forControlEvents:UIControlEventEditingChanged];
+            if (nickName != nil)
+                textField.text = nickName;
+            [cell.contentView addSubview:textField];
+        }
+    }
+    else if (indexPath.section == 2 && !indexPath.row && state == eAddFrndStateEdit)
+    {
+        cell.textLabel.text = @"Edit Contact";
+    }
+    
+    
+    return cell;
+}
+
+
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (section <1)
+        return 60.0;
+    if (section == 1)
+        return 70.0;
+    
+    return 30.0;
+}
+
+
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {

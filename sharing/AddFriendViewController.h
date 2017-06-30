@@ -32,6 +32,7 @@ enum eAddFrndState
 
 
 @property enum eAddFrndState state;
+@property bool bCanDelete;
 @property bool displayMe;
 
 
