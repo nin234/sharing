@@ -9,9 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "SHKeychainItemWrapper.h"
 
+
 @protocol ContactsViewControllerDelegate <NSObject>
 
 -(void) shareNow:(NSString *) shareStr;
+-(void) refreshShareMainLst;
 
 @end
 
@@ -33,6 +35,10 @@
 
 @property (nonatomic, strong) NSMutableDictionary *frndDic;
 @property (nonatomic, weak) id<ContactsViewControllerDelegate> delegate;
+
+@property (nonatomic, weak)  UITabBarController  *tabBarController;
+
+
 
 -(void) shareNow;
 

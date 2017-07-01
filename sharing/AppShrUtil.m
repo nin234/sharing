@@ -114,12 +114,14 @@
     selFrndCntrl = [[ContactsViewController alloc] initWithNibName:nil bundle:nil];
     selFrndCntrl.pShrMgr = pShrMgr;
     selFrndCntrl.delegate = delegate;
+    
     selFrndCntrl.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemContacts tag:0];
     UINavigationController *selFrndNavCntrl = [[UINavigationController alloc] initWithRootViewController:selFrndCntrl];
     
     NSArray* controllers = [NSArray arrayWithObjects:mainVwNavCntrl, selFrndNavCntrl, homeCntrl, nil];
     
     tabBarController.viewControllers = controllers;
+    selFrndCntrl.tabBarController = tabBarController;
     return;
 }
 

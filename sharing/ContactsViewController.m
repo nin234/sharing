@@ -25,6 +25,8 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 @synthesize bModeShare;
 @synthesize pShrMgr;
 @synthesize delegate;
+@synthesize tabBarController;
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -91,7 +93,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     NSMutableArray *seletedItemsTmp = [[NSMutableArray alloc] init];
 
     
-    NSUInteger cnt = [frndDic count];
+    NSUInteger cnt = [frndDic count] +1;
     for (NSUInteger i=0; i < cnt ; ++i)
     {
         [seletedItemsTmp addObject:[NSNumber numberWithBool:NO]];
@@ -140,14 +142,14 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 -(void) shareNow
 {
     NSString *shareStr = [[NSString alloc] init];
-    NSUInteger cnt = [frndDic count];
+    NSUInteger cnt = [frndDic count] +1;
     bool bFnd = false;
     for (NSUInteger i=0; i < cnt ; ++i)
     {
         NSNumber *numbr = [seletedItems objectAtIndex:i];
         if ([numbr boolValue] == YES)
         {
-            FriendDetails *frnd = [rownoFrndDetail objectForKey:[NSNumber numberWithUnsignedInteger:i]];
+            FriendDetails *frnd = [rownoFrndDetail objectForKey:[NSNumber numberWithUnsignedInteger:i-1]];
             if (frnd != nil)
             {
                 shareStr = [shareStr stringByAppendingString:frnd.name];
@@ -162,6 +164,9 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
         return;
     
     [delegate shareNow:shareStr];
+    tabBarController.selectedIndex = 0;
+    [delegate refreshShareMainLst];
+   
     return;
 }
 
@@ -211,25 +216,10 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     
     if (!indexPath.row)
     {
-        if (bModeShare)
+        cell.textLabel.text = @"ME";
+        if (!bModeShare)
         {
-            NSNumber* numbr = [seletedItems objectAtIndex:indexPath.row];
-            if ([numbr boolValue] == YES)
-            {
-                  cell.textLabel.text= @"\u2705  ME";
-
-            }
-            else
-            {
-                cell.textLabel.text = @"\u2B1C  ME";
-            }
-
-            
-        }
-        else
-        {
-            cell.textLabel.text = @"ME";
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+          cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
     }
     else
