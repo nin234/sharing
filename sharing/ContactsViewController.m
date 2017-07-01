@@ -106,6 +106,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 -(void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    NSLog(@"ContactsViewController viewWillAppear %s %d", __FILE__, __LINE__);
     NSString *title = @"Contacts";
     self.navigationItem.title = [NSString stringWithString:title];
     [self populateData];
@@ -165,6 +166,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     
     [delegate shareNow:shareStr];
     tabBarController.selectedIndex = 0;
+    bModeShare = false;
     [delegate refreshShareMainLst];
    
     return;
