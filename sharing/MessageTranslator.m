@@ -192,6 +192,8 @@
     [name getCString:(pStoreLst+nameoffset) maxLength:nameLen encoding:NSASCIIStringEncoding];
     int shareoff = nameoffset+nameLen;
     [shareLst getCString:(pStoreLst+shareoff) maxLength:listLen encoding:NSASCIIStringEncoding];
+    NSLog(@"shareLst=%@", shareLst);
+    NSLog(@"shareMsg nameLen=%d listLen=%d msglen=%d nameoffset=%d listoffset=%d", nameLen, listLen, msglen, nameoffset, shareoff);
     return pStoreLst;
 }
 
