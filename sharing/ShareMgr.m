@@ -34,6 +34,7 @@
 -(void) setShare_id:(long long)shrid
 {
     share_id = shrid;
+    [shrMgrDelegate setShareId:share_id];
     NSNumber *shrNumb = [NSNumber numberWithLongLong:share_id];
     
     NSString  *shridStr = [shrNumb stringValue];
@@ -44,6 +45,8 @@
     return;
     
 }
+
+
 
 -(void) storedTrndIdInCloud
 {

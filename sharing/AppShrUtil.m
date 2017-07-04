@@ -74,19 +74,19 @@
 -(void) didRegisterForRemoteNotification:(NSData *)deviceToken
 {
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
-    NSData *tokenNow = [kvlocal dataForKey:@"NotToken"];
+    NSData *tokenNow = [kvlocal dataForKey:@"NotNToken"];
     NSLog(@"Did register for remote notification with token %@ tokenNow=%@", deviceToken, tokenNow);
-    bool bChange = false;
+    bool bChange = true;
     if (tokenNow == nil)
     {
-        [kvlocal setObject:deviceToken forKey:@"NotToken"];
+        [kvlocal setObject:deviceToken forKey:@"NotNToken"];
         bChange = true;
     }
     else
     {
         if (![deviceToken isEqualToData:tokenNow])
         {
-            [kvlocal setObject:deviceToken forKey:@"NotToken"];
+            [kvlocal setObject:deviceToken forKey:@"NotNToken"];
             bChange = true;
         }
     }
@@ -96,6 +96,7 @@
         NSString *dToken = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
         
         dToken = [dToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+      //  dToken = [dToken uppercaseString];
         NSLog(@"device token %@", dToken);
         [pShrMgr storeDeviceToken:dToken];
     }
