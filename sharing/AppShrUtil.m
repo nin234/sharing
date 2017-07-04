@@ -52,6 +52,7 @@
     
     // Register for remote notifications.
     [[UIApplication sharedApplication] registerForRemoteNotifications];
+    NSLog(@"Register for remote notification %s %d", __FILE__, __LINE__);
     return;
 }
 
@@ -75,7 +76,7 @@
 {
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
     NSData *tokenNow = [kvlocal dataForKey:@"NotNToken"];
-    NSLog(@"Did register for remote notification with token %@ tokenNow=%@", deviceToken, tokenNow);
+    NSLog(@"Did register for remote notification with token %@ tokenNow=%@ %s %d", deviceToken, tokenNow, __FILE__, __LINE__);
     bool bChange = true;
     if (tokenNow == nil)
     {
