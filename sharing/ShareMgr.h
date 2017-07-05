@@ -67,6 +67,7 @@
 
 -(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr;
 -(void) getItems;
+-(void) getItems:(bool) upd;
 -(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName picLen:(long long) len;
 -(void) storePicData:(NSData *)picData;
 

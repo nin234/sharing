@@ -188,7 +188,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSLog(@"Number of contacts %lu %s %d", 1 + [frndDic count], __FILE__, __LINE__);
+    NSLog(@"Number of contacts %u %s %d", 1 + [frndDic count], __FILE__, __LINE__);
     return 1 + [frndDic count];
 }
 

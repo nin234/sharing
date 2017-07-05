@@ -26,7 +26,7 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [pTransl storeDeviceToken:share_id deviceToken:token msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len];
+    [self putMsgInQ:pMsgToSend msgLen:len upd:true];
     return;
 }
 
@@ -143,6 +143,15 @@
     int len =0;
     pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
     [self putMsgInQ:pMsgToSend msgLen:len];
+    return;
+}
+
+-(void) getItems:(bool) upord
+{
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
+    [self putMsgInQ:pMsgToSend msgLen:len upd:upord];
     return;
 }
 

@@ -20,6 +20,8 @@
 @property (nonatomic, retain)  UITabBarController  *tabBarController;
 @property (nonatomic, retain) IBOutlet UINavigationController *navViewController;
 @property (nonatomic, retain) ContactsViewController  *selFrndCntrl;
+@property (nonatomic, retain) NSArray* controllersListView;
+@property (nonatomic, retain) NSArray* controllersTemplListView;
 
 
 -(void) setPurchsdTokens:(NSString *)trid;
@@ -27,7 +29,7 @@
 -(void) didRegisterForRemoteNotification:(NSData *)deviceToken;
 -(void) showShareView;
 -(void) showTemplShareView;
--(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl ContactsDelegate:(id)delegate;
+-(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl ContactsDelegate:(id)delegate;
 
 
 

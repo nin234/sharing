@@ -17,6 +17,8 @@
 @synthesize tabBarController;
 @synthesize navViewController;
 @synthesize selFrndCntrl;
+@synthesize controllersListView;
+@synthesize controllersTemplListView;
 
 -(void) setPurchsdTokens:(NSString *) trid
 {
@@ -59,6 +61,7 @@
 -(void) showShareView
 {
     NSLog(@"showShareView setting tabBarController as the root view controller %s %d", __FILE__, __LINE__);
+    tabBarController.viewControllers = controllersListView;
     [self.window setRootViewController:self.tabBarController];
     return;
 }
@@ -66,6 +69,7 @@
 -(void) showTemplShareView
 {
     NSLog(@"showTemplShareView setting tabBarController as the root view controller %s %d", __FILE__, __LINE__);
+    tabBarController.viewControllers = controllersTemplListView;
     [self.window setRootViewController:self.tabBarController];
     return;
 }
@@ -105,7 +109,7 @@
     return;
 }
 
--(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl ContactsDelegate:(id)delegate
+-(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl ContactsDelegate:(id)delegate
 {
    tabBarController = [[UITabBarController alloc] init];
     HomeViewController *homeCntrl = [[HomeViewController alloc] init];
@@ -120,9 +124,10 @@
     selFrndCntrl.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemContacts tag:0];
     UINavigationController *selFrndNavCntrl = [[UINavigationController alloc] initWithRootViewController:selFrndCntrl];
     
-    NSArray* controllers = [NSArray arrayWithObjects:mainVwNavCntrl, selFrndNavCntrl, homeCntrl, nil];
+    controllersListView = [NSArray arrayWithObjects:mainVwNavCntrl, selFrndNavCntrl, homeCntrl, nil];
+    controllersTemplListView = [NSArray arrayWithObjects:mainTemplVwNavCntrl, selFrndNavCntrl, homeCntrl, nil];
     
-    tabBarController.viewControllers = controllers;
+    tabBarController.viewControllers = controllersListView;
     selFrndCntrl.tabBarController = tabBarController;
     return;
 }
