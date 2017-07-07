@@ -14,6 +14,9 @@
 
 -(void) shareNow:(NSString *) shareStr;
 -(void) refreshShareMainLst;
+@optional
+-(void) shareTemplList:(NSString *) shareStr;
+-(void) refreshTemplShareMainLst;
 
 @end
 
@@ -38,7 +41,7 @@
 
 @property (nonatomic, weak)  UITabBarController  *tabBarController;
 
-
+@property bool bTemplShare;
 
 -(void) shareNow;
 

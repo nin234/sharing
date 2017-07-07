@@ -61,6 +61,7 @@
 -(void) showShareView
 {
     NSLog(@"showShareView setting tabBarController as the root view controller %s %d", __FILE__, __LINE__);
+    selFrndCntrl.bTemplShare = false;
     tabBarController.viewControllers = controllersListView;
     [self.window setRootViewController:self.tabBarController];
     return;
@@ -69,6 +70,7 @@
 -(void) showTemplShareView
 {
     NSLog(@"showTemplShareView setting tabBarController as the root view controller %s %d", __FILE__, __LINE__);
+    selFrndCntrl.bTemplShare = true;
     tabBarController.viewControllers = controllersTemplListView;
     [self.window setRootViewController:self.tabBarController];
     return;

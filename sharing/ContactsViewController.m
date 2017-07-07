@@ -26,6 +26,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 @synthesize pShrMgr;
 @synthesize delegate;
 @synthesize tabBarController;
+@synthesize bTemplShare;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -34,7 +35,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
         if (self)
         {
             bModeShare = false;
-           
+            bTemplShare = false;
         }
 
     
@@ -163,11 +164,24 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     
     if (!bFnd)
         return;
-    
-    [delegate shareNow:shareStr];
+    if (bTemplShare)
+    {
+        [delegate shareTemplList:shareStr];
+    }
+    else
+    {
+          [delegate shareNow:shareStr];
+    }
     tabBarController.selectedIndex = 0;
     bModeShare = false;
-    [delegate refreshShareMainLst];
+    if (bTemplShare)
+    {
+        [delegate refreshTemplShareMainLst];
+    }
+    else
+    {
+        [delegate refreshShareMainLst];
+    }
    
     return;
 }
