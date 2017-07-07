@@ -104,7 +104,7 @@
     return;
 }
 
--(void) shareItem:(NSString *) list listName:(NSString *)name
+-(void) shareItem:(NSString *) list listName:(NSString *)name shrId:(long long) shareId
 {
     char *pMsgToSend = NULL;
     int len =0;
@@ -113,11 +113,11 @@
     return;
 }
 
--(void) shareTemplItem:(NSString *) list listName: (NSString *) name
+-(void) shareTemplItem:(NSString *) list listName: (NSString *) name shrId:(long long) shareId
 {
     char *pMsgToSend = NULL;
     int len =0;
-    pMsgToSend = [self.pTransl shareTemplItemMsg:self.share_id shareList:list listName:name msgLen:&len];
+    pMsgToSend = [self.pTransl shareTemplItemMsg:shareId  shareList:list listName:name msgLen:&len];
     [self putMsgInQ:pMsgToSend msgLen:len];
 }
 
