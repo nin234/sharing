@@ -272,6 +272,7 @@
     NSURL *pImgToSend;
     NSString *pImgMetaData;
     bool upd;
+    [shrMgrDelegate setShareId:share_id];
     [self getIdIfRequired];
     for(;;)
     {
