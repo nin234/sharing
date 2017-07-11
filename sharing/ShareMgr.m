@@ -122,9 +122,10 @@
 }
 
 
--(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr
+-(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr shrId:(long long) shareid
 {
-    [self putPicInQ:picUrl metaStr:picMetaStr];
+    NSString *pPicMetaStr = [NSString stringWithFormat:@"%@:::]%lld", picMetaStr, shareid];
+    [self putPicInQ:picUrl metaStr:pPicMetaStr];
     return;
 }
 
@@ -325,18 +326,31 @@
     int len =0;
     
     NSData *picData = [NSData dataWithContentsOfURL:picUrl];
+    NSArray *pArr = [picMetaStr componentsSeparatedByString:@":::]"];
+    NSUInteger cnt = [pArr count];
+    if (cnt != 2)
+    {
+        NSLog(@"Invalid picture metastr %@ %s %d", picMetaStr, __FILE__, __LINE__);
+        return;
+    }
+    NSString *picMetaStrR = [pArr objectAtIndex:0];
+    long long shareId = [[pArr objectAtIndex:1] longLongValue];
    
-    pMsgToSend = [self.pTransl sharePicMetaDataMsg:self.share_id name:picUrl picLength:[picData length]  metaStr:picMetaStr msgLen:&len];
+    pMsgToSend = [self.pTransl sharePicMetaDataMsg:shareId  name:picUrl picLength:[picData length]  metaStr:picMetaStrR msgLen:&len];
     [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len] upd:false];
+    NSLog(@"Sent picture metadata msg share_id=%lld picUrl=%@ picLength=%lu metaStr=%@ %s %d", shareId, picUrl, (unsigned long)[picData length], picMetaStrR, __FILE__, __LINE__);
     free(pMsgToSend);
     NSUInteger indx = 0;
-    for (;;)
+    
+    for (int i=0; i < 2; ++i)
     {
+        NSLog(@"Sending picture at Index %lu", (unsigned long)indx);
         NSData *pPicToSend = [pTransl sharePicMsg:picData dataIndx:&indx];
         if (pPicToSend == nil)
             break;
         [self sendMsg:pPicToSend upd:false];
     }
+    
  
     return;
 }

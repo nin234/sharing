@@ -154,7 +154,7 @@
         return nil;
     char buf[MAX_BUF];
     int msgLen = MAX_BUF;
-    memcpy(buf, &msgLen, sizeof(int));
+    
     int msgId = PIC_MSG;
     memcpy(buf+sizeof(int), &msgId, sizeof(int));
    
@@ -167,6 +167,8 @@
     aR.location = *indx;
     aR.length = canSent;
     [picData getBytes:buf+2*sizeof(int) range:aR];
+    msgLen = (int)canSent + 2*sizeof(int);
+    memcpy(buf, &msgLen, sizeof(int));
     NSData *pPicDataChunkToSend = [NSData dataWithBytes:buf length:canSent+2*sizeof(int)];
     
     *indx += canSent;

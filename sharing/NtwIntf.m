@@ -38,7 +38,7 @@
         close(cfd);
         return false;
     }
-    NSLog(@"Send message to server %s %d", __FILE__, __LINE__);
+  //  NSLog(@"Send message to server %s %d", __FILE__, __LINE__);
     
 
     return true;

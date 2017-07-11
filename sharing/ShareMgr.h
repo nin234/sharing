@@ -65,7 +65,7 @@
 -(void) shareTemplItem:(NSString *) list listName: (NSString *) name shrId:(long long) shareId;
 -(void) archiveItem:(NSString *) item itemName: (NSString *) name;
 
--(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr;
+-(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr shrId:(long long) share_id;
 -(void) getItems;
 -(void) getItems:(bool) upd;
 -(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName picLen:(long long) len;
