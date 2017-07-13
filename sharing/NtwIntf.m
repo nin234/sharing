@@ -32,13 +32,15 @@
     }
     NSUInteger len = [pMsg length];
     
+     NSLog(@"Sending message to server length=%lu %s %d",(unsigned long)len, __FILE__, __LINE__);
+    
     if (write(cfd, [pMsg bytes], len) != len)
     {
-        NSLog(@"Failed to send message to server %s %d", __FILE__, __LINE__);
+        NSLog(@"Failed to send message to server %d %s, %s %d", errno, strerror(errno), __FILE__, __LINE__);
         close(cfd);
         return false;
     }
-  //  NSLog(@"Send message to server %s %d", __FILE__, __LINE__);
+    NSLog(@"Send message to server length=%lu %s %d",(unsigned long)len, __FILE__, __LINE__);
     
 
     return true;
@@ -113,6 +115,12 @@
         NSLog(@"Could not connect socket to any address");
         return false;
     }
+    struct timeval tv;
+
+    tv.tv_sec = 5;  /* 5 Secs Timeout */
+    
+    setsockopt(cfd, SOL_SOCKET, SO_RCVTIMEO,(struct timeval *)&tv,sizeof(struct timeval));
+    /*
     int flags = fcntl(cfd, F_GETFL, 0);
     if (flags <0)
     {
@@ -126,6 +134,7 @@
         NSLog(@"Setting non blocking mode for socket failed");
         return false;
     }
+     */
     NSLog(@"Connected to server %s %d", __FILE__, __LINE__);
     isConnected = true;
     return true;

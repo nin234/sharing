@@ -221,7 +221,7 @@
         insrtIndx =0;
         picIndx =0;
         picInsrtIndx =0;
-        waitTime = 5;
+        waitTime = 1;
         for (int i=0; i < BUFFER_BOUND; ++i)
             upOrDown[i] = false;
         
@@ -338,11 +338,11 @@
    
     pMsgToSend = [self.pTransl sharePicMetaDataMsg:shareId  name:picUrl picLength:[picData length]  metaStr:picMetaStrR msgLen:&len];
     [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len] upd:false];
-    NSLog(@"Sent picture metadata msg share_id=%lld picUrl=%@ picLength=%lu metaStr=%@ %s %d", shareId, picUrl, (unsigned long)[picData length], picMetaStrR, __FILE__, __LINE__);
+    NSLog(@"Sent picture metadata msg share_id=%lld picUrl=%@ picLength=%lu metaStr=%@ msgLen=%d %s %d", shareId, picUrl, (unsigned long)[picData length], picMetaStrR, len, __FILE__, __LINE__);
     free(pMsgToSend);
     NSUInteger indx = 0;
     
-    for (int i=0; i < 2; ++i)
+    for (;;)
     {
         NSLog(@"Sending picture at Index %lu", (unsigned long)indx);
         NSData *pPicToSend = [pTransl sharePicMsg:picData dataIndx:&indx];
