@@ -367,6 +367,7 @@
         return;
     }
     NSError *error;
+    NSLog(@"Setting picMetaData shareId=%lld picName=%@ itemName=%@ picLen=%lld", shareId, name, iName, len);
     pFilHdl = [NSFileHandle fileHandleForWritingToURL:picSaveUrl error:&error];
     if (pFilHdl == nil)
         NSLog(@"Cannot open file handle for url=%@ , error=%@", picSaveUrl, error);

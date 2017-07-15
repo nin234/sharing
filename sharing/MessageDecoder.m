@@ -92,7 +92,7 @@
             break;
         }
         int len =0;
-        memcpy(&len, buffer, sizeof(int));
+        memcpy(&len, buffer + mlen - remaining, sizeof(int));
         if (remaining == len)
         {
             [self decodeMessage:buffer+mlen-remaining msglen:remaining];
@@ -219,7 +219,7 @@
     
     long long shareId;
     memcpy(&shareId,  buffer + 2*sizeof(int), sizeof(long long));
-    int picNameLenOffset = 2*sizeof(int) + sizeof(long);
+    int picNameLenOffset = 2*sizeof(int) + sizeof(long long);
     int picNameLen;
     long long picLen;
     memcpy(&picNameLen, buffer+ picNameLenOffset,  sizeof(int));

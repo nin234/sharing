@@ -51,9 +51,13 @@
 {
    if (!isConnected)
        return false;
+    //NSLog(@"Waiting for message");
     *len = recvfrom(cfd, buffer, blen, 0, NULL, NULL);
     if (*len >0)
+    {
+        NSLog(@"Received message of length %zd", *len);
         return true;
+    }
     else if (*len ==0)
     {
         close(cfd);
@@ -68,9 +72,15 @@
             close(cfd);
             isConnected = false;
             NSLog(@"Failed to receive message %zd %d", *len, errno);
+            return false;
+        }
+        else
+        {
+           // NSLog(@"Message recvd failed with EAGAIN trying again");
+            return false;
         }
         
-        return false;
+        
     }
     return true;
 }
@@ -118,7 +128,7 @@
     struct timeval tv;
 
     tv.tv_sec = 5;  /* 5 Secs Timeout */
-    
+    tv.tv_usec = 0;
     setsockopt(cfd, SOL_SOCKET, SO_RCVTIMEO,(struct timeval *)&tv,sizeof(struct timeval));
     /*
     int flags = fcntl(cfd, F_GETFL, 0);
