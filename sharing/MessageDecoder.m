@@ -26,7 +26,7 @@
 {
     if (MSG_AGGR_BUF_LEN - bufIndx < remaining)
     {
-        NSLog(@"Invalid message received remaining=%zd, bufIndx=%d", remaining, bufIndx );
+        NSLog(@"Invalid message received remaining=%zd, bufIndx=%d %s %d", remaining, bufIndx , __FILE__, __LINE__);
         bufIndx =0;
         start = true;
         return true;
@@ -38,36 +38,51 @@
 {
   bool bMore = false;
     bool next =true;
+    int msglen = len;
     while (next)
     {
-        if (remaining == len-bufIndx)
+        if (remaining == msglen-bufIndx)
         {
             if([self bufferOverFlowCheck:remaining])
                 break;
             memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, remaining);
-            [self decodeMessage:aggrbuf msglen:len];
+            [self decodeMessage:aggrbuf msglen:msglen];
             bufIndx = 0;
+            
+            NSLog(@"bufIndx=%d mlen=%zd remaining=%zd len=%d %s %d", bufIndx, mlen, remaining, msglen,  __FILE__, __LINE__);
             start = true;
             break;
         }
-        else if (remaining < (len -bufIndx))
+        else if (remaining < (msglen -bufIndx))
         {
             if([self bufferOverFlowCheck:remaining])
                 break;
             memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, remaining);
             bufIndx += remaining;
+            
+            NSLog(@"bufIndx=%d mlen=%zd remaining=%zd msglen=%d %s %d", bufIndx, mlen, remaining, msglen, __FILE__, __LINE__);
             bMore = true;
             break;
             
         }
         else
         {
-            if([self bufferOverFlowCheck:len-bufIndx])
+            if([self bufferOverFlowCheck:msglen-bufIndx])
                 break;
-            memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, len-bufIndx);
-            [self decodeMessage:aggrbuf msglen:len];
-            remaining -= len - bufIndx;
+            memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, msglen-bufIndx);
+            [self decodeMessage:aggrbuf msglen:msglen];
+            remaining -= msglen - bufIndx;
             bufIndx =0;
+            NSLog(@"bufIndx=%d mlen=%zd remaining=%zd msglen=%d %s %d", bufIndx, mlen, remaining, msglen, __FILE__, __LINE__);
+            if (remaining > sizeof(int))
+            {
+                memcpy(&msglen, buffer+mlen-remaining, sizeof(int));
+            }
+            else
+            {
+                memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, remaining);
+                bufIndx += remaining;
+            }
         }
     }
 
@@ -87,12 +102,15 @@
                 break;
             memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, remaining);
             bufIndx += remaining;
+            
+            NSLog(@"bufIndx=%d mlen=%zd remaining=%zd %s %d", bufIndx, mlen, remaining, __FILE__, __LINE__);
             bMore = true;
             start = false;
             break;
         }
         int len =0;
         memcpy(&len, buffer + mlen - remaining, sizeof(int));
+        NSLog(@"Decoding message mlen=%zd remaining=%zd len=%d %s %d", mlen, remaining, len, __FILE__, __LINE__);
         if (remaining == len)
         {
             [self decodeMessage:buffer+mlen-remaining msglen:remaining];
@@ -104,6 +122,7 @@
                 break;
             memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, remaining);
             bufIndx += remaining;
+            NSLog(@"bufIndx=%d mlen=%zd remaining=%zd len=%d %s %d", bufIndx, mlen, remaining, len, __FILE__, __LINE__);
             bMore = true;
             start = false;
             break;
@@ -145,6 +164,8 @@
                 bMore = true;
                 memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, remaining);
                 bufIndx += remaining;
+                NSLog(@"bufIndx=%d mlen=%zd remaining=%zd", bufIndx, mlen, remaining);
+                NSLog(@"bufIndx=%d mlen=%zd remaining=%zd %s %d", bufIndx, mlen, remaining, __FILE__, __LINE__);
             }
             else
             {
@@ -153,6 +174,7 @@
                 remaining -= lenRmng;
                 bufIndx += lenRmng;
                 memcpy(&len, aggrbuf, sizeof(int));
+                 NSLog(@"bufIndx=%d mlen=%zd remaining=%zd %s %d", bufIndx, mlen, remaining, __FILE__, __LINE__);
                  bMore = [self processFragmentedMessage:buffer msglen:mlen remain:remaining length:len];
             }
 
@@ -183,12 +205,14 @@
             
         case PIC_METADATA_MSG:
         {
+            NSLog(@"Received pic_metadata_msg mlen=%zd %s %d",mlen,  __FILE__, __LINE__);
             bRet = [self processPicMetaDataMessage:buffer msglen:mlen];
         }
             break;
             
         case PIC_MSG:
         {
+            NSLog(@"Received pic_msg mlen=%zd %s %d",mlen,  __FILE__, __LINE__);
             bRet = [self processPicMessage:buffer msglen:mlen];
         }
             break;
@@ -205,7 +229,7 @@
 -(bool) processPicMessage:(char *)buffer msglen:(ssize_t)mlen
 {
     int msgLen=0;
-    memcpy(buffer, &msgLen, sizeof(int));
+    memcpy(&msgLen, buffer, sizeof(int));
     int header = 2*sizeof(int);
     msgLen -= 2*sizeof(int);
     NSData *picDat = [NSData dataWithBytes:buffer + header length:msgLen];

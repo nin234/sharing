@@ -20,6 +20,9 @@
 -(void) storeThumbNailImage:(NSURL *)picUrl;
 -(void) setShareId : (long long) shareId;
 
+@optional
+-(void) updateEasyMainLstVwCntrl;
+
 @end
 
 @interface ShareMgr : NSThread<UIAlertViewDelegate>

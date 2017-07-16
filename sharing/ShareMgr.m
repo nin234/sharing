@@ -370,7 +370,18 @@
     NSLog(@"Setting picMetaData shareId=%lld picName=%@ itemName=%@ picLen=%lld", shareId, name, iName, len);
     pFilHdl = [NSFileHandle fileHandleForWritingToURL:picSaveUrl error:&error];
     if (pFilHdl == nil)
-        NSLog(@"Cannot open file handle for url=%@ , error=%@", picSaveUrl, error);
+    {
+        if ([[NSFileManager defaultManager] createFileAtPath:[picSaveUrl path] contents:nil attributes:nil] == YES)
+        {
+            pFilHdl = [NSFileHandle fileHandleForWritingAtPath:[picSaveUrl path]];
+            if (pFilHdl != nil)
+                NSLog(@"Created file handle for url=%@ , error=%@", picSaveUrl, error);
+            else
+                 NSLog(@"Failed to create file handle for url=%@ , error=%@", picSaveUrl, error);
+                
+        }
+        
+    }
     return;
 }
 
@@ -381,6 +392,7 @@
         [pFilHdl seekToEndOfFile];
         [pFilHdl writeData:picData];
         picSoFar += [picData length];
+        NSLog (@"Storing picData picSoFar=%lld", picSoFar);
         if (picSoFar >= picLen)
         {
             NSLog(@"Closing file descriptor as Image transfer complete ");
@@ -389,6 +401,7 @@
             picSoFar =0;
             picLen = 0;
             [shrMgrDelegate storeThumbNailImage:picSaveUrl];
+            [shrMgrDelegate updateEasyMainLstVwCntrl];
             
         }
         
@@ -406,7 +419,7 @@
     {
         if ([pNtwIntf getResp:rcvbuf buflen:RCV_BUF_LEN msglen:&len])
         {
-            more = [pDecoder processMessage:rcvbuf msglen:len];
+             [pDecoder processMessage:rcvbuf msglen:len];
         }
         else
         {

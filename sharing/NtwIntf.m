@@ -55,14 +55,14 @@
     *len = recvfrom(cfd, buffer, blen, 0, NULL, NULL);
     if (*len >0)
     {
-        NSLog(@"Received message of length %zd", *len);
+        NSLog(@"Received message of length %zd %s %d", *len, __FILE__, __LINE__);
         return true;
     }
     else if (*len ==0)
     {
         close(cfd);
         isConnected = false;
-        NSLog(@"Failed to receive message %zd %d", *len, errno);
+        NSLog(@"Failed to receive message %zd %d %s %d", *len, errno, __FILE__, __LINE__);
         return false;
     }
     else
@@ -127,7 +127,7 @@
     }
     struct timeval tv;
 
-    tv.tv_sec = 5;  /* 5 Secs Timeout */
+    tv.tv_sec = 1;  /* 5 Secs Timeout */
     tv.tv_usec = 0;
     setsockopt(cfd, SOL_SOCKET, SO_RCVTIMEO,(struct timeval *)&tv,sizeof(struct timeval));
     /*
