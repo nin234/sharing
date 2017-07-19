@@ -87,7 +87,7 @@
 {
     if (!shareId)
         return NULL;
-    SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
+    SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
     
     NSString* friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
     if (friendList == nil)

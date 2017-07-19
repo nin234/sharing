@@ -45,7 +45,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 -(void) populateData
 {
     seletedItems = [[NSMutableArray alloc] init];
-    kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
+    kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
     frndDic = [[NSMutableDictionary alloc] init];
     share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
     friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];

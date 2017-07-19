@@ -303,7 +303,10 @@ Keychain API expects as a validly constructed container class.
     {
         // No previous item found; add the new one.
         result = SecItemAdd((__bridge CFDictionaryRef)[self dictionaryToSecItemFormat:keychainItemData], NULL);
-        NSLog(@"SecItemAdd error code %d", (int)result);
+        
+        NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:result userInfo:nil];
+        NSLog(@"SecItemAdd error code %d %@", (int)result, error);
+    
 		NSAssert( result == noErr, @"Couldn't add the Keychain Item." );
     }
 }

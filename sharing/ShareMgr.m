@@ -38,7 +38,7 @@
     NSNumber *shrNumb = [NSNumber numberWithLongLong:share_id];
     
     NSString  *shridStr = [shrNumb stringValue];
-    kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
+    //kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"com.rekhaninan.frndlst"];
     
     [kchain setObject:shridStr forKey:(__bridge id)kSecValueData];
     NSLog(@"Setting shareid %@ into keychain kSecValueData", shridStr);
@@ -225,7 +225,7 @@
         for (int i=0; i < BUFFER_BOUND; ++i)
             upOrDown[i] = false;
         
-        kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
+        kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
         
         
        NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];

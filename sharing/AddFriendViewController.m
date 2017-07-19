@@ -52,7 +52,7 @@
     {
         if (userName != nil)
             oldName = userName;
-        kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.sharing"];
+        kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
         friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
     }
     return self;
