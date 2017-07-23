@@ -82,6 +82,8 @@
             {
                 memcpy(aggrbuf+bufIndx, buffer+mlen-remaining, remaining);
                 bufIndx += remaining;
+                bMore = true;
+                break;
             }
         }
     }
