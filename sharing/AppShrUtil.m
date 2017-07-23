@@ -19,6 +19,7 @@
 @synthesize selFrndCntrl;
 @synthesize controllersListView;
 @synthesize controllersTemplListView;
+@synthesize mainViewNavController ;
 
 -(void) setPurchsdTokens:(NSString *) trid
 {
@@ -111,8 +112,16 @@
     return;
 }
 
+-(void) pushAlbumContentsViewController:(id) albumVwCntrl title:(NSString *)title
+{
+    [mainViewNavController pushViewController:albumVwCntrl animated:NO];
+    mainViewNavController.navigationBar.topItem.title = title;
+    return;
+}
+
 -(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl ContactsDelegate:(id)delegate
 {
+    mainViewNavController = mainVwNavCntrl;
    tabBarController = [[UITabBarController alloc] init];
     HomeViewController *homeCntrl = [[HomeViewController alloc] init];
     [homeCntrl setDelegate:self];

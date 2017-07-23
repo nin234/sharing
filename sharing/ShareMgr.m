@@ -363,7 +363,7 @@
     picSoFar = 0;
     if (picSaveUrl == nil)
     {
-        NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@", name, iName);
+        NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@ %s %d", name, iName, __FILE__, __LINE__);
         return;
     }
     NSError *error;
@@ -401,7 +401,10 @@
             picSoFar =0;
             picLen = 0;
             [shrMgrDelegate storeThumbNailImage:picSaveUrl];
-            [shrMgrDelegate updateEasyMainLstVwCntrl];
+            if ([shrMgrDelegate respondsToSelector:@selector(updateEasyMainLstVwCntrl)] == YES)
+            {
+                [shrMgrDelegate updateEasyMainLstVwCntrl];
+            }
             
         }
         

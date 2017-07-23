@@ -22,6 +22,7 @@
 @property (nonatomic, retain) ContactsViewController  *selFrndCntrl;
 @property (nonatomic, retain) NSArray* controllersListView;
 @property (nonatomic, retain) NSArray* controllersTemplListView;
+@property (nonatomic, retain) UINavigationController *mainViewNavController;
 
 
 -(void) setPurchsdTokens:(NSString *)trid;
@@ -30,6 +31,7 @@
 -(void) showShareView;
 -(void) showTemplShareView;
 -(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl ContactsDelegate:(id)delegate;
+-(void) pushAlbumContentsViewController:(id) albumVwCntrl title:(NSString *) title;
 
 
 
