@@ -23,6 +23,7 @@
 @property (nonatomic, retain) NSArray* controllersListView;
 @property (nonatomic, retain) NSArray* controllersTemplListView;
 @property (nonatomic, retain) UINavigationController *mainViewNavController;
+@property (nonatomic, retain)  HomeViewController *homeCntrl;
 
 
 -(void) setPurchsdTokens:(NSString *)trid;
@@ -33,6 +34,6 @@
 -(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl ContactsDelegate:(id)delegate;
 -(void) pushAlbumContentsViewController:(id) albumVwCntrl title:(NSString *) title;
 
-
+-(void) hideTabBar;
 
 @end

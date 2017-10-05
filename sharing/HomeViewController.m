@@ -16,10 +16,20 @@
 -(void) viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:YES];
+    //self.hidesBottomBarWhenPushed = YES;
     [delegate switchRootView];
     
 }
 
+- (void)viewDidLoad
+{
+  // [delegate switchRootView];
+}
 
+-(void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+}
 
 @end

@@ -12,6 +12,7 @@
 
 @required
 -(void) switchRootView;
+-(void) hideTabBar;
 
 @end
 

@@ -20,6 +20,7 @@
 @synthesize controllersListView;
 @synthesize controllersTemplListView;
 @synthesize mainViewNavController ;
+@synthesize homeCntrl;
 
 -(void) setPurchsdTokens:(NSString *) trid
 {
@@ -65,7 +66,7 @@
     selFrndCntrl.bTemplShare = false;
     tabBarController.viewControllers = controllersListView;
     [self.window setRootViewController:self.tabBarController];
-    return;
+       return;
 }
 
 -(void) showTemplShareView
@@ -74,7 +75,7 @@
     selFrndCntrl.bTemplShare = true;
     tabBarController.viewControllers = controllersTemplListView;
     [self.window setRootViewController:self.tabBarController];
-    return;
+      return;
 }
 
 
@@ -123,7 +124,7 @@
 {
     mainViewNavController = mainVwNavCntrl;
    tabBarController = [[UITabBarController alloc] init];
-    HomeViewController *homeCntrl = [[HomeViewController alloc] init];
+    homeCntrl = [[HomeViewController alloc] init];
     [homeCntrl setDelegate:self];
     UIImage *imageHome = [UIImage imageNamed:@"802-dog-house@2x.png"];
     UIImage *imageHomeSel = [UIImage imageNamed:@"895-dog-house-selected@2x.png"];
@@ -143,10 +144,24 @@
     return;
 }
 
+-(void) hideTabBar
+{
+  
+}
+
+-(void ) showTabBar
+{
+  
+}
+
 -(void) switchRootView
 {
+   //return;
+   
+  self.tabBarController.selectedIndex = 0;
+   
     [self.window setRootViewController:self.navViewController];
-    tabBarController.selectedIndex = 0;
+    
 }
 
 
