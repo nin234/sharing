@@ -23,13 +23,18 @@
 {
     NSUUID *devId = [[UIDevice currentDevice] identifierForVendor];
     NSString *devIdStr = [devId UUIDString];
-    int devIdLen = (int)[devIdStr length] +1;
+    const char *pDevIdStr = [devIdStr UTF8String];
+    if (!pDevIdStr)
+    {
+        NSLog(@"Cannot encode devIdStr for getItems");
+    }
+    int devIdLen = (int)strlen(pDevIdStr) +1;
     int msglen = 16 + devIdLen;
     char *pGetIdMsg = (char *)malloc(msglen);
     memcpy(pGetIdMsg, &msglen, sizeof(int));
     memcpy(pGetIdMsg+4, &msgid, sizeof(int));
     memcpy(pGetIdMsg + 8, &shareId, sizeof(long long));
-    [devIdStr getCString:(pGetIdMsg+16) maxLength:devIdLen encoding:NSASCIIStringEncoding];
+    memcpy(pGetIdMsg+16, pDevIdStr, devIdLen);
     *len = msglen;
     return pGetIdMsg;
 }
@@ -58,7 +63,12 @@
     int storeTrnMsgId =STORE_TRNSCTN_ID_MSG;
     memcpy(pGetIdMsg+4, &storeTrnMsgId, sizeof(int));
     memcpy(pGetIdMsg+8, &shareId, sizeof(long long));
-    [transactionId getCString:(pGetIdMsg+16) maxLength:tridLen encoding:NSASCIIStringEncoding];
+    BOOL isSucess = [transactionId getCString:(pGetIdMsg+16) maxLength:tridLen encoding:NSASCIIStringEncoding];
+    if (isSucess == NO)
+    {
+        NSLog(@"Failed to encode transactionId");
+        return NULL;
+    }
     *len = msglen;
     return pGetIdMsg;
     
@@ -66,19 +76,24 @@
 
 -(char *) storeDeviceToken: (long long) shareId deviceToken:(NSString *)token msgLen:(int *)len
 {
-    int devTknLen = (int) [token length] +1;
-    NSString *devIdStr = @"ios";
-    int devIdLen = (int)[devIdStr length] +1;
     
+    const char *devIdStr = "ios";
+    int devIdLen = (int)strlen(devIdStr) +1;
+    const char *pDevTkn = [token UTF8String];
+    if (!pDevTkn)
+    {
+        NSLog(@"Cannot encode device token");
+        return NULL;
+    }
+    int devTknLen = (int)strlen(pDevTkn) + 1;
     int msglen = devTknLen + devIdLen + 16;
     char *pGetIdMsg = (char *)malloc(msglen);
     memcpy(pGetIdMsg, &msglen, sizeof(int));
     int storeDevTknMsgId = STORE_DEVICE_TKN_MSG;
     memcpy(pGetIdMsg+4, &storeDevTknMsgId, sizeof(int));
     memcpy(pGetIdMsg+8, &shareId, sizeof(long long));
-    [token getCString:(pGetIdMsg+16) maxLength:devTknLen encoding:NSASCIIStringEncoding];
-    [devIdStr getCString:(pGetIdMsg+16 + devTknLen) maxLength:devIdLen encoding:NSASCIIStringEncoding];
-    
+    memcpy(pGetIdMsg+16, pDevTkn, devTknLen);
+    memcpy(pGetIdMsg+16+devTknLen, devIdStr, 4);
     *len = msglen;
     return pGetIdMsg;
 }
@@ -92,14 +107,20 @@
     NSString* friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
     if (friendList == nil)
         return  NULL;
-    int frndLen = (int) [friendList length] + 1;
+    const char *pFrndLst = [friendList UTF8String];
+    if (!pFrndLst)
+    {
+        NSLog(@"Cannot encode friendlist");
+        return NULL;
+    }
+    int frndLen = (int) strlen(pFrndLst)+ 1;
     int msglen = frndLen + 8 + sizeof(long long);
     char *pStoreFrndMsg = (char *)malloc(msglen);
     memcpy(pStoreFrndMsg, &msglen, sizeof(int));
     int storeFrndListMsg = STORE_FRIEND_LIST_MSG;
     memcpy(pStoreFrndMsg + sizeof(int), &storeFrndListMsg, sizeof(int));
     memcpy(pStoreFrndMsg+8, &shareId, sizeof(long long));
-    [friendList getCString:(pStoreFrndMsg + 2*sizeof(int)+sizeof(long long)) maxLength:frndLen encoding:NSASCIIStringEncoding];
+    memcpy(pStoreFrndMsg+2*sizeof(int)+sizeof(long long), pFrndLst, frndLen);
     *len = msglen;
     return pStoreFrndMsg;
     
@@ -120,9 +141,10 @@
     }
     picName = [picName stringByAppendingString:@";"];
     picName = [picName stringByAppendingString:objName];
-    
-    int nameLen = (int)[picName length] + 1;
-    int metaStrLen = (int)[picMetaStr1 length]+ 1;
+    const char *pPicName = [picName UTF8String];
+    const char *pPicMetaStr = [picMetaStr1 UTF8String];
+    int nameLen = (int)strlen(pPicName) + 1;
+    int metaStrLen = (int)strlen(pPicMetaStr)+ 1;
     int msglen = 5*sizeof(int) + nameLen  + sizeof(long long) + metaStrLen;
     *len = msglen;
     
@@ -135,14 +157,16 @@
     memcpy(pStoreMsg+ namelenoffset, &nameLen, sizeof(int));
     
     int nameoffset = namelenoffset + sizeof(int);
-    [picName getCString:(pStoreMsg+nameoffset) maxLength:nameLen encoding:NSASCIIStringEncoding];
+    memcpy(pStoreMsg + nameoffset, pPicName, nameLen);
+   
     int lenghtoffset = nameoffset + nameLen;
     int piclen = (int) length;
     memcpy(pStoreMsg + lenghtoffset, &piclen, sizeof(int));
     int metastrlenoffset = lenghtoffset + sizeof(int);
     memcpy(pStoreMsg + metastrlenoffset, &metaStrLen, sizeof(int));
     int metastroffset = metastrlenoffset+sizeof(int);
-     [picMetaStr1 getCString:(pStoreMsg+metastroffset) maxLength:metaStrLen encoding:NSASCIIStringEncoding];
+    memcpy(pStoreMsg+ metastroffset, pPicMetaStr, metaStrLen);
+     
         return pStoreMsg;
 
 }
@@ -178,8 +202,16 @@
 
 -(char *) shareMsg:(long long) shareId shareList:(NSString *) shareLst  listName: (NSString* ) name msgLen:(int *)len msgId:(int) shareListMsgId
 {
-    int nameLen = (int)[name length] + 1;
-    int listLen = (int) [shareLst length] +1;
+   
+    const char *pShareLst = [shareLst UTF8String];
+    const char *pName = [name UTF8String];
+    if (!pShareLst || !pName)
+    {
+        NSLog(@"Failed to create shareMsg");
+        return NULL;
+    }
+    int listLen = (int)strlen(pShareLst)+1;
+     int nameLen = (int)strlen(pName) + 1;
     int msglen = 4*sizeof(int) + nameLen + listLen + sizeof(long long);
     *len = msglen;
     char *pStoreLst = (char *)malloc(msglen);
@@ -191,11 +223,12 @@
     int listlenoffset = namelenoffset+sizeof(int);
     memcpy(pStoreLst+listlenoffset, &listLen, sizeof(int));
     int nameoffset = listlenoffset + sizeof(int);
-    [name getCString:(pStoreLst+nameoffset) maxLength:nameLen encoding:NSASCIIStringEncoding];
+    memcpy(pStoreLst+nameoffset, pName, nameLen);
     int shareoff = nameoffset+nameLen;
-    [shareLst getCString:(pStoreLst+shareoff) maxLength:listLen encoding:NSASCIIStringEncoding];
-    NSLog(@"shareLst=%@", shareLst);
+    memcpy(pStoreLst +shareoff, pShareLst, listLen);
+       NSLog(@"shareLst=%@", shareLst);
     NSLog(@"shareMsg nameLen=%d listLen=%d msglen=%d nameoffset=%d listoffset=%d", nameLen, listLen, msglen, nameoffset, shareoff);
+   
     return pStoreLst;
 }
 
@@ -214,21 +247,32 @@
 {
     if (!shareId)
         return NULL;
-        int storeLen = (int)[storeLst length] + 1;
-    int msglen = storeLen + 2*sizeof(int) + sizeof(long long);
+    
+    const char *pStoreTemplLst = [storeLst UTF8String];
+    const char *pName = [name UTF8String];
+    if (!pStoreTemplLst || !pName)
+    {
+        NSLog(@"Failed to create archiveItemMsg");
+        return NULL;
+    }
+    int storeLen = (int)strlen(pStoreTemplLst)+1;
+    int nameLen = (int)strlen(pName) + 1;
+    int msglen = storeLen + nameLen + 4*sizeof(int) + sizeof(long long);
     char *pStoreLst = (char *)malloc(msglen);
     memcpy(pStoreLst, &msglen, sizeof(int));
     int storeLstMsgId = ARCHIVE_ITEM_MSG;
     memcpy(pStoreLst + sizeof(int), &storeLstMsgId, sizeof(int));
     memcpy(pStoreLst + 2*sizeof(int), &shareId, sizeof(long long));
-    int nameLen = (int)[name length];
-    int nameoffset = 2*sizeof(int)+sizeof(long long);
-    memcpy(pStoreLst + nameoffset, &nameLen, sizeof(int));
-    int templLstLen = (int)([storeLst length] - nameLen);
+    int nameLenoffset = 2*sizeof(int)+sizeof(long long);
+    memcpy(pStoreLst + nameLenoffset, &nameLen, sizeof(int));
+    
     int storelenoffset = 3*sizeof(int)+sizeof(long long);
-    memcpy(pStoreLst + storelenoffset, &templLstLen, sizeof(int));
-    int storelstoffset = 4*sizeof(int)+sizeof(long long);
-    [storeLst getCString:(pStoreLst + storelstoffset) maxLength:storeLen encoding:NSASCIIStringEncoding];
+    memcpy(pStoreLst + storelenoffset, &storeLen, sizeof(int));
+    int nameoffset =  4*sizeof(int)+sizeof(long long);
+    memcpy(pStoreLst+nameoffset, pName, nameLen);
+    int storelstoffset = 4*sizeof(int)+sizeof(long long) + nameLen;
+    memcpy(pStoreLst + storelstoffset, pStoreTemplLst, storeLen);
+    
     *len = msglen;
     return pStoreLst;
     

@@ -26,7 +26,15 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [pTransl storeDeviceToken:share_id deviceToken:token msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len upd:true];
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len upd:true];
+    }
+    else
+    {
+        NSLog(@"Failed to sent storeDeviceToken message null pointer");
+    }
+        
     return;
 }
 
@@ -100,7 +108,15 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [pTransl updateFriendListRequest:share_id msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len upd:true];
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len upd:true];
+    }
+    else
+    {
+        NSLog(@"Failed to sent updateFriendList message null pointer");
+    }
+
     return;
 }
 
@@ -109,7 +125,16 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl shareItemMsg:self.share_id shareList:list listName:name msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len];
+    
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len];
+    }
+    else
+    {
+        NSLog(@"Failed to sent shareItem message null pointer");
+    }
+
     return;
 }
 
@@ -118,7 +143,15 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl shareTemplItemMsg:shareId  shareList:list listName:name msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len];
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len];
+    }
+    else
+    {
+        NSLog(@"Failed to sent shareTemplItem message null pointer");
+    }
+
 }
 
 
@@ -134,7 +167,15 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl archiveItemMsg:self.share_id itemName:name item:item msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len];
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len];
+    }
+    else
+    {
+        NSLog(@"Failed to sent archiveItem message null pointer");
+    }
+
     return;
 }
 
@@ -143,7 +184,17 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len];
+    
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len];
+    }
+    else
+    {
+        NSLog(@"Failed to sent getItems message null pointer");
+    }
+    
+
     return;
 }
 
@@ -152,7 +203,15 @@
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
-    [self putMsgInQ:pMsgToSend msgLen:len upd:upord];
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len upd:upord];
+    }
+    else
+    {
+        NSLog(@"Failed to sent getItems upord message null pointer");
+    }
+    
     return;
 }
 
