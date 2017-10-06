@@ -166,7 +166,7 @@
     memcpy(pStoreMsg + metastrlenoffset, &metaStrLen, sizeof(int));
     int metastroffset = metastrlenoffset+sizeof(int);
     memcpy(pStoreMsg+ metastroffset, pPicMetaStr, metaStrLen);
-     
+    
         return pStoreMsg;
 
 }
