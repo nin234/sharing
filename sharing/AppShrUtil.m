@@ -124,6 +124,7 @@
 {
     mainViewNavController = mainVwNavCntrl;
    tabBarController = [[UITabBarController alloc] init];
+    tabBarController.delegate = self;
     homeCntrl = [[HomeViewController alloc] init];
     [homeCntrl setDelegate:self];
     UIImage *imageHome = [UIImage imageNamed:@"802-dog-house@2x.png"];
@@ -141,6 +142,12 @@
     
     tabBarController.viewControllers = controllersListView;
     selFrndCntrl.tabBarController = tabBarController;
+    return;
+}
+
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
+{
+   selFrndCntrl.bModeShare = false;
     return;
 }
 

@@ -12,7 +12,7 @@
 #import "HomeViewController.h"
 #import "ContactsViewController.h"
 
-@interface AppShrUtil : NSObject<HomeViewControllerDelegate>
+@interface AppShrUtil : NSObject<HomeViewControllerDelegate, UITabBarControllerDelegate>
 
 @property bool purchased;
 @property (nonatomic, retain) ShareMgr *pShrMgr;
