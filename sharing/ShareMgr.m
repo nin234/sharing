@@ -19,8 +19,8 @@
 @synthesize pTransl;
 @synthesize pDecoder;
 @synthesize shrMgrDelegate;
-
-
+@synthesize appActive;
+@synthesize ntwQ;
 -(void) storeDeviceToken:(NSString *)token
 {
     char *pMsgToSend = NULL;
@@ -281,6 +281,7 @@
         picIndx =0;
         picInsrtIndx =0;
         waitTime = 1;
+        appActive = true;
         for (int i=0; i < BUFFER_BOUND; ++i)
             upOrDown[i] = false;
         
@@ -326,22 +327,54 @@
     }
 }
 
--(void) main
+-(void) processItems
 {
+    NSInvocationOperation* theOp = [[NSInvocationOperation alloc] initWithTarget:self
+                                                                        selector:@selector(mainProcessLoop:) object:false];
+    [ntwQ addOperation:theOp];
+}
+
+-(void ) mainProcessLoop:(bool) bNtwThread
+{
+      bool upd;
     NSData *pMsgToSend;
     NSURL *pImgToSend;
     NSString *pImgMetaData;
-    bool upd;
-    [shrMgrDelegate setShareId:share_id];
-    [self getIdIfRequired];
+    int i=0;
+    if (!bNtwThread)
+    {
+        appActive = false;
+    }
     for(;;)
     {
+        UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+        ++i;
+        if (!bNtwThread)
+        {
+            
+            if (state != UIApplicationStateBackground)
+            {
+                appActive = true;
+                break;
+            }
+           if (i >35)
+               break;
+        }
+        else
+        {
+            if (!appActive)
+            {
+                [NSThread sleepForTimeInterval:1];
+                    continue;
+            }
+        }
+        
         [dataToSend lock];
         pMsgToSend = NULL;
         pImgToSend = NULL;
         pImgMetaData = NULL;
         upd = false;
-        if (sendIndx == insrtIndx || picIndx == picInsrtIndx)
+        if ((sendIndx == insrtIndx || picIndx == picInsrtIndx) && bNtwThread)
         {
             // NSLog(@"Waiting for work\n");
             NSDate *checkTime = [NSDate dateWithTimeIntervalSinceNow:waitTime];
@@ -376,7 +409,17 @@
         [self processResponse];
     }
     
-    return;
+
+}
+
+-(void) main
+{
+   
+    ntwQ = [[NSOperationQueue alloc] init];
+    [shrMgrDelegate setShareId:share_id];
+    [self getIdIfRequired];
+    [self mainProcessLoop:true];
+       return;
 }
 
 -(void) sendPic :(NSURL *)picUrl metaStr:(NSString *)picMetaStr

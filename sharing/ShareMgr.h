@@ -54,6 +54,8 @@
 @property (nonatomic, retain) NtwIntf *pNtwIntf;
 @property  (nonatomic, retain) id pTransl;
 @property (nonatomic, retain) id pDecoder;
+@property (nonatomic) bool appActive;
+@property (strong, nonatomic) NSOperationQueue *ntwQ;
 
 @property (nonatomic, weak) id<ShareMgrDelegate> shrMgrDelegate;
 
@@ -73,6 +75,7 @@
 -(void) getItems:(bool) upd;
 -(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName picLen:(long long) len;
 -(void) storePicData:(NSData *)picData;
-
+-(void ) mainProcessLoop:(bool) bNtwThread;
+-(void) processItems;
 
 @end
