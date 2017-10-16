@@ -253,6 +253,9 @@
     NSString *picNameArr = [NSString stringWithCString:(buffer + picNameOffset) encoding:NSASCIIStringEncoding];
     int picLenOffset = picNameOffset+picNameLen;
     memcpy(&picLen, buffer + picLenOffset, sizeof(long long));
+     int picOffset = picLenOffset + sizeof(long long);
+    int picSoFar =0;
+    memcpy(&picSoFar, buffer + picOffset, sizeof(int));
     NSArray *pArr = [picNameArr componentsSeparatedByString:@";"];
     NSUInteger cnt = [pArr count];
     if (cnt != 2)
@@ -263,7 +266,7 @@
     NSString *picName = [pArr objectAtIndex:0];
     NSString  *itemName = [pArr objectAtIndex:1];
     
-    [self.pShrMgr setPicDetails:shareId picName:picName itemName:itemName picLen:picLen];
+    [self.pShrMgr setPicDetails:shareId picName:picName itemName:itemName picLen:picLen picOffset:picSoFar];
     
     
     

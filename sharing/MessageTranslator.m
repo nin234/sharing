@@ -29,12 +29,40 @@
         NSLog(@"Cannot encode devIdStr for getItems");
     }
     int devIdLen = (int)strlen(pDevIdStr) +1;
-    int msglen = 16 + devIdLen;
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    NSInteger picStored = [kvlocal integerForKey:@"PicLenStored"];
+    NSInteger picLen = [kvlocal integerForKey:@"PicLen"];
+    int picRemaining = (int) (picLen-picStored);
+    if (picRemaining < 0)
+        picRemaining = 0;
+    NSString *name = [kvlocal objectForKey:@"PicName"];
+    NSURL *picUrl = [kvlocal objectForKey:@"PicUrl"];
+    NSError *error;
+    NSFileHandle * pFilHdl = [NSFileHandle fileHandleForWritingToURL:picUrl error:&error];
+    if (pFilHdl == nil)
+        picRemaining = 0;
+    int namelen = 0;
+    const char *pPicName = NULL;
+    if (name != nil && picRemaining)
+    {
+        pPicName = [name UTF8String];
+        namelen = (int)strlen(pPicName) +1;
+    }
+    int msglen = 16 + devIdLen + sizeof(int)+ namelen;
     char *pGetIdMsg = (char *)malloc(msglen);
     memcpy(pGetIdMsg, &msglen, sizeof(int));
     memcpy(pGetIdMsg+4, &msgid, sizeof(int));
     memcpy(pGetIdMsg + 8, &shareId, sizeof(long long));
     memcpy(pGetIdMsg+16, pDevIdStr, devIdLen);
+    memcpy(pGetIdMsg+16+devIdLen, &picRemaining, sizeof(int));
+    if (namelen)
+    {
+        memcpy(pGetIdMsg+20 + devIdLen, pPicName, namelen);
+    }
+    else
+    {
+        memcpy(pGetIdMsg+20 + devIdLen, "", 1);
+    }
     *len = msglen;
     return pGetIdMsg;
 }

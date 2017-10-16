@@ -457,22 +457,25 @@
     return;
 }
 
--(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName picLen:(long long) len
+-(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName
+                picLen:(long long) len picOffset:(int)pSoFar
 {
     
     picSaveUrl  = [shrMgrDelegate getPicUrl:shareId picName:name itemName:iName];
     picLen = len;
-    picSoFar = 0;
+    
     if (picSaveUrl == nil)
     {
         NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@ %s %d", name, iName, __FILE__, __LINE__);
         return;
     }
+    picSoFar = pSoFar;
     NSError *error;
     NSLog(@"Setting picMetaData shareId=%lld picName=%@ itemName=%@ picLen=%lld", shareId, name, iName, len);
     pFilHdl = [NSFileHandle fileHandleForWritingToURL:picSaveUrl error:&error];
     if (pFilHdl == nil)
     {
+        picSoFar = 0;
         if ([[NSFileManager defaultManager] createFileAtPath:[picSaveUrl path] contents:nil attributes:nil] == YES)
         {
             pFilHdl = [NSFileHandle fileHandleForWritingAtPath:[picSaveUrl path]];
@@ -484,6 +487,27 @@
         }
         
     }
+    else
+    {
+        if (picSoFar > 0)
+        {
+            unsigned long long fileSize = [pFilHdl seekToEndOfFile];
+            if (picSoFar < fileSize)
+            {
+                [pFilHdl seekToFileOffset:picSoFar];
+            }
+            else
+            {
+                picSoFar = 0;
+            }
+        }
+    }
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    [kvlocal setInteger:len forKey:@"PicLen"];
+    [kvlocal setObject:name forKey:@"PicName"];
+    [kvlocal setObject:picSaveUrl forKey:@"PicUrl"];
+    [kvlocal setInteger:picSoFar forKey:@"PicLenStored"];
+    
     return;
 }
 
@@ -495,6 +519,8 @@
         [pFilHdl writeData:picData];
         picSoFar += [picData length];
         NSLog (@"Storing picData picSoFar=%lld", picSoFar);
+        NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+        [kvlocal setInteger:picSoFar forKey:@"PicLenStored"];
         if (picSoFar >= picLen)
         {
             NSLog(@"Closing file descriptor as Image transfer complete ");
