@@ -38,12 +38,16 @@
     NSString *name = [kvlocal objectForKey:@"PicName"];
     NSURL *picUrl = [kvlocal objectForKey:@"PicUrl"];
     NSError *error;
-    NSFileHandle * pFilHdl = [NSFileHandle fileHandleForWritingToURL:picUrl error:&error];
+    NSFileHandle * pFilHdl = nil;
+    if (picUrl != nil)
+    {
+        [NSFileHandle fileHandleForWritingToURL:picUrl error:&error];
+    }
     if (pFilHdl == nil)
         picRemaining = 0;
-    int namelen = 0;
+    int namelen = 1;
     const char *pPicName = NULL;
-    if (name != nil && picRemaining)
+    if (name != nil)
     {
         pPicName = [name UTF8String];
         namelen = (int)strlen(pPicName) +1;

@@ -286,8 +286,7 @@
             upOrDown[i] = false;
         
         kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
-        
-        
+                
        NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
     
         if (share_id_str != nil)
@@ -495,10 +494,6 @@
             if (picSoFar < fileSize)
             {
                 [pFilHdl seekToFileOffset:picSoFar];
-            }
-            else
-            {
-                picSoFar = 0;
             }
         }
     }
