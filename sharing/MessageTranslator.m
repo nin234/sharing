@@ -18,6 +18,31 @@
     return [self getItems:shareId msgLen:len msgId:GET_ITEMS];
 }
 
+-(char *) picDone:(long long) shareId msgLen:(int *)len
+{
+    int msgId = PIC_DONE_MSG;
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    NSString *name = [kvlocal objectForKey:@"PicName"];
+    long long picShareId = [kvlocal integerForKey:@"PicShareId"];
+    
+    
+    int namelen = 1;
+    const char *pPicName = "NoName";
+    if (name != nil)
+    {
+        pPicName = [name UTF8String];
+    }
+    namelen = (int)strlen(pPicName) +1;
+    int msglen = 24 + namelen;
+     char *pGetIdMsg = (char *)malloc(msglen);
+    memcpy(pGetIdMsg, &msglen, sizeof(int));
+    memcpy(pGetIdMsg+4, &msgId, sizeof(int));
+    memcpy(pGetIdMsg + 8, &shareId, sizeof(long long));
+    memcpy(pGetIdMsg + 16, &picShareId, sizeof (long long));
+    memcpy(pGetIdMsg + 24, pPicName, namelen);
+    return pGetIdMsg;
+    
+}
 
 -(char *) getItems:(long long)shareId msgLen:(int *)len msgId:(int)msgid
 {
@@ -46,12 +71,12 @@
     if (pFilHdl == nil)
         picRemaining = 0;
     int namelen = 1;
-    const char *pPicName = NULL;
+    const char *pPicName = "NoName";
     if (name != nil)
     {
         pPicName = [name UTF8String];
-        namelen = (int)strlen(pPicName) +1;
     }
+    namelen = (int)strlen(pPicName) +1;
     int msglen = 16 + devIdLen + sizeof(int)+ namelen + sizeof(long long);
     char *pGetIdMsg = (char *)malloc(msglen);
     memcpy(pGetIdMsg, &msglen, sizeof(int));
@@ -59,14 +84,7 @@
     memcpy(pGetIdMsg + 8, &shareId, sizeof(long long));
     memcpy(pGetIdMsg+16, pDevIdStr, devIdLen);
     memcpy(pGetIdMsg+16+devIdLen, &picRemaining, sizeof(int));
-    if (name != nil)
-    {
-        memcpy(pGetIdMsg+20 + devIdLen, pPicName, namelen);
-    }
-    else
-    {
-        memcpy(pGetIdMsg+20 + devIdLen, "", namelen);
-    }
+    memcpy(pGetIdMsg+20 + devIdLen, pPicName, namelen);
     long long picShareId = [kvlocal integerForKey:@"PicShareId"];
     int picshidoffset = 20 + devIdLen + namelen;
     memcpy(pGetIdMsg + picshidoffset, &picShareId, sizeof (long long));

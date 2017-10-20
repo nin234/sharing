@@ -215,6 +215,24 @@
     return;
 }
 
+-(void) picDoneMsg
+{
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl picDone:self.share_id msgLen:&len];
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len];
+    }
+    else
+    {
+        NSLog(@"Failed to sent picDone message null pointer");
+    }
+    
+    return;
+}
+
+
 -(void) putPicInQ:(NSURL *)pPicToSend metaStr:(NSString *)picMetaStr
 {
     if (pPicToSend)
@@ -529,7 +547,7 @@
             {
                 [shrMgrDelegate updateEasyMainLstVwCntrl];
             }
-            
+            [self picDoneMsg];
         }
         
     }

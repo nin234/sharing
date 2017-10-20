@@ -35,6 +35,8 @@
 #define PIC_RPLY_MSG 18
 #define SHARE_TEMPL_ITEM_MSG 19
 #define SHARE_TEMPL_ITEM_RPLY_MSG 20
+#define PIC_DONE_MSG 21
+
 
 
 #endif /* Consts_h */
