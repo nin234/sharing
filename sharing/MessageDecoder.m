@@ -218,7 +218,14 @@
             bRet = [self processPicMessage:buffer msglen:mlen];
         }
             break;
+            
+        case SHOULD_UPLOAD_MSG:
+        {
+            NSLog(@"Received  SHOULD_UPLOAD_MSG mlen=%zd %s %d",mlen,  __FILE__, __LINE__);
+            bRet = [self processShouldUploadMessage:buffer msglen:mlen];
 
+        }
+        break;
             
         default:
             bRet = true;
@@ -226,6 +233,22 @@
     }
     
     return bRet;
+}
+
+-(bool) processShouldUploadMessage:(char *)buffer msglen:(ssize_t)mlen
+{
+    int upload;
+    memcpy(&upload, buffer + 3*sizeof(int) + sizeof(long), sizeof(int));
+    if (upload)
+    {
+        [self.pShrMgr setBSendPic:true];
+    }
+    else
+    {
+        [self.pShrMgr setBSendPicMetaData:true];
+    }
+    
+    return  true;
 }
 
 -(bool) processPicMessage:(char *)buffer msglen:(ssize_t)mlen

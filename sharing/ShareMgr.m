@@ -21,6 +21,9 @@
 @synthesize shrMgrDelegate;
 @synthesize appActive;
 @synthesize ntwQ;
+@synthesize bSendPic;
+@synthesize bSendPicMetaData;
+
 -(void) storeDeviceToken:(NSString *)token
 {
     char *pMsgToSend = NULL;
@@ -300,6 +303,8 @@
         picInsrtIndx =0;
         waitTime = 1;
         appActive = true;
+        bSendPic = false;
+        bSendPicMetaData = true;
         for (int i=0; i < BUFFER_BOUND; ++i)
             upOrDown[i] = false;
         
@@ -407,7 +412,7 @@
                 sendIndx =0;
         }
         
-        if (picIndx != picInsrtIndx)
+        if (bSendPicMetaData && picIndx != picInsrtIndx)
         {
             pImgToSend = pImgsToSend[picIndx];
             pImgMetaData = pImgsMetaData[picIndx];
@@ -418,9 +423,13 @@
         [dataToSend unlock];
         if (pMsgToSend)
             [self sendMsg:pMsgToSend upd:upd];
-        if (pImgToSend)
+        if (pImgMetaData)
         {
-            [self sendPic:pImgToSend metaStr:pImgMetaData];
+            [self sendPicMetaData:pImgToSend metaStr:pImgMetaData];
+        }
+        if (bSendPic)
+        {
+            [self sendPic];
         }
         [self sendGetIdRequest];
         [self processResponse];
@@ -439,12 +448,12 @@
        return;
 }
 
--(void) sendPic :(NSURL *)picUrl metaStr:(NSString *)picMetaStr
+-(void) sendPicMetaData:(NSURL *)picUrl metaStr:(NSString *)picMetaStr
 {
     char *pMsgToSend = NULL;
     int len =0;
+    picData = [NSData dataWithContentsOfURL:picUrl];
     
-    NSData *picData = [NSData dataWithContentsOfURL:picUrl];
     NSArray *pArr = [picMetaStr componentsSeparatedByString:@":::]"];
     NSUInteger cnt = [pArr count];
     if (cnt != 2)
@@ -454,12 +463,19 @@
     }
     NSString *picMetaStrR = [pArr objectAtIndex:0];
     long long shareId = [[pArr objectAtIndex:1] longLongValue];
-   
+    
     pMsgToSend = [self.pTransl sharePicMetaDataMsg:shareId  name:picUrl picLength:[picData length]  metaStr:picMetaStrR msgLen:&len];
     [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len] upd:false];
+    bSendPicMetaData = false;
     NSLog(@"Sent picture metadata msg share_id=%lld picUrl=%@ picLength=%lu metaStr=%@ msgLen=%d %s %d", shareId, picUrl, (unsigned long)[picData length], picMetaStrR, len, __FILE__, __LINE__);
     free(pMsgToSend);
-    NSUInteger indx = 0;
+
+}
+
+-(void) sendPic
+{
+   
+        NSUInteger indx = 0;
     
     for (;;)
     {
@@ -469,6 +485,8 @@
             break;
         [self sendMsg:pPicToSend upd:false];
     }
+    bSendPicMetaData = true;
+    bSendPic = false;
     
  
     return;
@@ -525,13 +543,13 @@
     return;
 }
 
--(void) storePicData:(NSData *)picData
+-(void) storePicData:(NSData *)picData1
 {
     if(pFilHdl != nil)
     {
         [pFilHdl seekToEndOfFile];
-        [pFilHdl writeData:picData];
-        picSoFar += [picData length];
+        [pFilHdl writeData:picData1];
+        picSoFar += [picData1 length];
         NSLog (@"Storing picData picSoFar=%lld", picSoFar);
         NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
         [kvlocal setInteger:picSoFar forKey:@"PicLenStored"];

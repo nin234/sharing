@@ -45,6 +45,8 @@
     NSFileHandle *pFilHdl;
     struct timeval nextIdReqTime;
      long tdelta;
+   
+    NSData *picData;
 
 }
 
@@ -58,6 +60,9 @@
 @property (strong, nonatomic) NSOperationQueue *ntwQ;
 
 @property (nonatomic, weak) id<ShareMgrDelegate> shrMgrDelegate;
+@property (nonatomic) bool bSendPic;
+
+@property (nonatomic)  bool bSendPicMetaData;
 
 -(void) getIdIfRequired;
 -(void) storedTrndIdInCloud;
