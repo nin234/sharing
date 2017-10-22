@@ -246,6 +246,7 @@
     else
     {
         [self.pShrMgr setBSendPicMetaData:true];
+        
     }
     
     return  true;
