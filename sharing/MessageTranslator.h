@@ -24,6 +24,7 @@
 
 -(char *) archiveItemMsg:(long long) shareId  itemName:(NSString *)name item:(NSString*) storeLst msgLen:(int *) len;
 -(char *) getItems:(long long) shareId msgLen:(int *)len;
+-(char *) shouldDownload:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld msgLen:(int *) len;
 -(NSData *) sharePicMsg:(NSData *) picData dataIndx:(NSUInteger *)indx;
 
 @end

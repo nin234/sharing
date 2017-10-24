@@ -296,6 +296,25 @@
     return [self shareMsg:shareId shareList:shareLst listName:name msgLen:len msgId:SHARE_ITEM_MSG];
 }
 
+-(char *) shouldDownload:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld msgLen:(int *) len
+{
+    const char *pName = [name UTF8String];
+    int nameLen = (int)strlen(pName) + 1;
+    int msgId = SHOULD_DOWNLOAD_MSG;
+    int msglen = 24 + nameLen;
+    char *pMsg = (char *)malloc(msglen);
+    memcpy(pMsg, &msglen, sizeof(int));
+    memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+    memcpy(pMsg + 2*sizeof(int), &shareId, sizeof(long long));
+    int download = shDwnld? 1:0;
+    int dwnldoffset = 2*sizeof(int) + sizeof(long long);
+    memcpy(pMsg + dwnldoffset, &download, sizeof(int));
+    int nameoffset = dwnldoffset + sizeof(int);
+    memcpy(pMsg + nameoffset, pName, nameLen);
+    *len = msglen;
+    return pMsg;
+}
+
 -(char *) archiveItemMsg:(long long) shareId  itemName:(NSString *)name item:(NSString*) storeLst msgLen:(int *) len
 {
     if (!shareId)

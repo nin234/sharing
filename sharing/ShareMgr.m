@@ -201,6 +201,8 @@
     return;
 }
 
+
+
 -(void) getItems:(bool) upord
 {
     char *pMsgToSend = NULL;
@@ -504,6 +506,7 @@
         NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@ %s %d", name, iName, __FILE__, __LINE__);
         return;
     }
+    bool shouldDownLoad = true;
     picSoFar = pSoFar;
     NSError *error;
     NSLog(@"Setting picMetaData shareId=%lld picName=%@ itemName=%@ picLen=%lld", shareId, name, iName, len);
@@ -532,6 +535,14 @@
                 [pFilHdl seekToFileOffset:picSoFar];
             }
         }
+        else
+        {
+            unsigned long long fileSize = [pFilHdl seekToEndOfFile];
+            if (fileSize >= len)
+            {
+                shouldDownLoad = false;
+            }
+        }
     }
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
     [kvlocal setInteger:len forKey:@"PicLen"];
@@ -539,8 +550,26 @@
     [kvlocal setObject:name forKey:@"PicName"];
     [kvlocal setObject:picSaveUrl forKey:@"PicUrl"];
     [kvlocal setInteger:picSoFar forKey:@"PicLenStored"];
+    [self shouldDownload:shareId picName:name shldDownload:shouldDownLoad];
     
     return;
+}
+
+-(void) shouldDownload:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld
+{
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl shouldDownload:shareId picName:name shldDownload:shDwnld msgLen:&len];
+    
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len];
+    }
+    else
+    {
+        NSLog(@"Failed to sent shouldDownload message null pointer");
+    }
+
 }
 
 -(void) storePicData:(NSData *)picData1
