@@ -8,6 +8,8 @@
 
 #import "ShareItemDBIntf.h"
 #import "ShareItem.h"
+#import "PicMetaData.h"
+#import "PicUrl.h"
 
 @implementation ShareItemDBIntf
 
@@ -24,6 +26,8 @@
     if (self)
     {
         itemDictonary = [[NSMutableDictionary alloc] init];
+        picMetaDataDictonary = [[NSMutableDictionary alloc] init];
+        picUrlDictonary = [[NSMutableDictionary alloc] init];
         
     }
     return  self;
@@ -62,6 +66,62 @@
         [self saveContext];
     }
     
+}
+
+
+-(void) storePicUrlData : (NSString *) item index:(int)indx
+{
+    NSManagedObjectModel *managedObjectModel =
+    [[self.managedObjectContext persistentStoreCoordinator] managedObjectModel];
+    NSDictionary *ent = [managedObjectModel entitiesByName];
+    printf("entity count %lu\n", (unsigned long)[[ent allKeys] count]);
+    NSEntityDescription *picUrlEntity = [ent objectForKey:@"PicUrl"];
+    PicUrl *picUrl = [[PicUrl alloc] initWithEntity:picUrlEntity insertIntoManagedObjectContext:self.managedObjectContext];
+    picUrl.value = item;
+    picUrl.index = indx;
+    
+    [picUrlDictonary setObject:picUrl forKey:[NSNumber numberWithInt:indx]];
+    [self saveContext];
+}
+
+-(void) deletePicUrlData : (int) index
+{
+    PicUrl *picUrl = [picUrlDictonary objectForKey:[NSNumber numberWithInt:index]];
+    if (picUrl != nil)
+    {
+        [self.managedObjectContext deleteObject:picUrl];
+        [picUrlDictonary removeObjectForKey:[NSNumber numberWithInt:index]];
+        [self saveContext];
+    }
+
+}
+
+-(void) storePicMetaData : (NSString *) item index:(int)indx
+{
+    NSManagedObjectModel *managedObjectModel =
+    [[self.managedObjectContext persistentStoreCoordinator] managedObjectModel];
+    NSDictionary *ent = [managedObjectModel entitiesByName];
+    printf("entity count %lu\n", (unsigned long)[[ent allKeys] count]);
+    NSEntityDescription *picMetaDataEntity = [ent objectForKey:@"PicMetaData"];
+    PicMetaData *picMetaDataItem = [[PicMetaData alloc] initWithEntity:picMetaDataEntity insertIntoManagedObjectContext:self.managedObjectContext];
+    picMetaDataItem.value = item;
+    picMetaDataItem.index = indx;
+    
+    [picMetaDataDictonary setObject:picMetaDataItem forKey:[NSNumber numberWithInt:indx]];
+    [self saveContext];
+
+}
+
+-(void) deletePicMetaData : (int) index
+{
+    PicMetaData *picMetaDataItem = [picMetaDataDictonary objectForKey:[NSNumber numberWithInt:index]];
+    if (picMetaDataItem != nil)
+    {
+        [self.managedObjectContext deleteObject:picMetaDataItem];
+        [picMetaDataDictonary removeObjectForKey:[NSNumber numberWithInt:index]];
+        [self saveContext];
+    }
+ 
 }
 
 - (void)saveContext

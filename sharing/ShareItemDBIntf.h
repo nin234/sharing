@@ -13,6 +13,8 @@
 @interface ShareItemDBIntf : NSObject<UIAlertViewDelegate>
 {
     NSMutableDictionary *itemDictonary;
+    NSMutableDictionary *picMetaDataDictonary;
+    NSMutableDictionary *picUrlDictonary;
 }
 
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
@@ -21,6 +23,14 @@
 
 -(void) storeItem : (NSString *) item index:(int)indx upord:(bool) upd;
 -(void) deleteItem : (int) index;
+
+-(void) storePicMetaData : (NSString *) item index:(int)indx;
+-(void) deletePicMetaData : (int) index;
+
+-(void) storePicUrlData : (NSString *) item index:(int)indx;
+-(void) deletePicUrlData : (int) index;
+
+
 - (void)saveContext;
 
 @end

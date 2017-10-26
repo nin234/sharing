@@ -23,6 +23,8 @@
 /* Begin PBXBuildFile section */
 		3BFE75CE1F9FEF18005A4B56 /* ShareItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFE75CD1F9FEF18005A4B56 /* ShareItem.m */; };
 		3BFE75D11F9FF094005A4B56 /* ShareItemDBIntf.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFE75D01F9FF094005A4B56 /* ShareItemDBIntf.m */; };
+		3BFE75DB1FA17E9F005A4B56 /* PicMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFE75DA1FA17E9F005A4B56 /* PicMetaData.m */; };
+		3BFE75DE1FA2220B005A4B56 /* PicUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFE75DD1FA2220B005A4B56 /* PicUrl.m */; };
 		DB00E5881C8156A400E898F7 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB00E5871C8156A400E898F7 /* HomeViewController.m */; };
 		DB5F3EB91C7005C4003DA1C3 /* NtwIntf.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */; };
 		DB5F3EC31C711FA6003DA1C3 /* ShareMgr.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F3EC21C711FA6003DA1C3 /* ShareMgr.m */; };
@@ -56,6 +58,10 @@
 		3BFE75CD1F9FEF18005A4B56 /* ShareItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShareItem.m; sourceTree = "<group>"; };
 		3BFE75CF1F9FF094005A4B56 /* ShareItemDBIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShareItemDBIntf.h; sourceTree = "<group>"; };
 		3BFE75D01F9FF094005A4B56 /* ShareItemDBIntf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShareItemDBIntf.m; sourceTree = "<group>"; };
+		3BFE75D91FA17E9F005A4B56 /* PicMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicMetaData.h; sourceTree = "<group>"; };
+		3BFE75DA1FA17E9F005A4B56 /* PicMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicMetaData.m; sourceTree = "<group>"; };
+		3BFE75DC1FA2220B005A4B56 /* PicUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicUrl.h; sourceTree = "<group>"; };
+		3BFE75DD1FA2220B005A4B56 /* PicUrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicUrl.m; sourceTree = "<group>"; };
 		DB00E5861C8156A400E898F7 /* HomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
 		DB00E5871C8156A400E898F7 /* HomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
 		DB5F3EB71C7005C3003DA1C3 /* NtwIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NtwIntf.h; sourceTree = "<group>"; };
@@ -135,6 +141,10 @@
 				DB881C471C5F896E00A2D0EA /* MessageTranslator.m */,
 				DB5F3EB71C7005C3003DA1C3 /* NtwIntf.h */,
 				DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */,
+				3BFE75D91FA17E9F005A4B56 /* PicMetaData.h */,
+				3BFE75DA1FA17E9F005A4B56 /* PicMetaData.m */,
+				3BFE75DC1FA2220B005A4B56 /* PicUrl.h */,
+				3BFE75DD1FA2220B005A4B56 /* PicUrl.m */,
 				3BFE75CC1F9FEF18005A4B56 /* ShareItem.h */,
 				3BFE75CD1F9FEF18005A4B56 /* ShareItem.m */,
 				3BFE75CF1F9FF094005A4B56 /* ShareItemDBIntf.h */,
@@ -227,12 +237,14 @@
 			files = (
 				DB5F3EE61C726E14003DA1C3 /* FriendDetails.m in Sources */,
 				DB881C401C5F0E4A00A2D0EA /* sharing.m in Sources */,
+				3BFE75DE1FA2220B005A4B56 /* PicUrl.m in Sources */,
 				DB881C481C5F896E00A2D0EA /* MessageTranslator.m in Sources */,
 				3BFE75D11F9FF094005A4B56 /* ShareItemDBIntf.m in Sources */,
 				DB00E5881C8156A400E898F7 /* HomeViewController.m in Sources */,
 				DB5F3EC81C713C25003DA1C3 /* MessageDecoder.m in Sources */,
 				DB5F3EB91C7005C4003DA1C3 /* NtwIntf.m in Sources */,
 				3BFE75CE1F9FEF18005A4B56 /* ShareItem.m in Sources */,
+				3BFE75DB1FA17E9F005A4B56 /* PicMetaData.m in Sources */,
 				DB881C791C664A4500A2D0EA /* SHKeychainItemWrapper.m in Sources */,
 				DB5F3EE91C726EAD003DA1C3 /* AddFriendViewController.m in Sources */,
 				DBD16B371C976C4700052A03 /* AppShrUtil.m in Sources */,
