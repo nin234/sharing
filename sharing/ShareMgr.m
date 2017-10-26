@@ -7,7 +7,9 @@
 //
 
 #import "ShareMgr.h"
-
+#import "ShareItem.h"
+#import "PicUrl.h"
+#import "PicMetaData.h"
 
 
 @implementation ShareMgr
@@ -245,6 +247,8 @@
         [dataToSend lock];
         pImgsToSend[picInsrtIndx] = pPicToSend;
         pImgsMetaData[picInsrtIndx] = picMetaStr;
+        [pShareDBIntf storePicMetaData:picMetaStr index:picInsrtIndx];
+        [pShareDBIntf storePicUrlData:[pPicToSend absoluteString] index:picInsrtIndx];
         ++picInsrtIndx;
         if (picInsrtIndx == BUFFER_BOUND)
             picInsrtIndx =0;
@@ -259,8 +263,10 @@
     if (pMsgToSend)
     {
         [dataToSend lock];
-        pMsgsToSend[insrtIndx] = [NSData dataWithBytes:pMsgToSend length:len];
+        NSData *pMsg =[NSData dataWithBytes:pMsgToSend length:len];
+        pMsgsToSend[insrtIndx] = pMsg;
         upOrDown[insrtIndx] = upord;
+        [pShareDBIntf storeItem:[[NSString alloc] initWithData:pMsg encoding:NSUTF8StringEncoding] index:insrtIndx upord:upord];
         ++insrtIndx;
         if (insrtIndx == BUFFER_BOUND)
             insrtIndx =0;
@@ -276,8 +282,10 @@
     if (pMsgToSend)
     {
         [dataToSend lock];
-        pMsgsToSend[insrtIndx] = [NSData dataWithBytes:pMsgToSend length:len];
+        NSData *pMsg =[NSData dataWithBytes:pMsgToSend length:len];
+        pMsgsToSend[insrtIndx] = pMsg;
         upOrDown[insrtIndx] = false;
+        [pShareDBIntf storeItem:[[NSString alloc] initWithData:pMsg encoding:NSUTF8StringEncoding] index:insrtIndx upord:false];
         ++insrtIndx;
         if (insrtIndx == BUFFER_BOUND)
             insrtIndx =0;
@@ -324,8 +332,38 @@
         friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
         if (friendList != nil)
             NSLog(@"Friendlist %@", friendList);
+        
+        pShareDBIntf = [[ShareItemDBIntf alloc] init];
+        [self initializeShareObjs];
     }
     return self;
+}
+
+-(void) initializeShareObjs
+{
+    NSMutableDictionary *shareItemDic = [pShareDBIntf refreshItemData];
+    for (NSNumber *key in shareItemDic)
+    {
+        ShareItem *shareItem = [shareItemDic objectForKey:key];
+        pMsgsToSend[shareItem.index] = [shareItem.value dataUsingEncoding:NSUTF8StringEncoding];
+        upOrDown[shareItem.index] = shareItem.upord;
+    }
+    
+    NSMutableDictionary *picUrlDictionary = [pShareDBIntf refreshPicUrls];
+    for (NSNumber *key in picUrlDictionary)
+    {
+        PicUrl *picUrl = [picUrlDictionary objectForKey:key];
+        pImgsToSend[picUrl.index] = [NSURL URLWithString:picUrl.value];
+    }
+    
+    NSMutableDictionary *picMetaDataDic = [pShareDBIntf refreshPicMetaData];
+    for (NSNumber *key in picMetaDataDic)
+    {
+        PicMetaData *picMetaData = [picMetaDataDic objectForKey:key];
+        pImgsMetaData[picMetaData.index] = picMetaData.value;
+    }
+
+    
 }
 
 -(void ) sendGetIdRequest
@@ -409,22 +447,24 @@
             pMsgToSend = pMsgsToSend[sendIndx];
             upd = upOrDown[sendIndx];
             NSLog(@"Sending message at Index=%d insrtIndx=%d upd=%d", sendIndx, insrtIndx, upd);
-            ++sendIndx;
-            if (sendIndx == BUFFER_BOUND)
-                sendIndx =0;
+          
         }
         
         if (bSendPicMetaData && picIndx != picInsrtIndx)
         {
             pImgToSend = pImgsToSend[picIndx];
             pImgMetaData = pImgsMetaData[picIndx];
-            ++picIndx;
-            if (picIndx == BUFFER_BOUND)
-                picIndx = 0;
+            
         }
         [dataToSend unlock];
         if (pMsgToSend)
+        {
             [self sendMsg:pMsgToSend upd:upd];
+            [pShareDBIntf deleteItem:sendIndx];
+            ++sendIndx;
+            if (sendIndx == BUFFER_BOUND)
+                sendIndx =0;
+        }
         if (pImgMetaData)
         {
             [self sendPicMetaData:pImgToSend metaStr:pImgMetaData];
@@ -432,6 +472,12 @@
         if (bSendPic)
         {
             [self sendPic];
+            [pShareDBIntf deletePicMetaData:picIndx];
+            [pShareDBIntf deletePicUrlData:picIndx];
+            ++picIndx;
+            if (picIndx == BUFFER_BOUND)
+                picIndx = 0;
+            
         }
         [self sendGetIdRequest];
         [self processResponse];

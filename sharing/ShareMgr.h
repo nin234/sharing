@@ -12,6 +12,7 @@
 #import "MessageTranslator.h"
 #import "MessageDecoder.h"
 #include "Consts.h"
+#import "ShareItemDBIntf.h"
 #include <sys/time.h>
 
 @protocol ShareMgrDelegate <NSObject>
@@ -45,7 +46,7 @@
     NSFileHandle *pFilHdl;
     struct timeval nextIdReqTime;
      long tdelta;
-   
+    ShareItemDBIntf *pShareDBIntf;
     NSData *picData;
 
 }

@@ -30,7 +30,11 @@
 -(void) storePicUrlData : (NSString *) item index:(int)indx;
 -(void) deletePicUrlData : (int) index;
 
-
 - (void)saveContext;
+
+-(NSMutableDictionary *) refreshItemData;
+-(NSMutableDictionary *) refreshPicUrls;
+-(NSMutableDictionary *) refreshPicMetaData;
+
 
 @end

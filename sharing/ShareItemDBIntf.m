@@ -40,6 +40,60 @@
     return;
 }
 
+-(NSMutableDictionary *) refreshItemData
+{
+    NSManagedObjectContext *moc = self.managedObjectContext;
+    NSEntityDescription *descr = [NSEntityDescription entityForName:@"ShareItem" inManagedObjectContext:moc];
+    NSFetchRequest *req = [[NSFetchRequest alloc] init];
+    [req setEntity:descr];
+    NSError *error = nil;
+    NSArray *shareItems = [moc executeFetchRequest:req error:&error];
+    for (ShareItem *shareItem in shareItems)
+    {
+        [itemDictonary setObject:shareItem forKey:[NSNumber numberWithInt:shareItem.index]];
+    }
+    
+    [self saveContext];
+    return itemDictonary;
+}
+
+-(NSMutableDictionary *) refreshPicUrls
+{
+    NSManagedObjectContext *moc = self.managedObjectContext;
+    NSEntityDescription *descr = [NSEntityDescription entityForName:@"PicUrl" inManagedObjectContext:moc];
+    NSFetchRequest *req = [[NSFetchRequest alloc] init];
+    [req setEntity:descr];
+    NSError *error = nil;
+    NSArray *picUrls = [moc executeFetchRequest:req error:&error];
+    for (PicUrl *picUrl in picUrls)
+    {
+        [picUrlDictonary setObject:picUrl forKey:[NSNumber numberWithInt:picUrl.index]];
+    }
+    
+    [self saveContext];
+    return picUrlDictonary;
+}
+
+-(NSMutableDictionary *) refreshPicMetaData
+{
+    NSManagedObjectContext *moc = self.managedObjectContext;
+    NSEntityDescription *descr = [NSEntityDescription entityForName:@"PicMetaData" inManagedObjectContext:moc];
+    NSFetchRequest *req = [[NSFetchRequest alloc] init];
+    [req setEntity:descr];
+    NSError *error = nil;
+    NSArray *picMetaDatas = [moc executeFetchRequest:req error:&error];
+    for (PicMetaData *picMetaData in picMetaDatas)
+    {
+        [picMetaDataDictonary setObject:picMetaData forKey:[NSNumber numberWithInt:picMetaData.index]];
+    }
+    
+    [self saveContext];
+    return picMetaDataDictonary;
+    
+}
+
+
+
 -(void) storeItem : (NSString *) item index:(int)indx upord:(bool) upd
 {
     NSManagedObjectModel *managedObjectModel =
