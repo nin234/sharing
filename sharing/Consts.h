@@ -9,7 +9,7 @@
 #ifndef Consts_h
 #define Consts_h
 
-#define BUFFER_BOUND 100
+#define BUFFER_BOUND 200
 #define RCV_BUF_LEN 16384
 #define MSG_AGGR_BUF_LEN 32768
 
