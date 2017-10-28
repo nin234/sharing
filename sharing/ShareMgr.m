@@ -459,11 +459,13 @@
         [dataToSend unlock];
         if (pMsgToSend)
         {
-            [self sendMsg:pMsgToSend upd:upd];
-            [pShareDBIntf deleteItem:sendIndx];
-            ++sendIndx;
-            if (sendIndx == BUFFER_BOUND)
-                sendIndx =0;
+           if( [self sendMsg:pMsgToSend upd:upd])
+           {
+               [pShareDBIntf deleteItem:sendIndx];
+               ++sendIndx;
+               if (sendIndx == BUFFER_BOUND)
+                   sendIndx =0;
+           }
         }
         if (pImgMetaData)
         {
@@ -471,12 +473,14 @@
         }
         if (bSendPic)
         {
-            [self sendPic];
-            [pShareDBIntf deletePicMetaData:picIndx];
-            [pShareDBIntf deletePicUrlData:picIndx];
-            ++picIndx;
-            if (picIndx == BUFFER_BOUND)
-                picIndx = 0;
+            if ([self sendPic])
+            {
+                [pShareDBIntf deletePicMetaData:picIndx];
+                [pShareDBIntf deletePicUrlData:picIndx];
+                ++picIndx;
+                if (picIndx == BUFFER_BOUND)
+                    picIndx = 0;
+                }
             
         }
         [self sendGetIdRequest];
@@ -520,7 +524,7 @@
 
 }
 
--(void) sendPic
+-(bool) sendPic
 {
    
         NSUInteger indx = 0;
@@ -531,13 +535,16 @@
         NSData *pPicToSend = [pTransl sharePicMsg:picData dataIndx:&indx];
         if (pPicToSend == nil)
             break;
-        [self sendMsg:pPicToSend upd:false];
+        if (![self sendMsg:pPicToSend upd:false])
+        {
+            return false;
+        }
     }
     bSendPicMetaData = true;
     bSendPic = false;
     
  
-    return;
+    return true;
 }
 
 -(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName
@@ -667,7 +674,7 @@
 
 }
 
--(void) sendMsg:(NSData *)pMsg upd:(bool) upord
+-(bool) sendMsg:(NSData *)pMsg upd:(bool) upord
 {
     if (![pNtwIntf sendMsg:pMsg])
     {
@@ -681,12 +688,12 @@
                            }
                            
                        });
-        
+        return false;
     }
     
     
     //char *pMsg =
-    return;
+    return true;
 }
 
 
