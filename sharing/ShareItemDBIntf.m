@@ -200,12 +200,12 @@
 
 - (NSManagedObjectContext *)managedObjectContext {
     
-    NSLog(@"getting moc");
+    NSLog(@"getting moc for sharing");
     
     if (__managedObjectContext != nil) {
         return __managedObjectContext;
     }
-    NSLog(@"getting moc1");
+    NSLog(@"getting moc1 for sharing");
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
     
     if (coordinator != nil)
