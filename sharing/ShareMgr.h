@@ -64,6 +64,7 @@
 @property (nonatomic) bool bSendPic;
 
 @property (nonatomic)  bool bSendPicMetaData;
+@property (nonatomic) int uploadPicOffset;
 
 -(void) getIdIfRequired;
 -(void) storedTrndIdInCloud;

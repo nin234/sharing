@@ -25,6 +25,7 @@
 @synthesize ntwQ;
 @synthesize bSendPic;
 @synthesize bSendPicMetaData;
+@synthesize uploadPicOffset;
 
 -(void) storeDeviceToken:(NSString *)token
 {
@@ -311,6 +312,7 @@
         insrtIndx =0;
         picIndx =0;
         picInsrtIndx =0;
+        uploadPicOffset = 0;
         waitTime = 1;
         appActive = true;
         bSendPic = false;
@@ -527,7 +529,7 @@
 -(bool) sendPic
 {
    
-        NSUInteger indx = 0;
+        NSUInteger indx = uploadPicOffset;
     
     for (;;)
     {
