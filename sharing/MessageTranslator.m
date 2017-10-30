@@ -301,7 +301,7 @@
     const char *pName = [name UTF8String];
     int nameLen = (int)strlen(pName) + 1;
     int msgId = SHOULD_DOWNLOAD_MSG;
-    int msglen = 24 + nameLen;
+    int msglen = 20 + nameLen;
     char *pMsg = (char *)malloc(msglen);
     memcpy(pMsg, &msglen, sizeof(int));
     memcpy(pMsg+sizeof(int), &msgId, sizeof(int));

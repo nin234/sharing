@@ -200,7 +200,7 @@
 
 - (NSManagedObjectContext *)managedObjectContext {
     
-    NSLog(@"getting moc for sharing");
+   
     
     if (__managedObjectContext != nil) {
         return __managedObjectContext;

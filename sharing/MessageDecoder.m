@@ -240,7 +240,7 @@
     int upload;
     memcpy(&upload, buffer + 3*sizeof(int) + sizeof(long), sizeof(int));
     int picOffset;
-    memcpy (&picOffset, buffer + 3*sizeof(int) + sizeof(long), sizeof(int));
+    memcpy (&picOffset, buffer + 4*sizeof(int) + sizeof(long), sizeof(int));
     [self.pShrMgr setUploadPicOffset:picOffset];
     if (upload)
     {
