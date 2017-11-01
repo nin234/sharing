@@ -48,6 +48,8 @@
      long tdelta;
     ShareItemDBIntf *pShareDBIntf;
     NSData *picData;
+    long long lastPicRcvdTime;
+    bool bSendGetItem;
 
 }
 

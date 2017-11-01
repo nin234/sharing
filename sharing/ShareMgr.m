@@ -185,8 +185,34 @@
     return;
 }
 
+-(void) getItemsInLoop
+{
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
+    
+    if (pMsgToSend)
+    {
+        [self putMsgInQ:pMsgToSend msgLen:len];
+    }
+    else
+    {
+        NSLog(@"Failed to sent getItems message null pointer");
+    }
+    
+    
+    return;
+}
+
 -(void) getItems
 {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    if (tv.tv_sec - lastPicRcvdTime < 120)
+    {
+        bSendGetItem =true;
+        return;
+    }
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
@@ -208,6 +234,13 @@
 
 -(void) getItems:(bool) upord
 {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    if (tv.tv_sec - lastPicRcvdTime < 120)
+    {
+        bSendGetItem =true;
+        return;
+    }
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
@@ -313,6 +346,8 @@
         picIndx =0;
         picInsrtIndx =0;
         uploadPicOffset = 0;
+        lastPicRcvdTime =0;
+        bSendGetItem = false;
         waitTime = 1;
         appActive = true;
         bSendPic = false;
@@ -438,6 +473,11 @@
         pImgToSend = NULL;
         pImgMetaData = NULL;
         upd = false;
+        if (bSendGetItem)
+        {
+            [self getItemsInLoop];
+            bSendGetItem = false;
+        }
         if ((sendIndx == insrtIndx || picIndx == picInsrtIndx) && bNtwThread)
         {
             // NSLog(@"Waiting for work\n");
@@ -555,7 +595,9 @@
     
     picSaveUrl  = [shrMgrDelegate getPicUrl:shareId picName:name itemName:iName];
     picLen = len;
-    
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    lastPicRcvdTime = tv.tv_sec;
     if (picSaveUrl == nil)
     {
         NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@ %s %d", name, iName, __FILE__, __LINE__);
@@ -637,6 +679,9 @@
         NSLog (@"Storing picData picSoFar=%lld", picSoFar);
         NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
         [kvlocal setInteger:picSoFar forKey:@"PicLenStored"];
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        lastPicRcvdTime = tv.tv_sec;
         if (picSoFar >= picLen)
         {
             NSLog(@"Closing file descriptor as Image transfer complete ");
@@ -644,6 +689,7 @@
             pFilHdl = nil;
             picSoFar =0;
             picLen = 0;
+            lastPicRcvdTime = 0;
             [shrMgrDelegate storeThumbNailImage:picSaveUrl];
             if ([shrMgrDelegate respondsToSelector:@selector(updateEasyMainLstVwCntrl)] == YES)
             {
