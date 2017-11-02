@@ -40,6 +40,7 @@
     memcpy(pGetIdMsg + 8, &shareId, sizeof(long long));
     memcpy(pGetIdMsg + 16, &picShareId, sizeof (long long));
     memcpy(pGetIdMsg + 24, pPicName, namelen);
+    *len = msglen;
     return pGetIdMsg;
     
 }
@@ -56,19 +57,24 @@
     int devIdLen = (int)strlen(pDevIdStr) +1;
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
     NSInteger picStored = [kvlocal integerForKey:@"PicLenStored"];
+    //PicLenStored redundant to be eliminated
+    NSString *picUrl = [kvlocal objectForKey:@"PicUrl"];
+    if (picUrl != nil)
+    {
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:picUrl error:NULL];
+        if (attributes != nil)
+            picStored = [attributes fileSize];
+    }
     NSInteger picLen = [kvlocal integerForKey:@"PicLen"];
     int picRemaining = (int) (picLen-picStored);
     if (picRemaining < 0)
         picRemaining = 0;
     NSString *name = [kvlocal objectForKey:@"PicName"];
-    NSURL *picUrl = [kvlocal objectForKey:@"PicUrl"];
-    NSError *error;
+    
+    
     NSFileHandle * pFilHdl = nil;
-    if (picUrl != nil)
-    {
-        [NSFileHandle fileHandleForWritingToURL:picUrl error:&error];
-    }
-    if (pFilHdl == nil)
+    
+        if (pFilHdl == nil)
         picRemaining = 0;
     int namelen = 1;
     const char *pPicName = "NoName";

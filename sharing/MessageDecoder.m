@@ -242,17 +242,7 @@
     int picOffset;
     memcpy (&picOffset, buffer + 4*sizeof(int) + sizeof(long), sizeof(int));
     [self.pShrMgr setUploadPicOffset:picOffset];
-    if (upload)
-    {
-        
-        [self.pShrMgr setBSendPic:true];
-    }
-    else
-    {
-        [self.pShrMgr setBSendPicMetaData:true];
-        
-    }
-    
+    [self.pShrMgr processShouldUploadMsg:upload];
     return  true;
 }
 

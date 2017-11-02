@@ -87,5 +87,7 @@
 -(void) storePicData:(NSData *)picData;
 -(void ) mainProcessLoop:(bool) bNtwThread;
 -(void) processItems;
+-(void) processShouldUploadMsg:(bool) upload;
+
 
 @end

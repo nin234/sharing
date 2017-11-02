@@ -193,7 +193,7 @@
     
     if (pMsgToSend)
     {
-        [self putMsgInQ:pMsgToSend msgLen:len];
+        [self putMsgInQNoLock:pMsgToSend msgLen:len];
     }
     else
     {
@@ -263,6 +263,7 @@
     pMsgToSend = [self.pTransl picDone:self.share_id msgLen:&len];
     if (pMsgToSend)
     {
+        NSLog(@"Sending picDoneMsg");
         [self putMsgInQ:pMsgToSend msgLen:len];
     }
     else
@@ -307,6 +308,24 @@
         free(pMsgToSend);
         [dataToSend signal];
         [dataToSend unlock];
+    }
+    return;
+}
+
+
+
+-(void) putMsgInQNoLock :(char*) pMsgToSend msgLen:(int) len
+{
+    if (pMsgToSend)
+    {
+        NSData *pMsg =[NSData dataWithBytes:pMsgToSend length:len];
+        pMsgsToSend[insrtIndx] = pMsg;
+        upOrDown[insrtIndx] = false;
+        [pShareDBIntf storeItem:[[NSString alloc] initWithData:pMsg encoding:NSUTF8StringEncoding] index:insrtIndx upord:false];
+        ++insrtIndx;
+        if (insrtIndx == BUFFER_BOUND)
+            insrtIndx =0;
+        free(pMsgToSend);
     }
     return;
 }
@@ -517,12 +536,8 @@
         {
             if ([self sendPic])
             {
-                [pShareDBIntf deletePicMetaData:picIndx];
-                [pShareDBIntf deletePicUrlData:picIndx];
-                ++picIndx;
-                if (picIndx == BUFFER_BOUND)
-                    picIndx = 0;
-                }
+                [self updatePicIndx];
+            }
             
         }
         [self sendGetIdRequest];
@@ -530,6 +545,30 @@
     }
     
 
+}
+
+-(void) updatePicIndx
+{
+    [pShareDBIntf deletePicMetaData:picIndx];
+    [pShareDBIntf deletePicUrlData:picIndx];
+    ++picIndx;
+    if (picIndx == BUFFER_BOUND)
+        picIndx = 0;
+    bSendPicMetaData = true;
+    bSendPic = false;
+}
+
+-(void) processShouldUploadMsg : (bool) upload
+{
+    if (upload)
+    {
+        bSendPic = true;
+    }
+    else
+    {
+        [self updatePicIndx];
+    }
+    
 }
 
 -(void) main
@@ -582,10 +621,6 @@
             return false;
         }
     }
-    bSendPicMetaData = true;
-    bSendPic = false;
-    
- 
     return true;
 }
 
@@ -615,7 +650,7 @@
         {
             pFilHdl = [NSFileHandle fileHandleForWritingAtPath:[picSaveUrl path]];
             if (pFilHdl != nil)
-                NSLog(@"Created file handle for url=%@ , error=%@", picSaveUrl, error);
+                NSLog(@"Created file handle for url=%@", picSaveUrl);
             else
                  NSLog(@"Failed to create file handle for url=%@ , error=%@", picSaveUrl, error);
                 
@@ -645,7 +680,7 @@
     [kvlocal setInteger:len forKey:@"PicLen"];
     [kvlocal setInteger:shareId forKey:@"PicShareId"];
     [kvlocal setObject:name forKey:@"PicName"];
-    [kvlocal setObject:picSaveUrl forKey:@"PicUrl"];
+    [kvlocal setObject:[picSaveUrl path] forKey:@"PicUrl"];
     [kvlocal setInteger:picSoFar forKey:@"PicLenStored"];
     [self shouldDownload:shareId picName:name shldDownload:shouldDownLoad];
     
@@ -660,6 +695,7 @@
     
     if (pMsgToSend)
     {
+        NSLog(@"Sending should download msg for shareId=%lld picName=%@ download=%d", shareId, name, shDwnld);
         [self putMsgInQ:pMsgToSend msgLen:len];
     }
     else
