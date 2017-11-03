@@ -629,13 +629,25 @@
 {
     
     picSaveUrl  = [shrMgrDelegate getPicUrl:shareId picName:name itemName:iName];
+    if (picSaveUrl == nil)
+    {
+        //To account for a weird race condition when the pictures are already uploaded and the items is downloaded followed immediatly by picMetaDataMsg
+         NSLog(@"Sleeping to obtain picUrl for picName=%@ itemName=%@ shareId=%lld %s %d", name, iName, shareId, __FILE__, __LINE__);
+        for (int i=0; i < 3; ++i)
+        {
+            [NSThread sleepForTimeInterval:1.0f];
+            picSaveUrl  = [shrMgrDelegate getPicUrl:shareId picName:name itemName:iName];
+            if (picSaveUrl != nil)
+                break;
+        }
+    }
     picLen = len;
     struct timeval tv;
     gettimeofday(&tv, NULL);
     lastPicRcvdTime = tv.tv_sec;
     if (picSaveUrl == nil)
     {
-        NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@ %s %d", name, iName, __FILE__, __LINE__);
+        NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@ shareId=%lld %s %d", name, iName, shareId, __FILE__, __LINE__);
         return;
     }
     bool shouldDownLoad = true;
