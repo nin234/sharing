@@ -135,6 +135,7 @@
     
     [kchain setObject:shridStr forKey:(__bridge id)kSecValueData];
     [kvlocal setBool:NO forKey:@"TokenInServ"];
+    [NSThread sleepForTimeInterval:1.0f];
     exit(1);
 }
 
@@ -428,7 +429,7 @@
     self = [super init];
     if (self)
     {
-        
+     //   [self clearShareId];
         pGetIdReq = NULL;
         dataToSend = [[NSCondition alloc] init];
         gettimeofday(&nextIdReqTime, NULL);
