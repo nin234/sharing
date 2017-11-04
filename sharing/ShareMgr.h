@@ -50,11 +50,14 @@
     NSData *picData;
     long long lastPicRcvdTime;
     bool bSendGetItem;
+    unsigned long long lastIdSentTime;
+    unsigned long long lastTokenUpdateSentTime;
 
 }
 
 @property (nonatomic) long long share_id;
 @property (nonatomic, retain) NSString *friendList;
+@property (nonatomic, retain) NSString *token;
 @property (nonatomic, retain) SHKeychainItemWrapper *kchain;
 @property (nonatomic, retain) NtwIntf *pNtwIntf;
 @property  (nonatomic, retain) id pTransl;
@@ -66,7 +69,10 @@
 @property (nonatomic) bool bSendPic;
 
 @property (nonatomic)  bool bSendPicMetaData;
+@property (nonatomic)  bool bUpdateToken;
 @property (nonatomic) int uploadPicOffset;
+
+-(void )updateDeviceTknStatus;
 
 -(void) getIdIfRequired;
 -(void) storedTrndIdInCloud;
@@ -88,6 +94,6 @@
 -(void ) mainProcessLoop:(bool) bNtwThread;
 -(void) processItems;
 -(void) processShouldUploadMsg:(bool) upload;
-
+-(void) setNewToken:(NSString *)token;
 
 @end

@@ -227,7 +227,15 @@
         }
         break;
             
+        case STORE_DEVICE_TKN_RPLY_MSG:
+        {
+            NSLog (@"Received STORE_DEVICE_TKN_RPLY_MSG");
+            [self.pShrMgr updateDeviceTknStatus];
+        }
+        break;
+            
         default:
+            NSLog(@"Message of type=%d not handled here %s %d", msgTyp, __FILE__, __LINE__);
             bRet = true;
             break;
     }

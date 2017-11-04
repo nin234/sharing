@@ -93,7 +93,7 @@
     }
     else
     {
-        if (![deviceToken isEqualToData:tokenNow])
+        if (![deviceToken isEqualToData:tokenNow] || [kvlocal boolForKey:@"TokenInServ"] == NO)
         {
             [kvlocal setObject:deviceToken forKey:@"NotNToken"];
             bChange = true;

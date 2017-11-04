@@ -26,21 +26,83 @@
 @synthesize bSendPic;
 @synthesize bSendPicMetaData;
 @synthesize uploadPicOffset;
+@synthesize token;
+@synthesize bUpdateToken;
 
--(void) storeDeviceToken:(NSString *)token
+-(void) setNewToken:(NSString *)tkn
+{
+    tkn = token;
+}
+
+-(void) initializeTokenUpdate
+{
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    BOOL tokenInServ = [kvlocal boolForKey:@"TokenInServ"];
+    if (tokenInServ == YES)
+    {
+        bUpdateToken = false;
+    }
+    else
+    {
+        bUpdateToken = true;
+    }
+    NSData *tokenNow = [kvlocal dataForKey:@"NotNToken"];
+    if (tokenNow == nil)
+    {
+        bUpdateToken = false;
+    }
+    token = [[tokenNow description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+    
+    token = [token stringByReplacingOccurrencesOfString:@" " withString:@""];
+}
+
+-(void )updateDeviceTknStatus
+{
+    NSLog (@"Updating device token status to bUpdateToken is false and TokenInServ YES ");
+    bUpdateToken = false;
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    [kvlocal setBool:YES forKey:@"TokenInServ"];
+}
+
+-(void) shareDeviceToken
 {
     char *pMsgToSend = NULL;
     int len =0;
+    if (share_id == 0)
+        return;
+    
+    if (!bUpdateToken)
+        return;
+    
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    if (lastTokenUpdateSentTime > 0)
+    {
+        if (now.tv_sec < lastTokenUpdateSentTime + 120)
+            return;
+    }
+    lastTokenUpdateSentTime = now.tv_sec;
+    
     pMsgToSend = [pTransl storeDeviceToken:share_id deviceToken:token msgLen:&len];
+    NSLog(@"Sending device token message to server share_id=%lld token=%@", share_id, token);
     if (pMsgToSend)
     {
-        [self putMsgInQ:pMsgToSend msgLen:len upd:true];
+        [self putMsgInQNoLock:pMsgToSend msgLen:len];
     }
     else
     {
         NSLog(@"Failed to sent storeDeviceToken message null pointer");
     }
-        
+
+}
+
+-(void) storeDeviceToken:(NSString *)tkn
+{
+    bUpdateToken = true;
+    token = tkn;
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    [kvlocal setBool:NO forKey:@"TokenInServ"];
+    
     return;
 }
 
@@ -56,11 +118,25 @@
     
     [kchain setObject:shridStr forKey:(__bridge id)kSecValueData];
     NSLog(@"Setting shareid %@ into keychain kSecValueData", shridStr);
+    [self shareDeviceToken];
     return;
     
 }
 
 
+-(void ) clearShareId
+{
+    kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    NSNumber *shrNumb = [NSNumber numberWithLongLong:0];
+    
+    NSString  *shridStr = [shrNumb stringValue];
+    //kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"com.rekhaninan.frndlst"];
+    
+    [kchain setObject:shridStr forKey:(__bridge id)kSecValueData];
+    [kvlocal setBool:NO forKey:@"TokenInServ"];
+    exit(1);
+}
 
 -(void) storedTrndIdInCloud
 {
@@ -71,38 +147,36 @@
 
 -(void) getIdIfRequired
 {
-    char *pMsgToSend = NULL;
-    int len =0;
-    /*
-    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
-    
-    NSString *transactionId = [kvlocal objectForKey:@"TransactionId"];
-
-    if (transactionId == nil)
+    if (share_id > 0)
     {
-        
-        NSLog(@"In app purchase incomplete TransactionId object nil in user defaults");
         return;
     }
-    if (share_id)
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    if (lastIdSentTime > 0)
     {
-        BOOL bTokPut = [kvlocal boolForKey:@"TrnIdInCloud"];
-        if (bTokPut == NO)
-        {
-            pMsgToSend = [pTransl storeTrnIdRequest:transactionId share_id:share_id msgLen:&len];
-        }
+            if (now.tv_sec < lastIdSentTime + 120)
+            return;
     }
-    else
-    {
-                pMsgToSend = [pTransl createIdRequest:transactionId msgLen:&len];
-    }
-     */
+    lastIdSentTime = now.tv_sec;
+    char *pMsgToSend = NULL;
+    int len =0;
     
     if (!share_id)
     {
         NSLog(@"Creating share_id request");
         pMsgToSend = [pTransl createIdRequest:@"1000" msgLen:&len];
        pGetIdReq=  [NSData dataWithBytes:pMsgToSend length:len];
+        if (![pNtwIntf sendMsg:pGetIdReq])
+        {
+                    NSLog (@"Failed to send get Id request");
+        }
+        else
+        {
+            NSLog (@"Successfully send get Id request");
+            pGetIdReq = NULL;
+        }
+
     }
     
     
@@ -354,6 +428,7 @@
     self = [super init];
     if (self)
     {
+        
         pGetIdReq = NULL;
         dataToSend = [[NSCondition alloc] init];
         gettimeofday(&nextIdReqTime, NULL);
@@ -366,6 +441,8 @@
         picInsrtIndx =0;
         uploadPicOffset = 0;
         lastPicRcvdTime =0;
+        lastIdSentTime = 0;
+        lastTokenUpdateSentTime = 0;
         bSendGetItem = false;
         waitTime = 1;
         appActive = true;
@@ -389,7 +466,10 @@
         if (friendList != nil)
             NSLog(@"Friendlist %@", friendList);
         
+        [self initializeTokenUpdate];
+        
         pShareDBIntf = [[ShareItemDBIntf alloc] init];
+        
         [self initializeShareObjs];
     }
     return self;
@@ -487,7 +567,11 @@
             }
         }
         
+        
+        
         [dataToSend lock];
+        [self getIdIfRequired];
+        [self shareDeviceToken];
         pMsgToSend = NULL;
         pImgToSend = NULL;
         pImgMetaData = NULL;
@@ -540,7 +624,7 @@
             }
             
         }
-        [self sendGetIdRequest];
+        
         [self processResponse];
     }
     
