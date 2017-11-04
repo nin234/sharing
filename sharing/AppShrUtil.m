@@ -85,7 +85,7 @@
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
     NSData *tokenNow = [kvlocal dataForKey:@"NotNToken"];
     NSLog(@"Did register for remote notification with token %@ tokenNow=%@ %s %d", deviceToken, tokenNow, __FILE__, __LINE__);
-    bool bChange = true;
+    bool bChange = false;
     if (tokenNow == nil)
     {
         [kvlocal setObject:deviceToken forKey:@"NotNToken"];
