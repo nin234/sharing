@@ -262,6 +262,10 @@
 
 -(void) getItemsInLoop
 {
+    if (!self.share_id)
+    {
+        return;
+    }
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
@@ -281,6 +285,11 @@
 
 -(void) getItems
 {
+    if (!self.share_id)
+    {
+        NSLog(@"No share Id too early to send getItems");
+        return;
+    }
     struct timeval tv;
     gettimeofday(&tv, NULL);
     if (tv.tv_sec - lastPicRcvdTime < 120)
@@ -309,6 +318,12 @@
 
 -(void) getItems:(bool) upord
 {
+    if (!self.share_id)
+    {
+        
+        return;
+    }
+
     struct timeval tv;
     gettimeofday(&tv, NULL);
     if (tv.tv_sec - lastPicRcvdTime < 120)
@@ -859,16 +874,7 @@
 {
     if (![pNtwIntf sendMsg:pMsg])
     {
-        
-        dispatch_async(dispatch_get_main_queue(),
-                       ^{
-                           if (!upord)
-                           {
-                               UIAlertView *pAvw = [[UIAlertView alloc] initWithTitle:@"Share Failed" message:@"Failed to share/download item, try again later" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                               [pAvw show];
-                           }
-                           
-                       });
+        NSLog(@"Failed to send Message");
         return false;
     }
     
