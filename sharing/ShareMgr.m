@@ -118,6 +118,7 @@
     
     [kchain setObject:shridStr forKey:(__bridge id)kSecValueData];
     NSLog(@"Setting shareid %@ into keychain kSecValueData", shridStr);
+    bUpdateToken = true;
     [self shareDeviceToken];
     return;
     
@@ -148,6 +149,7 @@
 
 -(void) getIdIfRequired
 {
+    
     if (share_id > 0)
     {
         return;
@@ -555,6 +557,7 @@
     NSURL *pImgToSend;
     NSString *pImgMetaData;
     int i=0;
+    
     if (!bNtwThread)
     {
         appActive = false;
@@ -600,6 +603,14 @@
         if ((sendIndx == insrtIndx || picIndx == picInsrtIndx) && bNtwThread)
         {
             // NSLog(@"Waiting for work\n");
+            if (bNtwConnected)
+            {
+                waitTime = 1;
+            }
+            else
+            {
+                waitTime = 30;
+            }
             NSDate *checkTime = [NSDate dateWithTimeIntervalSinceNow:waitTime];
             [dataToSend waitUntilDate:checkTime];
         }
@@ -622,11 +633,16 @@
         {
            if( [self sendMsg:pMsgToSend upd:upd])
            {
+               bNtwConnected = true;
                [pShareDBIntf deleteItem:sendIndx];
                ++sendIndx;
                if (sendIndx == BUFFER_BOUND)
                    sendIndx =0;
            }
+            else
+            {
+                bNtwConnected = false;
+            }
         }
         if (pImgMetaData)
         {
@@ -673,7 +689,8 @@
 
 -(void) main
 {
-   
+    bNtwConnected = true;
+    
     ntwQ = [[NSOperationQueue alloc] init];
     [shrMgrDelegate setShareId:share_id];
     [self getIdIfRequired];
@@ -698,7 +715,15 @@
     long long shareId = [[pArr objectAtIndex:1] longLongValue];
     
     pMsgToSend = [self.pTransl sharePicMetaDataMsg:shareId  name:picUrl picLength:[picData length]  metaStr:picMetaStrR msgLen:&len];
-    [self sendMsg:[NSData dataWithBytes:pMsgToSend length:len] upd:false];
+    if ([self sendMsg:[NSData dataWithBytes:pMsgToSend length:len] upd:false])
+    {
+        bNtwConnected = true;
+    }
+    else
+    {
+        bNtwConnected = false;
+    }
+
     bSendPicMetaData = false;
     NSLog(@"Sent picture metadata msg share_id=%lld picUrl=%@ picLength=%lu metaStr=%@ msgLen=%d %s %d", shareId, picUrl, (unsigned long)[picData length], picMetaStrR, len, __FILE__, __LINE__);
     free(pMsgToSend);
@@ -718,9 +743,11 @@
             break;
         if (![self sendMsg:pPicToSend upd:false])
         {
+            bNtwConnected = false;
             return false;
         }
     }
+    bNtwConnected = true;
     return true;
 }
 

@@ -52,6 +52,7 @@
     bool bSendGetItem;
     unsigned long long lastIdSentTime;
     unsigned long long lastTokenUpdateSentTime;
+    bool bNtwConnected;
 
 }
 
