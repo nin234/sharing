@@ -564,11 +564,11 @@
     }
     for(;;)
     {
-        UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+       
         ++i;
         if (!bNtwThread)
         {
-            
+             UIApplicationState state = [[UIApplication sharedApplication] applicationState];
             if (state != UIApplicationStateBackground)
             {
                 appActive = true;
