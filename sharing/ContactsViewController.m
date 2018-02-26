@@ -22,11 +22,12 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 @synthesize frndDic;
 @synthesize kchain;
 @synthesize friendList;
-@synthesize bModeShare;
+@synthesize eViewCntrlMode;
 @synthesize pShrMgr;
 @synthesize delegate;
 @synthesize tabBarController;
 @synthesize bTemplShare;
+
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -34,7 +35,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
         if (self)
         {
-            bModeShare = false;
+            eViewCntrlMode = eModeContactsMgmt;
             bTemplShare = false;
         }
 
@@ -104,22 +105,56 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     return;
 }
 
+-(void) setNavItemsForContactsMgmtViewMode
+{
+    NSString *title = @"Contacts";
+    self.navigationItem.title = [NSString stringWithString:title];
+    UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addContact) ];
+    self.navigationItem.rightBarButtonItem = pBarItem1;
+}
+
+-(void) setNavItemsForShareToSelected
+{
+    NSString *title = @"Share to";
+    self.navigationItem.title = [NSString stringWithString:title];
+    UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(shareNow) ];
+    self.navigationItem.rightBarButtonItem = pBarItem1;
+}
+
+-(void ) setNavItemsForSelectToShare
+{
+    NSString *title = @"Select ";
+    self.navigationItem.title = [NSString stringWithString:title];
+    UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(launchChatView) ];
+    self.navigationItem.rightBarButtonItem = pBarItem1;
+}
+
 -(void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     NSLog(@"ContactsViewController viewWillAppear %s %d", __FILE__, __LINE__);
-    NSString *title = @"Contacts";
-    self.navigationItem.title = [NSString stringWithString:title];
+    
     [self populateData];
     [self.tableView reloadData];
-    if (bModeShare)
+    switch (eViewCntrlMode)
     {
-        UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(shareNow) ];
-        self.navigationItem.rightBarButtonItem = pBarItem1;
-        return;
+        case eModeContactsMgmt:
+            [self setNavItemsForContactsMgmtViewMode];
+        break;
+            
+        case eModeShareToSelected:
+            [self setNavItemsForShareToSelected];
+        break;
+            
+        case eModeSelectToShare:
+            [self setNavItemsForSelectToShare];
+        break;
+            
+        default:
+            NSLog (@"Invalid view mode in ContactsViewController");
+            break;
     }
-    UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addContact) ];
-    self.navigationItem.rightBarButtonItem = pBarItem1;
+    
 }
 
 - (void)viewDidLoad
@@ -139,6 +174,11 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
         
     [self.navigationController pushViewController:frndViewController animated:YES];
     return;
+}
+
+-(void) launchChatView
+{
+    NSLog(@"Creating new chat for contact");
 }
 
 -(void) shareNow
@@ -173,7 +213,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
           [delegate shareNow:shareStr];
     }
     tabBarController.selectedIndex = 0;
-    bModeShare = false;
+    eViewCntrlMode = eModeContactsMgmt;
     if (bTemplShare)
     {
         [delegate refreshTemplShareMainLst];
@@ -233,7 +273,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     if (!indexPath.row)
     {
         cell.textLabel.text = @"ME";
-        if (!bModeShare)
+        if (eViewCntrlMode == eModeContactsMgmt)
         {
           cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
@@ -254,7 +294,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
                 labtxt  = item.name ;
             }
         }
-        if (bModeShare)
+        if (eViewCntrlMode != eModeContactsMgmt)
         {
             NSNumber* numbr = [seletedItems objectAtIndex:indexPath.row];
             if ([numbr boolValue] == YES)
@@ -321,7 +361,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     // Navigation logic may go here, for example:
     // Create the next view controller.
     
-    if (bModeShare)
+    if (eViewCntrlMode == eModeShareToSelected)
     {
         UITableViewCell *cell =
         [tableView cellForRowAtIndexPath:indexPath];

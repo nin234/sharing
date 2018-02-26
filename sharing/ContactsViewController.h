@@ -9,6 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "SHKeychainItemWrapper.h"
 
+enum eContactVwCntrlMode
+{
+    eModeContactsMgmt,
+    eModeShareToSelected,
+    eModeSelectToShare
+};
 
 @protocol ContactsViewControllerDelegate <NSObject>
 
@@ -30,7 +36,7 @@
 
 @property (nonatomic, retain) SHKeychainItemWrapper *kchain;
 @property (nonatomic, retain) NSString *friendList;
-@property (nonatomic) bool bModeShare;
+@property enum eContactVwCntrlMode eViewCntrlMode;
 
 -(void) populateData;
 

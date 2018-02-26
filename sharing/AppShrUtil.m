@@ -147,7 +147,7 @@
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
 {
-   selFrndCntrl.bModeShare = false;
+   selFrndCntrl.eViewCntrlMode = eModeContactsMgmt;
     return;
 }
 
