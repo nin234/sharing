@@ -232,6 +232,43 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     // Dispose of any resources that can be recreated.
 }
 
+-(void) changeSelectionForShareToSelected:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell =
+    [self.tableView cellForRowAtIndexPath:indexPath];
+    UITextField *textField = (UITextField *)[cell.contentView viewWithTag:SELECTION_INDICATOR_TAG];
+    NSNumber* numbr = [seletedItems objectAtIndex:indexPath.row];
+    if ([numbr boolValue] == YES)
+    {
+        
+        [seletedItems replaceObjectAtIndex:indexPath.row withObject:[NSNumber numberWithBool:NO]];
+        textField.text = [textField.text stringByReplacingOccurrencesOfString:@"\u2705" withString: @"\u2B1C"];
+    }
+    else
+    {
+        textField.text = [textField.text stringByReplacingOccurrencesOfString:@"\u2B1C" withString:@"\u2705" ];
+        
+        [seletedItems replaceObjectAtIndex:indexPath.row withObject:[NSNumber numberWithBool:YES]];
+        NSUInteger cnt = [seletedItems  count];
+        for (NSUInteger i=1; i < cnt; ++i)
+        {
+            if (i == indexPath.row)
+            {
+                continue;
+            }
+            NSNumber* othr_row_no = [seletedItems objectAtIndex:i];
+            if ([othr_row_no boolValue] == YES)
+            {
+                UITableViewCell *othr_row_cell =
+                [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
+                 UITextField *textField = (UITextField *)[othr_row_cell.contentView viewWithTag:SELECTION_INDICATOR_TAG];
+                textField.text = [textField.text stringByReplacingOccurrencesOfString:@"\u2705" withString: @"\u2B1C"];
+                [seletedItems replaceObjectAtIndex:i withObject:[NSNumber numberWithBool:NO]];
+            }
+        }
+    }
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -380,6 +417,11 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
             [seletedItems replaceObjectAtIndex:indexPath.row withObject:[NSNumber numberWithBool:YES]];
         }
         
+        return;
+    }
+    else if (eViewCntrlMode == eModeSelectToShare)
+    {
+        [self changeSelectionForShareToSelected:indexPath];
         return;
     }
     AddFriendViewController *frndViewController = [AddFriendViewController alloc];
