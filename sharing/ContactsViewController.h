@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "SHKeychainItemWrapper.h"
+#import "FriendDetails.h"
 
 enum eContactVwCntrlMode
 {
@@ -23,6 +24,7 @@ enum eContactVwCntrlMode
 @optional
 -(void) shareTemplList:(NSString *) shareStr;
 -(void) refreshTemplShareMainLst;
+-(void) launchChat:(FriendDetails *) frnd;
 
 @end
 

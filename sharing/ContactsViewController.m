@@ -7,7 +7,6 @@
 //
 
 #import "ContactsViewController.h"
-#import "FriendDetails.h"
 #import "AddFriendViewController.h"
 
 
@@ -179,6 +178,21 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 -(void) launchChatView
 {
     NSLog(@"Creating new chat for contact");
+    NSUInteger cnt = [frndDic count] +1;
+    for (NSUInteger i=0; i < cnt ; ++i)
+    {
+        NSNumber *numbr = [seletedItems objectAtIndex:i];
+        if ([numbr boolValue] == YES)
+        {
+            FriendDetails *frnd = [rownoFrndDetail objectForKey:[NSNumber numberWithUnsignedInteger:i-1]];
+            if (frnd != nil)
+            {
+                [delegate launchChat:frnd];
+                return;
+            }
+        }
+        
+    }
 }
 
 -(void) shareNow
