@@ -28,7 +28,7 @@ enum eContactVwCntrlMode
 
 @end
 
-@interface ContactsViewController : UITableViewController
+@interface ContactsViewController : UITableViewController<UITableViewDelegate>
 {
     NSEnumerator *itr;
     NSMutableDictionary *rownoFrndDetail;
