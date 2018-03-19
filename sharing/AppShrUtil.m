@@ -12,7 +12,7 @@
 @implementation AppShrUtil
 
 @synthesize purchased;
-@synthesize pShrMgr;
+@synthesize pShrMgr = _pShrMgr;
 @synthesize window;
 @synthesize tabBarController;
 @synthesize navViewController;
@@ -40,6 +40,7 @@
         BOOL purch = [kvlocal boolForKey:@"Purchased"];
         if (purch == YES)
             purchased = true;
+        pNotificationHdlr = [[RemoteNotificationHandler alloc] init];
         return self;
     }
     return nil;
@@ -47,16 +48,8 @@
 
 -(void) registerForRemoteNotifications
 {
+    [pNotificationHdlr registerForRemoteNotifications];
     
-    UIUserNotificationType types = UIUserNotificationTypeBadge |
-    UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
-    UIUserNotificationSettings *mySettings =
-    [UIUserNotificationSettings settingsForTypes:types categories:nil];
-    [[UIApplication sharedApplication] registerUserNotificationSettings:mySettings];
-    
-    // Register for remote notifications.
-    [[UIApplication sharedApplication] registerForRemoteNotifications];
-    NSLog(@"Register for remote notification %s %d", __FILE__, __LINE__);
     return;
 }
 
@@ -82,35 +75,18 @@
 
 -(void) didRegisterForRemoteNotification:(NSData *)deviceToken
 {
-    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
-    NSData *tokenNow = [kvlocal dataForKey:@"NotNToken"];
-    NSLog(@"Did register for remote notification with token %@ tokenNow=%@ %s %d", deviceToken, tokenNow, __FILE__, __LINE__);
-    bool bChange = false;
-    if (tokenNow == nil)
-    {
-        [kvlocal setObject:deviceToken forKey:@"NotNToken"];
-        bChange = true;
-    }
-    else
-    {
-        if (![deviceToken isEqualToData:tokenNow] || [kvlocal boolForKey:@"TokenInServ"] == NO)
-        {
-            [kvlocal setObject:deviceToken forKey:@"NotNToken"];
-            bChange = true;
-        }
-    }
-    
-    if (bChange)
-    {
-        NSString *dToken = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
-        
-        dToken = [dToken stringByReplacingOccurrencesOfString:@" " withString:@""];
-      //  dToken = [dToken uppercaseString];
-        NSLog(@"device token %@", dToken);
-        [pShrMgr storeDeviceToken:dToken];
-    }
-
+    [pNotificationHdlr didRegisterForRemoteNotification:deviceToken];
     return;
+}
+
+-(void) setPShrMgr:(ShareMgr *)pShrMgr
+{
+    if (!pNotificationHdlr)
+    {
+        pNotificationHdlr = [[RemoteNotificationHandler alloc] init];
+    }
+    pNotificationHdlr.pShrMgr = pShrMgr;
+    _pShrMgr = pShrMgr;
 }
 
 -(void) pushAlbumContentsViewController:(id) albumVwCntrl title:(NSString *)title
@@ -119,6 +95,8 @@
     mainViewNavController.navigationBar.topItem.title = title;
     return;
 }
+
+
 
 -(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl ContactsDelegate:(id)delegate
 {
@@ -131,7 +109,7 @@
     UIImage *imageHomeSel = [UIImage imageNamed:@"895-dog-house-selected@2x.png"];
     homeCntrl.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:imageHome selectedImage:imageHomeSel];
     selFrndCntrl = [[ContactsViewController alloc] initWithNibName:nil bundle:nil];
-    selFrndCntrl.pShrMgr = pShrMgr;
+    selFrndCntrl.pShrMgr = _pShrMgr;
     selFrndCntrl.delegate = delegate;
     
     selFrndCntrl.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemContacts tag:0];

@@ -11,8 +11,12 @@
 #import "ShareMgr.h"
 #import "HomeViewController.h"
 #import "ContactsViewController.h"
+#import "RemoteNotificationHandler.h"
 
 @interface AppShrUtil : NSObject<HomeViewControllerDelegate, UITabBarControllerDelegate>
+{
+    RemoteNotificationHandler *pNotificationHdlr;
+}
 
 @property bool purchased;
 @property (nonatomic, retain) ShareMgr *pShrMgr;

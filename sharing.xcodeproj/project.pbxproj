@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		3B4E2887205FF60900968E0E /* RemoteNotificationHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B4E2886205FF60900968E0E /* RemoteNotificationHandler.m */; };
 		3BFE75CE1F9FEF18005A4B56 /* ShareItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFE75CD1F9FEF18005A4B56 /* ShareItem.m */; };
 		3BFE75D11F9FF094005A4B56 /* ShareItemDBIntf.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFE75D01F9FF094005A4B56 /* ShareItemDBIntf.m */; };
 		3BFE75DB1FA17E9F005A4B56 /* PicMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 3BFE75DA1FA17E9F005A4B56 /* PicMetaData.m */; };
@@ -54,6 +55,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3B4E2885205FF60900968E0E /* RemoteNotificationHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteNotificationHandler.h; sourceTree = "<group>"; };
+		3B4E2886205FF60900968E0E /* RemoteNotificationHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RemoteNotificationHandler.m; sourceTree = "<group>"; };
 		3BFE75CC1F9FEF18005A4B56 /* ShareItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShareItem.h; sourceTree = "<group>"; };
 		3BFE75CD1F9FEF18005A4B56 /* ShareItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShareItem.m; sourceTree = "<group>"; };
 		3BFE75CF1F9FF094005A4B56 /* ShareItemDBIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShareItemDBIntf.h; sourceTree = "<group>"; };
@@ -126,6 +129,8 @@
 				DB5F3EEA1C726EF7003DA1C3 /* AddFriendViewController.xib */,
 				DBD16B351C976C4700052A03 /* AppShrUtil.h */,
 				DBD16B361C976C4700052A03 /* AppShrUtil.m */,
+				3B4E2885205FF60900968E0E /* RemoteNotificationHandler.h */,
+				3B4E2886205FF60900968E0E /* RemoteNotificationHandler.m */,
 				DB881C491C60285400A2D0EA /* Consts.h */,
 				DB5F3EEF1C72C5CA003DA1C3 /* ContactsViewController.h */,
 				DB5F3EEE1C72C5CA003DA1C3 /* ContactsViewController.m */,
@@ -250,6 +255,7 @@
 				DBD16B371C976C4700052A03 /* AppShrUtil.m in Sources */,
 				DBD16B3C1C98319700052A03 /* InAppPurchase.m in Sources */,
 				DB5F3EF01C72C5CA003DA1C3 /* ContactsViewController.m in Sources */,
+				3B4E2887205FF60900968E0E /* RemoteNotificationHandler.m in Sources */,
 				DB5F3EC31C711FA6003DA1C3 /* ShareMgr.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
