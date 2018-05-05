@@ -816,7 +816,7 @@
         }
     }
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
-    [kvlocal setInteger:len forKey:@"PicLen"];
+    [kvlocal setInteger:(NSInteger)len forKey:@"PicLen"];
     [kvlocal setInteger:shareId forKey:@"PicShareId"];
     [kvlocal setObject:name forKey:@"PicName"];
     [kvlocal setObject:[picSaveUrl path] forKey:@"PicUrl"];
