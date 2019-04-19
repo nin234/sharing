@@ -107,6 +107,12 @@
     [homeCntrl setDelegate:self];
     UIImage *imageHome = [UIImage imageNamed:@"802-dog-house@2x.png"];
     UIImage *imageHomeSel = [UIImage imageNamed:@"895-dog-house-selected@2x.png"];
+    
+  //  UIImage *imageHome = [UIImage imageNamed:@"ic_event_note_white_36pt"];
+   // UIImage *imageHomeSel = [UIImage imageNamed:@"ic_event_note_white_36pt"];
+    
+    // UIImage *imageHome = [UIImage imageNamed:@"ic_list_white_36pt"];
+   //  UIImage *imageHomeSel = [UIImage imageNamed:@"ic_list_white_36pt"];
     homeCntrl.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Home" image:imageHome selectedImage:imageHomeSel];
     selFrndCntrl = [[ContactsViewController alloc] initWithNibName:nil bundle:nil];
     selFrndCntrl.pShrMgr = _pShrMgr;
@@ -120,6 +126,7 @@
     
     tabBarController.viewControllers = controllersListView;
     selFrndCntrl.tabBarController = tabBarController;
+    [self.window setRootViewController:self.tabBarController];
     return;
 }
 
