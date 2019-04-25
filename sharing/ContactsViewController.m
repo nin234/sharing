@@ -56,7 +56,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
         NSUInteger cnt = [friends count];
         if(cnt >1)
         {
-            for (NSUInteger i=1; i < cnt-1; ++i)
+            for (NSUInteger i=0; i < cnt-1; ++i)
             {
                 NSString *frndStr = [friends objectAtIndex:i];
                 if (frndStr != nil && [frndStr length] > 0)

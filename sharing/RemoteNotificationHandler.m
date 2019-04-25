@@ -31,6 +31,7 @@
             bChange = true;
         }
     }
+    //bChange = true;
     
     if (bChange)
     {
