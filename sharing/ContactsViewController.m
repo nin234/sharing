@@ -118,6 +118,13 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     self.navigationItem.title = [NSString stringWithString:title];
     UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(shareNow) ];
     self.navigationItem.rightBarButtonItem = pBarItem1;
+    UIBarButtonItem *pBarItem2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(shareCancel) ];
+    self.navigationItem.leftBarButtonItem = pBarItem2;
+}
+
+-(void) shareCancel
+{
+    [delegate cancelShare];
 }
 
 -(void ) setNavItemsForSelectToShare
@@ -228,6 +235,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     }
     tabBarController.selectedIndex = 0;
     eViewCntrlMode = eModeContactsMgmt;
+    [delegate shareDone];
     if (bTemplShare)
     {
         [delegate refreshTemplShareMainLst];

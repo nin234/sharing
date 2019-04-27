@@ -21,6 +21,8 @@ enum eContactVwCntrlMode
 
 -(void) shareNow:(NSString *) shareStr;
 -(void) refreshShareMainLst;
+-(void) cancelShare;
+-(void) shareDone;
 @optional
 -(void) shareTemplList:(NSString *) shareStr;
 -(void) refreshTemplShareMainLst;
