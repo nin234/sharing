@@ -31,19 +31,30 @@
             bChange = true;
         }
     }
-    //bChange = true;
+  //  bChange = true;
     
     if (bChange)
     {
-        NSString *dToken = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
-        
-        dToken = [dToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSString *dToken = [self stringFromDeviceToken:deviceToken];
         //  dToken = [dToken uppercaseString];
         NSLog(@"device token %@", dToken);
         [pShrMgr storeDeviceToken:dToken];
     }
     
     return;
+}
+
+- (NSString *)stringFromDeviceToken:(NSData *)deviceToken {
+    NSUInteger length = deviceToken.length;
+    if (length == 0) {
+        return nil;
+    }
+    const unsigned char *buffer = deviceToken.bytes;
+    NSMutableString *hexString  = [NSMutableString stringWithCapacity:(length * 2)];
+    for (int i = 0; i < length; ++i) {
+        [hexString appendFormat:@"%02x", buffer[i]];
+    }
+    return [hexString copy];
 }
 
 -(void) registerForRemoteNotifications
