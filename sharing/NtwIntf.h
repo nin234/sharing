@@ -14,15 +14,21 @@
 #include <sys/types.h>
 #include <netdb.h>
 
-@interface NtwIntf : NSObject
+@interface NtwIntf : NSObject 
 {
     int cfd;
     bool isConnected;
+    CFReadStreamRef readStream;
+    CFWriteStreamRef writeStream;
+    NSInputStream *inputStream ;
+    NSOutputStream *outputStream ;
 }
 
 -(instancetype) init;
 @property (nonatomic, retain) NSString *connectAddr;
 @property (nonatomic, retain) NSString *connectPort;
+@property(nonatomic) bool useNSStream;
+@property uint32_t port;
 
 -(bool) sendMsg:(NSData *)pMsg;
 -(bool) connect;

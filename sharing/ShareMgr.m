@@ -887,7 +887,7 @@
     {
         if ([pNtwIntf getResp:rcvbuf buflen:RCV_BUF_LEN msglen:&len])
         {
-             [pDecoder processMessage:rcvbuf msglen:len];
+            [pDecoder processMessage:rcvbuf msglen:len];
         }
         else
         {

@@ -11,12 +11,14 @@
 @implementation NtwIntf
 @synthesize connectAddr;
 @synthesize connectPort;
+@synthesize useNSStream;
+@synthesize port;
 
 -(instancetype) init
 {
    self = [super init];
     isConnected = false;
-    
+    useNSStream = true;
     return self;
 }
 
@@ -30,6 +32,13 @@
             return false;
         }
     }
+    
+    if (useNSStream)
+    {
+        return [self sendStreamMsg:pMsg];
+    }
+    
+    
     NSUInteger len = [pMsg length];
     
      NSLog(@"Sending message to server length=%lu %s %d",(unsigned long)len, __FILE__, __LINE__);
@@ -46,11 +55,85 @@
     return true;
 }
 
+-(bool) sendStreamMsg:(NSData *)pMsg
+{
+    NSStreamStatus status =  [outputStream streamStatus];
+    if (status == NSStreamStatusClosed || status == NSStreamStatusError)
+    {
+        isConnected = false;
+        return false;
+    }
+    
+    if (status != NSStreamStatusOpen)
+    {
+        
+        return false;
+    }
+     NSUInteger len = [pMsg length];
+    NSLog(@"Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+    if ([outputStream hasSpaceAvailable] == YES)
+    {
+        if ([outputStream write:[pMsg bytes] maxLength:[pMsg length]] <= 0)
+        {
+            [inputStream close];
+            [outputStream close];
+            isConnected = false;
+             NSLog(@"Failed to send message ");
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    else
+    {
+        NSLog(@"Failed to send message output stream busy");
+        return false;
+    }
+     return true;
+}
+
+-(bool) getStreamResp:(char*) buffer buflen:(int)blen msglen:(ssize_t*)len
+{
+    NSStreamStatus status =  [inputStream streamStatus];
+    if (status == NSStreamStatusClosed)
+    {
+        isConnected = false;
+        return false;
+    }
+    
+    if ([inputStream hasBytesAvailable] == YES)
+    {
+        *len = [inputStream read:(uint8_t*)buffer maxLength:blen];
+        if (*len>0)
+        {
+             NSLog(@"Received message of length %zd %s %d", *len, __FILE__, __LINE__);
+            return true;
+        }
+        if (*len == -1)
+        {
+            NSLog(@"Failed to receive message %zd", *len);
+            [inputStream close];
+            [outputStream close];
+            isConnected = false;
+        }
+        return false;
+    }
+    
+    return false;
+}
 
 -(bool) getResp:(char*) buffer buflen:(int)blen msglen:(ssize_t*)len
 {
-   if (!isConnected)
-       return false;
+     if (!isConnected)
+         return false;
+    if (useNSStream)
+    {
+        return [self getStreamResp:buffer buflen:blen msglen:len];
+    }
+    
+  
     //NSLog(@"Waiting for message");
     *len = recvfrom(cfd, buffer, blen, 0, NULL, NULL);
     if (*len >0)
@@ -85,8 +168,27 @@
     return true;
 }
 
+-(bool) streamConnect
+{
+            CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)connectAddr, port, &readStream, &writeStream);
+           inputStream = (__bridge_transfer NSInputStream *)readStream;
+           outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+           
+           [inputStream open];
+           [outputStream open];
+    
+    NSLog(@"Connected to server %s %d", __FILE__, __LINE__);
+    isConnected = true;
+    return true;
+}
+
 -(bool) connect
 {
+    if (useNSStream)
+    {
+        return [self streamConnect];
+    }
+    
     NSLog(@"Connecting to server %s %d", __FILE__, __LINE__);
     struct addrinfo hints;
     struct addrinfo *result, *rp;
