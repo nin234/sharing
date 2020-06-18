@@ -18,7 +18,7 @@
 {
    self = [super init];
     isConnected = false;
-    useNSStream = true;
+    useNSStream = false;
     return self;
 }
 
@@ -91,6 +91,7 @@
         NSLog(@"Failed to send message output stream busy");
         return false;
     }
+   
      return true;
 }
 
@@ -173,11 +174,12 @@
             CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)connectAddr, port, &readStream, &writeStream);
            inputStream = (__bridge_transfer NSInputStream *)readStream;
            outputStream = (__bridge_transfer NSOutputStream *)writeStream;
-           
+           [inputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+            [outputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
            [inputStream open];
            [outputStream open];
     
-    NSLog(@"Connected to server %s %d", __FILE__, __LINE__);
+    NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
     isConnected = true;
     return true;
 }

@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <netdb.h>
 
-@interface NtwIntf : NSObject 
+@interface NtwIntf : NSObject <NSStreamDelegate>
 {
     int cfd;
     bool isConnected;
