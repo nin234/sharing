@@ -658,6 +658,7 @@
         }
         
         [self processResponse];
+        [[NSRunLoop  currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2.0]];
     }
     
 

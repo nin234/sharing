@@ -18,7 +18,7 @@
 {
    self = [super init];
     isConnected = false;
-    useNSStream = false;
+    useNSStream = true;
     return self;
 }
 
@@ -57,32 +57,37 @@
 
 -(bool) sendStreamMsg:(NSData *)pMsg
 {
+     NSUInteger len = [pMsg length];
     NSStreamStatus status =  [outputStream streamStatus];
+    NSLog(@"Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
     if (status == NSStreamStatusClosed || status == NSStreamStatusError)
     {
+         NSLog(@"1 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
         isConnected = false;
         return false;
     }
     
     if (status != NSStreamStatusOpen)
     {
-        
+         NSLog(@" 2 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
         return false;
     }
-     NSUInteger len = [pMsg length];
-    NSLog(@"Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+    
+     NSLog(@"3 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
     if ([outputStream hasSpaceAvailable] == YES)
     {
+         NSLog(@"4 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
         if ([outputStream write:[pMsg bytes] maxLength:[pMsg length]] <= 0)
         {
             [inputStream close];
             [outputStream close];
             isConnected = false;
-             NSLog(@"Failed to send message ");
+             NSLog(@"Failed to send message outputStream write failed");
             return false;
         }
         else
         {
+             NSLog(@"Send message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
             return true;
         }
     }
@@ -92,6 +97,7 @@
         return false;
     }
    
+     NSLog(@"5 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
      return true;
 }
 
@@ -171,18 +177,176 @@
 
 -(bool) streamConnect
 {
+    /*
             CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)connectAddr, port, &readStream, &writeStream);
            inputStream = (__bridge_transfer NSInputStream *)readStream;
            outputStream = (__bridge_transfer NSOutputStream *)writeStream;
-           [inputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
-            [outputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+          // [inputStream setProperty:NSStreamSocketSecurityLevelSSLv3 forKey:NSStreamSocketSecurityLevelKey];
+           // [outputStream setProperty:NSStreamSocketSecurityLevelSSLv2 forKey:NSStreamSocketSecurityLevelKey];
+    
+    
+    NSMutableDictionary *settings = [NSMutableDictionary dictionaryWithCapacity:1];
+    //   [settings setObject:(NSString *)NSStreamSocketSecurityLevelSSLv3 forKey:(NSString *)kCFStreamSSLLevel];
+       [settings setObject:(id)kCFBooleanFalse forKey:(NSString *)kCFStreamSSLValidatesCertificateChain];
+      
+    //   inputStream.delegate  = self;
+    //   outputStream.delegate = self;
+
+      // [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
+       //                           forMode:NSDefaultRunLoopMode];
+   // [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]forMode:NSDefaultRunLoopMode];
+
+       CFReadStreamSetProperty((CFReadStreamRef)inputStream, kCFStreamPropertySSLSettings, (CFTypeRef)settings);
+       CFWriteStreamSetProperty((CFWriteStreamRef)outputStream, kCFStreamPropertySSLSettings, (CFTypeRef)settings);
+    
+    
            [inputStream open];
            [outputStream open];
     
     NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
     isConnected = true;
+    
+    
+    */
+    
+   
+
+   
+    CFStreamCreatePairWithSocketToHost(NULL,
+                                       (__bridge CFStringRef)connectAddr,
+                                       port,
+                                       &readStream,
+                                       &writeStream);
+
+    // Set this kCFStreamPropertySocketSecurityLevel before
+    // setting kCFStreamPropertySSLSettings.
+    // Setting kCFStreamPropertySocketSecurityLevel
+    // appears to override previous settings in kCFStreamPropertySSLSettings
+    
+    
+   
+    NSDictionary *sslSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 (id)kCFBooleanFalse, kCFStreamSSLValidatesCertificateChain,
+                                 kCFNull, kCFStreamSSLPeerName,
+                                 (id)kCFBooleanFalse, kCFStreamSSLIsServer,
+                                 kCFStreamSocketSecurityLevelNegotiatedSSL, kCFStreamSSLLevel,
+                                 nil];
+
+  CFReadStreamSetProperty(readStream,
+                            kCFStreamPropertySSLSettings,
+                            (__bridge CFTypeRef _Null_unspecified)(sslSettings));
+
+    CFWriteStreamSetProperty(writeStream,
+    kCFStreamPropertySSLSettings,
+    (__bridge CFTypeRef _Null_unspecified)(sslSettings));
+ 
+    inputStream = (__bridge NSInputStream *)readStream;
+    outputStream = (__bridge NSOutputStream *)writeStream;
+   
+    
+    [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
+                                 forMode:NSDefaultRunLoopMode];
+    [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]forMode:NSDefaultRunLoopMode];
+    inputStream.delegate = self;
+    outputStream.delegate = self;
+    [inputStream open];
+    [outputStream open];
+     NSLog(@"Connecting to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
     return true;
 }
+
+-(void) addSSLCertificate:(NSStream *) aStream
+{
+    NSString* filePath = [[NSBundle mainBundle] pathForResource:@"servercert" ofType:@"der"];
+
+          NSData *iosTrustedCertDerData = [NSData dataWithContentsOfFile:filePath];
+         SecCertificateRef certificate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef) iosTrustedCertDerData);
+
+    SecCertificateRef certs[1] = { certificate };
+     SecTrustRef trust;
+              // #2
+            
+   /* SecTrustRef inputTrust = (__bridge SecTrustRef)([inputStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerTrust]);
+    
+    if (inputTrust == nil)
+    {
+        NSLog(@"Input stream trust object is nil");
+        return;
+    }
+    
+    SecTrustRef outputTrust = (__bridge SecTrustRef)([outputStream propertyForKey:(NSString *) kCFStreamPropertySSLPeerTrust]);
+    
+    if (outputTrust == nil)
+    {
+        NSLog(@"Outputstream stream trust object is nil");
+        return;
+    }
+           */
+    CFArrayRef array = CFArrayCreate(NULL, (const void **) certs, 1, NULL);
+    SecPolicyRef policy   = SecPolicyCreateBasicX509();
+       if(SecTrustCreateWithCertificates(array, policy, &trust) != errSecSuccess)
+       {
+           NSLog(@"Failed to create trust");
+           return;
+       }
+             
+              // #4
+    SecTrustSetAnchorCertificates(trust, (__bridge CFArrayRef) [NSArray arrayWithObject:(__bridge id)certificate]);
+      
+    CFErrorRef error;
+    SecTrustResultType result;
+    if (@available(iOS 12.0, *))
+    {
+        NSLog(@"Evaluating trust");
+        if (!SecTrustEvaluateWithError(trust, &error))
+        {
+            NSLog(@"Failed to evaluated inputTrust error=%@", error);
+            return;
+        }
+        
+      
+    }
+    else
+    {
+        SecTrustEvaluate(trust, &result);
+         
+        // Fallback on earlier versions
+    }
+    
+}
+
+- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode
+{
+    NSLog(@"stream:handleEvent: is invoked... eventCode=%lu", (unsigned long)eventCode);
+ 
+    switch(eventCode)
+    {
+        
+        case NSStreamEventHasSpaceAvailable:
+        {
+            
+          //  [self addSSLCertificate];
+            isConnected = true;
+             NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
+        }
+        break;
+            
+        case NSStreamEventOpenCompleted:
+        {
+            
+          NSLog(@"Adding SSL certificate");
+            [self addSSLCertificate:stream];
+            isConnected = true;
+             NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
+            
+        }
+            break;
+        // continued ...
+            default:
+            break;
+    }
+}
+
 
 -(bool) connect
 {
