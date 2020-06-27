@@ -13,12 +13,14 @@
 @synthesize connectPort;
 @synthesize useNSStream;
 @synthesize port;
+@synthesize connecting;
 
 -(instancetype) init
 {
    self = [super init];
     isConnected = false;
     useNSStream = true;
+    connecting = false;
     return self;
 }
 
