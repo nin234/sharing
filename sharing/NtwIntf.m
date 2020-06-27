@@ -314,6 +314,7 @@
          
         // Fallback on earlier versions
     }
+     NSLog(@"Evaluated trust");
     
 }
 
