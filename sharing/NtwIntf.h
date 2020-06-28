@@ -22,6 +22,8 @@
     CFWriteStreamRef writeStream;
     NSInputStream *inputStream ;
     NSOutputStream *outputStream ;
+    bool bInStreamOpened;
+    bool bOutStreamOpened;
 }
 
 -(instancetype) init;

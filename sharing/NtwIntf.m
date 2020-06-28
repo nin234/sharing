@@ -21,6 +21,8 @@
     isConnected = false;
     useNSStream = true;
     connecting = false;
+    bInStreamOpened = false;
+    bOutStreamOpened = false;
     return self;
 }
 
@@ -211,7 +213,8 @@
     
     */
     
-   
+   bInStreamOpened = false;
+     bOutStreamOpened = false;
 
    
     CFStreamCreatePairWithSocketToHost(NULL,
@@ -327,8 +330,8 @@
         
         case NSStreamEventHasSpaceAvailable:
         {
-            
-          //  [self addSSLCertificate];
+              NSLog(@"Adding SSL certificate");
+            [self addSSLCertificate:stream];
             isConnected = true;
              NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
         }
@@ -336,11 +339,23 @@
             
         case NSStreamEventOpenCompleted:
         {
+            if (stream == inputStream)
+            {
+                bInStreamOpened = true;
+            }
             
-          NSLog(@"Adding SSL certificate");
-            [self addSSLCertificate:stream];
-            isConnected = true;
-             NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
+            if (stream == outputStream)
+            {
+                bOutStreamOpened = true;
+            }
+            
+            if (bOutStreamOpened && bInStreamOpened)
+            {
+                NSLog(@"Adding SSL certificate");
+                [self addSSLCertificate:stream];
+                isConnected = true;
+                NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
+            }
             
         }
             break;
