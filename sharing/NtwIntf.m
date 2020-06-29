@@ -23,6 +23,8 @@
     connecting = false;
     bInStreamOpened = false;
     bOutStreamOpened = false;
+    bAddCertInOpen  = false;
+    bAddCertInHasSpace = false;
     return self;
 }
 
@@ -215,7 +217,7 @@
     
    bInStreamOpened = false;
      bOutStreamOpened = false;
-
+    connecting = true;
    
     CFStreamCreatePairWithSocketToHost(NULL,
                                        (__bridge CFStringRef)connectAddr,
@@ -262,7 +264,7 @@
 
 -(void) addSSLCertificate:(NSStream *) aStream
 {
-    NSString* filePath = [[NSBundle mainBundle] pathForResource:@"servercert" ofType:@"der"];
+    NSString* filePath = [[NSBundle mainBundle] pathForResource:@"client" ofType:@"der"];
 
           NSData *iosTrustedCertDerData = [NSData dataWithContentsOfFile:filePath];
          SecCertificateRef certificate = SecCertificateCreateWithData(NULL, (__bridge CFDataRef) iosTrustedCertDerData);
@@ -330,10 +332,20 @@
         
         case NSStreamEventHasSpaceAvailable:
         {
+            
+            if (bOutStreamOpened && bInStreamOpened)
+            {
+                if (!bAddCertInHasSpace)
+                {
               NSLog(@"Adding SSL certificate");
             [self addSSLCertificate:stream];
             isConnected = true;
              NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
+                    bAddCertInHasSpace = true;
+                    connecting = false;
+                }
+            }
+             
         }
         break;
             
@@ -349,13 +361,23 @@
                 bOutStreamOpened = true;
             }
             
+            
             if (bOutStreamOpened && bInStreamOpened)
             {
+                if (!bAddCertInOpen)
+                {
                 NSLog(@"Adding SSL certificate");
                 [self addSSLCertificate:stream];
                 isConnected = true;
                 NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
+                    bAddCertInOpen = true;
+                    
+                }
+             
+                
             }
+             
+             
             
         }
             break;

@@ -24,13 +24,15 @@
     NSOutputStream *outputStream ;
     bool bInStreamOpened;
     bool bOutStreamOpened;
+    bool bAddCertInOpen;
+    bool bAddCertInHasSpace;
 }
 
 -(instancetype) init;
 @property (nonatomic, retain) NSString *connectAddr;
 @property (nonatomic, retain) NSString *connectPort;
 @property(nonatomic) bool useNSStream;
-@property(nonatomic) bool connecting;
+@property(nonatomic) bool connecting; //either connected or connecting to true
 @property uint32_t port;
 
 -(bool) sendMsg:(NSData *)pMsg;

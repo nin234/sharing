@@ -600,18 +600,21 @@
             [self getItemsInLoop];
             bSendGetItem = false;
         }
-        if ((sendIndx == insrtIndx || picIndx == picInsrtIndx) && bNtwThread)
+        if (((sendIndx == insrtIndx && picIndx == picInsrtIndx) || pNtwIntf.connecting)
+            && bNtwThread)
         {
             // NSLog(@"Waiting for work\n");
-            if (bNtwConnected)
+            if (pNtwIntf.connecting)
             {
                 waitTime = 1;
             }
             else
             {
-                waitTime = 30;
+                waitTime = 3;
             }
+           
             NSDate *checkTime = [NSDate dateWithTimeIntervalSinceNow:waitTime];
+             NSLog(@"Waiting waitTime=%d bNtwConnected=%d connecting=%d", waitTime, bNtwConnected, pNtwIntf.connecting);
             [dataToSend waitUntilDate:checkTime];
         }
         if (sendIndx != insrtIndx)
