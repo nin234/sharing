@@ -614,7 +614,7 @@
             }
            
             NSDate *checkTime = [NSDate dateWithTimeIntervalSinceNow:waitTime];
-             NSLog(@"Waiting waitTime=%d bNtwConnected=%d connecting=%d", waitTime, bNtwConnected, pNtwIntf.connecting);
+           //  NSLog(@"Waiting waitTime=%d bNtwConnected=%d connecting=%d", waitTime, //bNtwConnected, pNtwIntf.connecting);
             [dataToSend waitUntilDate:checkTime];
         }
         if (sendIndx != insrtIndx)
