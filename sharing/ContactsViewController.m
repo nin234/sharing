@@ -116,7 +116,9 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
 {
     NSString *title = @"Share to";
     self.navigationItem.title = [NSString stringWithString:title];
-    UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(shareNow) ];
+    
+     
+    UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStylePlain target:self action:@selector(shareNow) ];
     self.navigationItem.rightBarButtonItem = pBarItem1;
     UIBarButtonItem *pBarItem2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(shareCancel) ];
     self.navigationItem.leftBarButtonItem = pBarItem2;
@@ -224,7 +226,18 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     }
     
     if (!bFnd)
+    {
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Recipient missing"
+                                       message:@"Please select at least one contact to share the item."
+                                       preferredStyle:UIAlertControllerStyleAlert];
+         
+        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+           handler:^(UIAlertAction * action) {}];
+         
+        [alert addAction:defaultAction];
+        [self presentViewController:alert animated:YES completion:nil];
         return;
+    }
     if (bTemplShare)
     {
         [delegate shareTemplList:shareStr];

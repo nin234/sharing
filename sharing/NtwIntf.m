@@ -18,20 +18,31 @@
 -(instancetype) init
 {
    self = [super init];
-    isConnected = false;
+    
     useNSStream = true;
-    connecting = false;
+    [self cleanUpFlags];
+    
+    return self;
+}
+
+-(void) cleanUpFlags
+{
+     connecting = false;
+    isConnected = false;
     bInStreamOpened = false;
     bOutStreamOpened = false;
     bAddCertInOpen  = false;
     bAddCertInHasSpace = false;
-    return self;
 }
 
 -(bool) sendMsg:(NSData *)pMsg
 {
     if (!isConnected)
     {
+        if (connecting)
+        {
+            NSLog(@"Still connecting to server message not send");
+        }
         if (![self connect])
         {
             NSLog(@"Failed to connect to server, failed to send message");
@@ -87,7 +98,7 @@
         {
             [inputStream close];
             [outputStream close];
-            isConnected = false;
+            [self cleanUpFlags];
              NSLog(@"Failed to send message outputStream write failed");
             return false;
         }
@@ -103,7 +114,7 @@
         return false;
     }
    
-     NSLog(@"5 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+    
      return true;
 }
 
@@ -183,37 +194,6 @@
 
 -(bool) streamConnect
 {
-    /*
-            CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)connectAddr, port, &readStream, &writeStream);
-           inputStream = (__bridge_transfer NSInputStream *)readStream;
-           outputStream = (__bridge_transfer NSOutputStream *)writeStream;
-          // [inputStream setProperty:NSStreamSocketSecurityLevelSSLv3 forKey:NSStreamSocketSecurityLevelKey];
-           // [outputStream setProperty:NSStreamSocketSecurityLevelSSLv2 forKey:NSStreamSocketSecurityLevelKey];
-    
-    
-    NSMutableDictionary *settings = [NSMutableDictionary dictionaryWithCapacity:1];
-    //   [settings setObject:(NSString *)NSStreamSocketSecurityLevelSSLv3 forKey:(NSString *)kCFStreamSSLLevel];
-       [settings setObject:(id)kCFBooleanFalse forKey:(NSString *)kCFStreamSSLValidatesCertificateChain];
-      
-    //   inputStream.delegate  = self;
-    //   outputStream.delegate = self;
-
-      // [inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
-       //                           forMode:NSDefaultRunLoopMode];
-   // [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]forMode:NSDefaultRunLoopMode];
-
-       CFReadStreamSetProperty((CFReadStreamRef)inputStream, kCFStreamPropertySSLSettings, (CFTypeRef)settings);
-       CFWriteStreamSetProperty((CFWriteStreamRef)outputStream, kCFStreamPropertySSLSettings, (CFTypeRef)settings);
-    
-    
-           [inputStream open];
-           [outputStream open];
-    
-    NSLog(@"Connected to server=%@ port=%d, %s %d",connectAddr, port, __FILE__, __LINE__);
-    isConnected = true;
-    
-    
-    */
     
    bInStreamOpened = false;
      bOutStreamOpened = false;
@@ -381,6 +361,24 @@
             
         }
             break;
+            
+        case NSStreamEventErrorOccurred:
+        {
+            NSLog(@"Received NSStreamEventErrorOccurred: closing and cleaning up");
+            [inputStream close];
+            [outputStream close];
+            [self cleanUpFlags];
+        }
+        break;
+        
+        case NSStreamEventEndEncountered:
+        {
+            NSLog(@"Received NSStreamEventEndEncountered: closing and cleaning up");
+            [inputStream close];
+            [outputStream close];
+            [self cleanUpFlags];
+        }
+        break;
         // continued ...
             default:
             break;
