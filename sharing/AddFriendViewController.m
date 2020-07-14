@@ -335,12 +335,22 @@
     return YES;
 }
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
-    
-    return YES;
-}
 
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    // Prevent crashing undo bug – see note below.
+    if (textField.tag == 2)
+    {
+        return YES;
+    }
+    if(range.length + range.location > textField.text.length)
+    {
+        return NO;
+    }
+        
+    NSUInteger newLength = [textField.text length] + [string length] - range.length;
+    return newLength <= 5;
+}
 
 
 -(BOOL) textFieldShouldBeginEditing:(UITextField *)textField
@@ -355,6 +365,8 @@
 
     return YES;
 }
+
+
 
 - (void)textChanged:(id)sender
 {
@@ -472,6 +484,7 @@
                 textField.text = userName;
             textField.keyboardType = UIKeyboardTypeNumberPad;
             textField.userInteractionEnabled = YES;
+            textField.tag = 1;
             [cell.contentView addSubview:textField];
         }
         
@@ -491,6 +504,7 @@
             [textField addTarget:self action:@selector(textChanged:) forControlEvents:UIControlEventEditingChanged];
             if (nickName != nil)
                 textField.text = nickName;
+            textField.tag = 2;
             [cell.contentView addSubview:textField];
         }
     }

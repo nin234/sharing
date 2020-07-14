@@ -28,6 +28,8 @@
 @synthesize uploadPicOffset;
 @synthesize token;
 @synthesize bUpdateToken;
+@synthesize bSendAlert;
+@synthesize alertMsg;
 
 -(void) setNewToken:(NSString *)tkn
 {
@@ -447,6 +449,7 @@
     if (self)
     {
      //   [self clearShareId];
+        bSendAlert = false;
         pGetIdReq = NULL;
         dataToSend = [[NSCondition alloc] init];
         gettimeofday(&nextIdReqTime, NULL);
@@ -550,6 +553,24 @@
     [ntwQ addOperation:theOp];
 }
 
+-(void) displayAlertIfReqd
+{
+    if (!bSendAlert)
+    {
+        return;
+    }
+    if (sendIndx == insrtIndx && picIndx == picInsrtIndx)
+    {
+        NSLog(@"Displaying sent item alert");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSString *msg = [NSString stringWithFormat:@"Sent item %@", alertMsg];
+            //msg = [msg stringByAppendingString:alertMsg];
+            [shrMgrDelegate displayAlert:msg];
+        });
+    }
+    bSendAlert = false;
+}
+
 -(void ) mainProcessLoop:(bool) bNtwThread
 {
       bool upd;
@@ -603,6 +624,7 @@
         if (((sendIndx == insrtIndx && picIndx == picInsrtIndx) || pNtwIntf.connecting)
             && bNtwThread)
         {
+            [self displayAlertIfReqd];
             // NSLog(@"Waiting for work\n");
             if (pNtwIntf.connecting)
             {
