@@ -110,6 +110,7 @@ const NSInteger SELECTION_INDICATOR_TAG = 53322;
     self.navigationItem.title = [NSString stringWithString:title];
     UIBarButtonItem *pBarItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addContact) ];
     self.navigationItem.rightBarButtonItem = pBarItem1;
+    self.navigationItem.leftBarButtonItem = nil;
 }
 
 -(void) setNavItemsForShareToSelected
