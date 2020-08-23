@@ -98,7 +98,7 @@
 
 
 
--(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl checkListCntrl:(UINavigationController *)checkListNavCntrl ContactsDelegate:(id)delegate
+-(void) initializeTabBarCntrl:(UINavigationController *)mainShareVwNavCntrl mainNavCntrl:(UINavigationController*) mainVwNavCntrl checkListCntrl:(UINavigationController *)checkListNavCntrl ContactsDelegate:(id)delegate
 {
     mainViewNavController = mainVwNavCntrl;
    tabBarController = [[UITabBarController alloc] init];
@@ -121,9 +121,8 @@
     selFrndCntrl.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:UITabBarSystemItemContacts tag:0];
     UINavigationController *selFrndNavCntrl = [[UINavigationController alloc] initWithRootViewController:selFrndCntrl];
     
-    controllersListView = [NSArray arrayWithObjects:mainVwNavCntrl, selFrndNavCntrl, checkListNavCntrl, homeCntrl, nil];
-    controllersTemplListView = [NSArray arrayWithObjects:mainTemplVwNavCntrl, selFrndNavCntrl, checkListNavCntrl, homeCntrl, nil];
-    
+    controllersListView = [NSArray arrayWithObjects:mainShareVwNavCntrl, selFrndNavCntrl, checkListNavCntrl, mainVwNavCntrl, nil];
+   
     tabBarController.viewControllers = controllersListView;
     selFrndCntrl.tabBarController = tabBarController;
    [self.window setRootViewController:self.tabBarController];
