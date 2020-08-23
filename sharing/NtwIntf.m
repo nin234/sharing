@@ -104,7 +104,8 @@
         }
         else
         {
-             NSLog(@"Send message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+            NSString *strData = [[NSString alloc]initWithData:pMsg encoding:NSUTF8StringEncoding];
+             NSLog(@"Send message to server length=%lu StreamStatus=%lu msg=%@ %s %d ",(unsigned long)len, (unsigned long)status, strData, __FILE__, __LINE__);
             return true;
         }
     }

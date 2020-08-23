@@ -94,8 +94,9 @@
     else
     {
         NSLog(@"Failed to sent storeDeviceToken message null pointer");
+        return;
     }
-
+    NSLog(@"Put device token msg in send Queue");
 }
 
 -(void) storeDeviceToken:(NSString *)tkn
@@ -583,6 +584,8 @@
     {
         appActive = false;
     }
+
+    NSLog(@"Entering main processing loop of ShareMgr");
     for(;;)
     {
        
@@ -620,6 +623,7 @@
         {
             [self getItemsInLoop];
             bSendGetItem = false;
+            
         }
         if (((sendIndx == insrtIndx && picIndx == picInsrtIndx) || pNtwIntf.connecting)
             && bNtwThread)

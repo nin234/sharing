@@ -35,7 +35,7 @@
 -(void) didRegisterForRemoteNotification:(NSData *)deviceToken;
 -(void) showShareView;
 -(void) showTemplShareView;
--(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl ContactsDelegate:(id)delegate;
+-(void) initializeTabBarCntrl:(UINavigationController *)mainVwNavCntrl templNavCntrl:(UINavigationController*) mainTemplVwNavCntrl checkListCntrl:(UINavigationController *)checkListNavCntrl  ContactsDelegate:(id)delegate;
 -(void) pushAlbumContentsViewController:(id) albumVwCntrl title:(NSString *) title;
 
 -(void) hideTabBar;
