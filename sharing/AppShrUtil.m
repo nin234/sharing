@@ -21,6 +21,7 @@
 @synthesize controllersTemplListView;
 @synthesize mainViewNavController ;
 @synthesize homeCntrl;
+@synthesize delegate;
 
 -(void) setPurchsdTokens:(NSString *) trid
 {
@@ -125,6 +126,7 @@
    
     tabBarController.viewControllers = controllersListView;
     selFrndCntrl.tabBarController = tabBarController;
+     self.tabBarController.selectedIndex = 3;
    [self.window setRootViewController:self.tabBarController];
     return;
 }
@@ -132,6 +134,10 @@
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
 {
    selFrndCntrl.eViewCntrlMode = eModeContactsMgmt;
+  if (tabBarController.selectedIndex == 0)
+  {
+      [delegate refreshShareView];
+  }
     return;
 }
 

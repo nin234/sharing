@@ -13,6 +13,12 @@
 #import "ContactsViewController.h"
 #import "RemoteNotificationHandler.h"
 
+@protocol AppShrUtilDelegate <NSObject>
+
+-(void) refreshShareView;
+
+@end
+
 @interface AppShrUtil : NSObject<HomeViewControllerDelegate, UITabBarControllerDelegate>
 {
     RemoteNotificationHandler *pNotificationHdlr;
@@ -29,6 +35,7 @@
 @property (nonatomic, retain) UINavigationController *mainViewNavController;
 @property (nonatomic, retain)  HomeViewController *homeCntrl;
 
+@property (nonatomic, weak) id<AppShrUtilDelegate> delegate;
 
 -(void) setPurchsdTokens:(NSString *)trid;
 -(void) registerForRemoteNotifications;
