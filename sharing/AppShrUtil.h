@@ -35,6 +35,8 @@
 @property (nonatomic, retain) UINavigationController *mainViewNavController;
 @property (nonatomic, retain)  HomeViewController *homeCntrl;
 
+@property (nonatomic, retain) UINavigationController *shareViewNavController;
+
 @property (nonatomic, weak) id<AppShrUtilDelegate> delegate;
 
 -(void) setPurchsdTokens:(NSString *)trid;

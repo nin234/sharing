@@ -22,6 +22,7 @@
 @synthesize mainViewNavController ;
 @synthesize homeCntrl;
 @synthesize delegate;
+@synthesize shareViewNavController;
 
 -(void) setPurchsdTokens:(NSString *) trid
 {
@@ -92,8 +93,8 @@
 
 -(void) pushAlbumContentsViewController:(id) albumVwCntrl title:(NSString *)title
 {
-    [mainViewNavController pushViewController:albumVwCntrl animated:NO];
-    mainViewNavController.navigationBar.topItem.title = title;
+    [shareViewNavController pushViewController:albumVwCntrl animated:NO];
+    shareViewNavController.navigationBar.topItem.title = title;
     return;
 }
 
@@ -101,6 +102,7 @@
 
 -(void) initializeTabBarCntrl:(UINavigationController *)mainShareVwNavCntrl mainNavCntrl:(UINavigationController*) mainVwNavCntrl checkListCntrl:(UINavigationController *)checkListNavCntrl ContactsDelegate:(id)delegate
 {
+    shareViewNavController = mainShareVwNavCntrl;
     mainViewNavController = mainVwNavCntrl;
    tabBarController = [[UITabBarController alloc] init];
     tabBarController.delegate = self;
