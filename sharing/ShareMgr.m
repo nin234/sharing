@@ -152,11 +152,12 @@
 
 -(void) getIdIfRequired
 {
-    
+   
     if (share_id > 0)
     {
         return;
     }
+    
     struct timeval now;
     gettimeofday(&now, NULL);
     if (lastIdSentTime > 0)
@@ -722,6 +723,7 @@
     bNtwConnected = true;
     
     ntwQ = [[NSOperationQueue alloc] init];
+    
     [shrMgrDelegate setShareId:share_id];
     [self getIdIfRequired];
     [self mainProcessLoop:true];
