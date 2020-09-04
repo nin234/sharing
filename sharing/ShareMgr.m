@@ -762,6 +762,8 @@
 
 }
 
+
+
 -(bool) sendPic
 {
    
@@ -771,11 +773,25 @@
     {
         NSLog(@"Sending picture at Index %lu", (unsigned long)indx);
         NSData *pPicToSend = [pTransl sharePicMsg:picData dataIndx:&indx];
+        
         if (pPicToSend == nil)
+        {
+            uploadPicOffset = 0;
             break;
-        if (![self sendMsg:pPicToSend upd:false])
+        }
+        SendStatus status = [pNtwIntf sendMsg:pPicToSend];
+        if (status == SEND_FAIL)
         {
             bNtwConnected = false;
+            uploadPicOffset = 0;
+            return false;
+        }
+        else if (status == SEND_SUCCESS)
+        {
+            uploadPicOffset = indx;
+        }
+        else if (status == SEND_TRY_AGAIN)
+        {
             return false;
         }
     }
@@ -931,15 +947,15 @@
 
 -(bool) sendMsg:(NSData *)pMsg upd:(bool) upord
 {
-    if (![pNtwIntf sendMsg:pMsg])
+    if ([pNtwIntf sendMsg:pMsg] == SEND_SUCCESS)
     {
-        NSLog(@"Failed to send Message");
-        return false;
+        
+        return true;
     }
     
-    
+    NSLog(@"Failed to send Message");
     //char *pMsg =
-    return true;
+    return false;
 }
 
 

@@ -72,7 +72,7 @@
 
 @property (nonatomic)  bool bSendPicMetaData;
 @property (nonatomic)  bool bUpdateToken;
-@property (nonatomic) int uploadPicOffset;
+@property (nonatomic) NSUInteger uploadPicOffset;
 
 @property (nonatomic)  bool bSendAlert;
 

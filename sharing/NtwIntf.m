@@ -35,7 +35,7 @@
     bAddCertInHasSpace = false;
 }
 
--(bool) sendMsg:(NSData *)pMsg
+-(SendStatus) sendMsg:(NSData *)pMsg
 {
     if (!isConnected)
     {
@@ -46,7 +46,7 @@
         if (![self connect])
         {
             NSLog(@"Failed to connect to server, failed to send message");
-            return false;
+            return SEND_FAIL;
         }
     }
     
@@ -64,59 +64,59 @@
     {
         NSLog(@"Failed to send message to server %d %s, %s %d", errno, strerror(errno), __FILE__, __LINE__);
         close(cfd);
-        return false;
+        return SEND_FAIL;
     }
     NSLog(@"Send message to server length=%lu %s %d",(unsigned long)len, __FILE__, __LINE__);
     
 
-    return true;
+    return SEND_SUCCESS;
 }
 
--(bool) sendStreamMsg:(NSData *)pMsg
+-(SendStatus) sendStreamMsg:(NSData *)pMsg
 {
      NSUInteger len = [pMsg length];
     NSStreamStatus status =  [outputStream streamStatus];
-    NSLog(@"Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+    
     if (status == NSStreamStatusClosed || status == NSStreamStatusError)
     {
-         NSLog(@"1 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+         NSLog(@"Failed to send message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
         isConnected = false;
-        return false;
+        return SEND_FAIL;
     }
     
     if (status != NSStreamStatusOpen)
     {
-         NSLog(@" 2 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
-        return false;
+         NSLog(@" Failed to send message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+        return SEND_FAIL;
     }
     
-     NSLog(@"3 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+     //NSLog(@"3 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
     if ([outputStream hasSpaceAvailable] == YES)
     {
-         NSLog(@"4 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
+         //NSLog(@"4 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
         if ([outputStream write:[pMsg bytes] maxLength:[pMsg length]] <= 0)
         {
             [inputStream close];
             [outputStream close];
             [self cleanUpFlags];
              NSLog(@"Failed to send message outputStream write failed");
-            return false;
+            return SEND_FAIL;
         }
         else
         {
             NSString *strData = [[NSString alloc]initWithData:pMsg encoding:NSUTF8StringEncoding];
              NSLog(@"Send message to server length=%lu StreamStatus=%lu msg=%@ %s %d ",(unsigned long)len, (unsigned long)status, strData, __FILE__, __LINE__);
-            return true;
+            return SEND_SUCCESS;
         }
     }
     else
     {
         NSLog(@"Failed to send message output stream busy");
-        return false;
+        return SEND_TRY_AGAIN;
     }
    
     
-     return true;
+     return SEND_SUCCESS;
 }
 
 -(bool) getStreamResp:(char*) buffer buflen:(int)blen msglen:(ssize_t*)len

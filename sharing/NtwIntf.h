@@ -14,6 +14,12 @@
 #include <sys/types.h>
 #include <netdb.h>
 
+typedef NS_ENUM(NSUInteger, SendStatus) {
+    SEND_FAIL,
+    SEND_SUCCESS,
+    SEND_TRY_AGAIN
+};
+
 @interface NtwIntf : NSObject <NSStreamDelegate>
 {
     int cfd;
@@ -35,7 +41,7 @@
 @property(nonatomic) bool connecting; //either connected or connecting to true
 @property uint32_t port;
 
--(bool) sendMsg:(NSData *)pMsg;
+-(SendStatus) sendMsg:(NSData *)pMsg;
 -(bool) connect;
 -(void) disconnect;
 -(bool) getResp:(char*) buffer buflen:(int) blen msglen:(ssize_t*)len;
