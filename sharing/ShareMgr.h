@@ -24,6 +24,7 @@
 
 @optional
 -(void) updateEasyMainLstVwCntrl;
+-(NSURL *) getShareUrl:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName;
 
 @end
 
@@ -42,6 +43,7 @@
     int picInsrtIndx;
     int waitTime;
     NSURL *picSaveUrl;
+    NSURL *picShareUrl;
     long long picLen;
     long long picSoFar;
     NSFileHandle *pFilHdl;

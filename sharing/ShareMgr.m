@@ -630,7 +630,7 @@
             && bNtwThread)
         {
             [self displayAlertIfReqd];
-            // NSLog(@"Waiting for work\n");
+           // NSLog(@"Waiting for work\n");
             if (pNtwIntf.connecting)
             {
                 waitTime = 1;
@@ -641,7 +641,7 @@
             }
            
             NSDate *checkTime = [NSDate dateWithTimeIntervalSinceNow:waitTime];
-           //  NSLog(@"Waiting waitTime=%d bNtwConnected=%d connecting=%d", waitTime, //bNtwConnected, pNtwIntf.connecting);
+        //     NSLog(@"Waiting waitTime=%d bNtwConnected=%d connecting=%d", waitTime, //bNtwConnected, pNtwIntf.connecting);
             [dataToSend waitUntilDate:checkTime];
         }
         if (sendIndx != insrtIndx)
@@ -816,6 +816,7 @@
                 break;
         }
     }
+    picShareUrl = [shrMgrDelegate getShareUrl:shareId picName:name itemName:iName];
     picLen = len;
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -907,24 +908,38 @@
         lastPicRcvdTime = tv.tv_sec;
         if (picSoFar >= picLen)
         {
-            NSLog(@"Closing file descriptor as Image transfer complete ");
-            [pFilHdl closeFile];
-            pFilHdl = nil;
-            picSoFar =0;
-            picLen = 0;
-            lastPicRcvdTime = 0;
-            [shrMgrDelegate storeThumbNailImage:picSaveUrl];
-            if ([shrMgrDelegate respondsToSelector:@selector(updateEasyMainLstVwCntrl)] == YES)
-            {
-                [shrMgrDelegate updateEasyMainLstVwCntrl];
-            }
-            [self picDoneMsg];
+            [self storePicturePostProcessing];
         }
         
     }
     return;
 }
 
+-(void) storePicturePostProcessing
+{
+    NSLog(@"Closing file descriptor as Image transfer complete ");
+    [pFilHdl closeFile];
+    pFilHdl = nil;
+    picSoFar =0;
+    picLen = 0;
+    lastPicRcvdTime = 0;
+    [shrMgrDelegate storeThumbNailImage:picSaveUrl];
+    if ([shrMgrDelegate respondsToSelector:@selector(updateEasyMainLstVwCntrl)] == YES)
+    {
+        [shrMgrDelegate updateEasyMainLstVwCntrl];
+    }
+    [self picDoneMsg];
+    NSError *error;
+    
+    if ([[NSFileManager defaultManager] copyItemAtURL:picSaveUrl toURL:picShareUrl error:&error] == YES)
+    {
+        NSLog(@"Stored picture=%@ in sharing file=%@", picSaveUrl, picShareUrl);
+    }
+    else
+    {
+        NSLog(@"Failed to store picture=%@ in sharing file=%@ error=%@", picSaveUrl, picShareUrl, error);
+    }
+}
 
 -(void) processResponse
 {
