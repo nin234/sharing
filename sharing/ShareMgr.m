@@ -22,7 +22,6 @@
 @synthesize pDecoder;
 @synthesize shrMgrDelegate;
 @synthesize appActive;
-@synthesize ntwQ;
 @synthesize bSendPic;
 @synthesize bSendPicMetaData;
 @synthesize uploadPicOffset;
@@ -30,6 +29,8 @@
 @synthesize bUpdateToken;
 @synthesize bSendAlert;
 @synthesize alertMsg;
+@synthesize sharingQueue;
+@synthesize bgTaskId;
 
 -(void) setNewToken:(NSString *)tkn
 {
@@ -494,6 +495,7 @@
         pShareDBIntf = [[ShareItemDBIntf alloc] init];
         
         [self initializeShareObjs];
+        sharingQueue = dispatch_queue_create("SHARING", NULL);
     }
     return self;
 }
@@ -550,9 +552,7 @@
 
 -(void) processItems
 {
-    NSInvocationOperation* theOp = [[NSInvocationOperation alloc] initWithTarget:self
-                                                                        selector:@selector(mainProcessLoop:) object:false];
-    [ntwQ addOperation:theOp];
+    
 }
 
 -(void) displayAlertIfReqd
@@ -718,16 +718,33 @@
     
 }
 
--(void) main
+-(void) start
 {
-    bNtwConnected = true;
+    dispatch_async(sharingQueue, ^{
+        [self beginBackgroundUpdateTask];
+        bNtwConnected = true;
+        [shrMgrDelegate setShareId:share_id];
+        [self getIdIfRequired];
+        [self mainProcessLoop:true];
+        [self endBackgroundUpdateTask];
+    });
     
-    ntwQ = [[NSOperationQueue alloc] init];
-    
-    [shrMgrDelegate setShareId:share_id];
-    [self getIdIfRequired];
-    [self mainProcessLoop:true];
        return;
+}
+
+- (void) beginBackgroundUpdateTask
+{
+    NSLog(@"Background task started");
+    bgTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self endBackgroundUpdateTask];
+    }];
+}
+
+- (void) endBackgroundUpdateTask
+{
+    NSLog(@"Background task ended");
+    [[UIApplication sharedApplication] endBackgroundTask: bgTaskId];
+    bgTaskId = UIBackgroundTaskInvalid;
 }
 
 -(void) sendPicMetaData:(NSURL *)picUrl metaStr:(NSString *)picMetaStr

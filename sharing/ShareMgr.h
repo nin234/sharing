@@ -28,7 +28,7 @@
 
 @end
 
-@interface ShareMgr : NSThread<UIAlertViewDelegate>
+@interface ShareMgr : NSObject<UIAlertViewDelegate>
 {
     
     NSCondition *dataToSend;
@@ -67,7 +67,7 @@
 @property  (nonatomic, retain) id pTransl;
 @property (nonatomic, retain) id pDecoder;
 @property (nonatomic) bool appActive;
-@property (strong, nonatomic) NSOperationQueue *ntwQ;
+
 
 @property (nonatomic, weak) id<ShareMgrDelegate> shrMgrDelegate;
 @property (nonatomic) bool bSendPic;
@@ -77,6 +77,14 @@
 @property (nonatomic) NSUInteger uploadPicOffset;
 
 @property (nonatomic)  bool bSendAlert;
+
+@property (nonatomic, retain) dispatch_queue_t sharingQueue;
+
+@property (nonatomic) UIBackgroundTaskIdentifier bgTaskId;
+- (void) endBackgroundUpdateTask;
+- (void) beginBackgroundUpdateTask;
+
+
 
 @property (nonatomic, retain) NSString * alertMsg;
 
@@ -103,5 +111,6 @@
 -(void) processItems;
 -(void) processShouldUploadMsg:(bool) upload;
 -(void) setNewToken:(NSString *)token;
+-(void) start;
 
 @end
