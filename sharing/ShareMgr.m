@@ -10,6 +10,7 @@
 #import "ShareItem.h"
 #import "PicUrl.h"
 #import "PicMetaData.h"
+#import <BackgroundTasks/BackgroundTasks.h>
 
 
 @implementation ShareMgr
@@ -21,9 +22,7 @@
 @synthesize pTransl;
 @synthesize pDecoder;
 @synthesize shrMgrDelegate;
-@synthesize appActive;
 @synthesize bSendPic;
-@synthesize bSendPicMetaData;
 @synthesize uploadPicOffset;
 @synthesize token;
 @synthesize bUpdateToken;
@@ -31,6 +30,7 @@
 @synthesize alertMsg;
 @synthesize sharingQueue;
 @synthesize bgTaskId;
+@synthesize bBackGroundMode;
 
 -(void) setNewToken:(NSString *)tkn
 {
@@ -175,7 +175,7 @@
         NSLog(@"Creating share_id request");
         pMsgToSend = [pTransl createIdRequest:@"1000" msgLen:&len];
        pGetIdReq=  [NSData dataWithBytes:pMsgToSend length:len];
-        if (![pNtwIntf sendMsg:pGetIdReq])
+        if (![self sendMsg:pGetIdReq])
         {
                     NSLog (@"Failed to send get Id request");
         }
@@ -245,6 +245,7 @@
 
 -(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr shrId:(long long) shareid
 {
+    NSLog(@"Sharing picture URL=%@ metaStr=%@ shareId=%lld", picUrl, picMetaStr, shareid);
     NSString *pPicMetaStr = [NSString stringWithFormat:@"%@:::]%lld", picMetaStr, shareid];
     [self putPicInQ:picUrl metaStr:pPicMetaStr];
     return;
@@ -398,7 +399,7 @@
         NSData *pMsg =[NSData dataWithBytes:pMsgToSend length:len];
         pMsgsToSend[insrtIndx] = pMsg;
         upOrDown[insrtIndx] = upord;
-        [pShareDBIntf storeItem:[[NSString alloc] initWithData:pMsg encoding:NSUTF8StringEncoding] index:insrtIndx upord:upord];
+        [pShareDBIntf storeItem:pMsg index:insrtIndx upord:upord];
         ++insrtIndx;
         if (insrtIndx == BUFFER_BOUND)
             insrtIndx =0;
@@ -418,7 +419,7 @@
         NSData *pMsg =[NSData dataWithBytes:pMsgToSend length:len];
         pMsgsToSend[insrtIndx] = pMsg;
         upOrDown[insrtIndx] = false;
-        [pShareDBIntf storeItem:[[NSString alloc] initWithData:pMsg encoding:NSUTF8StringEncoding] index:insrtIndx upord:false];
+        [pShareDBIntf storeItem:pMsg index:insrtIndx upord:false];
         ++insrtIndx;
         if (insrtIndx == BUFFER_BOUND)
             insrtIndx =0;
@@ -435,7 +436,7 @@
         NSData *pMsg =[NSData dataWithBytes:pMsgToSend length:len];
         pMsgsToSend[insrtIndx] = pMsg;
         upOrDown[insrtIndx] = false;
-        [pShareDBIntf storeItem:[[NSString alloc] initWithData:pMsg encoding:NSUTF8StringEncoding] index:insrtIndx upord:false];
+        [pShareDBIntf storeItem:pMsg index:insrtIndx upord:false];
         ++insrtIndx;
         if (insrtIndx == BUFFER_BOUND)
             insrtIndx =0;
@@ -444,6 +445,11 @@
         [dataToSend unlock];
     }
     return;
+}
+
+-(void) stopBackGroundTask
+{
+    stop = true;
 }
 
 - (instancetype)init
@@ -462,6 +468,7 @@
         sendIndx =0;
         insrtIndx =0;
         picIndx =0;
+        picMetaIndx = 0;
         picInsrtIndx =0;
         uploadPicOffset = 0;
         lastPicRcvdTime =0;
@@ -469,9 +476,10 @@
         lastTokenUpdateSentTime = 0;
         bSendGetItem = false;
         waitTime = 1;
-        appActive = true;
+        bBackGroundMode = false;
+        stop = false;
+        
         bSendPic = false;
-        bSendPicMetaData = true;
         for (int i=0; i < BUFFER_BOUND; ++i)
             upOrDown[i] = false;
         
@@ -495,7 +503,7 @@
         pShareDBIntf = [[ShareItemDBIntf alloc] init];
         
         [self initializeShareObjs];
-        sharingQueue = dispatch_queue_create("SHARING", NULL);
+        sharingQueue = dispatch_queue_create("sharing", NULL);
     }
     return self;
 }
@@ -503,11 +511,38 @@
 -(void) initializeShareObjs
 {
     NSMutableDictionary *shareItemDic = [pShareDBIntf refreshItemData];
+    int lindx = BUFFER_BOUND + 10;
+    int hindx = -1;
+    NSMutableArray *itemsToDelete = [[NSMutableArray alloc] init];
     for (NSNumber *key in shareItemDic)
     {
         ShareItem *shareItem = [shareItemDic objectForKey:key];
-        pMsgsToSend[shareItem.index] = [shareItem.value dataUsingEncoding:NSUTF8StringEncoding];
+        NSLog(@"Archived message to send index=%d message=%@", shareItem.index, shareItem.value);
+        if (shareItem.value == NULL)
+        {
+            [itemsToDelete addObject:[NSNumber numberWithInt:shareItem.index]];
+            
+            continue;
+        }
+        pMsgsToSend[shareItem.index] = shareItem.value;
         upOrDown[shareItem.index] = shareItem.upord;
+        if (shareItem.index < lindx)
+            lindx = shareItem.index;
+        if (shareItem.index > hindx)
+            hindx = shareItem.index;
+    }
+    
+    for (NSNumber *item in itemsToDelete)
+    {
+        [pShareDBIntf deleteItem:[item intValue]];
+    }
+    
+    if (hindx != -1)
+    {
+        sendIndx = lindx;
+        insrtIndx = hindx + 1;
+        lindx = BUFFER_BOUND + 10;
+        hindx = -1;
     }
     
     NSMutableDictionary *picUrlDictionary = [pShareDBIntf refreshPicUrls];
@@ -515,8 +550,19 @@
     {
         PicUrl *picUrl = [picUrlDictionary objectForKey:key];
         pImgsToSend[picUrl.index] = [NSURL URLWithString:picUrl.value];
+        if (picUrl.index < lindx)
+            lindx = picUrl.index;
+        if (picUrl.index > hindx)
+            hindx = picUrl.index;
     }
     
+    if (hindx != -1)
+    {
+        picIndx = lindx;
+        picMetaIndx = lindx;
+        picInsrtIndx = hindx + 1;
+        
+    }
     NSMutableDictionary *picMetaDataDic = [pShareDBIntf refreshPicMetaData];
     for (NSNumber *key in picMetaDataDic)
     {
@@ -535,7 +581,7 @@
         gettimeofday(&now, NULL);
         if (now.tv_sec > nextIdReqTime.tv_sec)
         {
-            if (![pNtwIntf sendMsg:pGetIdReq])
+            if (![self sendMsg:pGetIdReq])
             {
                 nextIdReqTime.tv_sec = now.tv_sec + tdelta;
                 tdelta *=2;
@@ -579,40 +625,12 @@
     NSData *pMsgToSend;
     NSURL *pImgToSend;
     NSString *pImgMetaData;
-    int i=0;
     
-    if (!bNtwThread)
-    {
-        appActive = false;
-    }
-
     NSLog(@"Entering main processing loop of ShareMgr");
     for(;;)
     {
-       
-        ++i;
-        if (!bNtwThread)
-        {
-             UIApplicationState state = [[UIApplication sharedApplication] applicationState];
-            if (state != UIApplicationStateBackground)
-            {
-                appActive = true;
-                break;
-            }
-           if (i >35)
-               break;
-        }
-        else
-        {
-            if (!appActive)
-            {
-                [NSThread sleepForTimeInterval:1];
-                    continue;
-            }
-        }
-        
-        
-        
+        if (stop)
+            break;
         [dataToSend lock];
         [self getIdIfRequired];
         [self shareDeviceToken];
@@ -649,25 +667,33 @@
             pMsgToSend = pMsgsToSend[sendIndx];
             upd = upOrDown[sendIndx];
             NSLog(@"Sending message at Index=%d insrtIndx=%d upd=%d", sendIndx, insrtIndx, upd);
-          
+            if (!pMsgToSend)
+                [self updateMsgIndx];
         }
         
-        if (bSendPicMetaData && picIndx != picInsrtIndx)
+        if (picIndx != picInsrtIndx)
         {
             pImgToSend = pImgsToSend[picIndx];
-            pImgMetaData = pImgsMetaData[picIndx];
+            bool bNoMeta = false;
+            if (picIndx == picMetaIndx)
+            {
+                pImgMetaData = pImgsMetaData[picMetaIndx];
+                if (!pImgMetaData)
+                    bNoMeta = true;
+                
+            }
+            if (!pImgToSend || bNoMeta)
+                [self updatePicIndx];
             
         }
+        
         [dataToSend unlock];
         if (pMsgToSend)
         {
-           if( [self sendMsg:pMsgToSend upd:upd])
+           if( [self sendMsg:pMsgToSend])
            {
                bNtwConnected = true;
-               [pShareDBIntf deleteItem:sendIndx];
-               ++sendIndx;
-               if (sendIndx == BUFFER_BOUND)
-                   sendIndx =0;
+               [self updateMsgIndx];
            }
             else
             {
@@ -689,9 +715,33 @@
         
         [self processResponse];
         [[NSRunLoop  currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2.0]];
+        
+        
+        
     }
     
 
+}
+
+-(void) updateMsgIndx
+{
+    [pShareDBIntf deleteItem:sendIndx];
+    ++sendIndx;
+    if (sendIndx == BUFFER_BOUND)
+        sendIndx =0;
+}
+
+-(bool) doneBackGroundProcessing
+{
+   
+    struct timeval now;
+    
+    gettimeofday(&now, NULL);
+    
+    if (now.tv_sec - lastNtwActvtyTime.tv_sec > MAX_IDLE_TIME)
+        return true;
+    
+    return false;
 }
 
 -(void) updatePicIndx
@@ -701,7 +751,7 @@
     ++picIndx;
     if (picIndx == BUFFER_BOUND)
         picIndx = 0;
-    bSendPicMetaData = true;
+    picMetaIndx = picIndx;
     bSendPic = false;
 }
 
@@ -710,9 +760,11 @@
     if (upload)
     {
         bSendPic = true;
+        NSLog(@"Shoud upload picture at offset %lu %s %d", (unsigned long)uploadPicOffset, __FILE__, __LINE__);
     }
     else
     {
+        NSLog(@"Don't upload picture %s %d",  __FILE__, __LINE__);
         [self updatePicIndx];
     }
     
@@ -720,6 +772,7 @@
 
 -(void) start
 {
+    
     dispatch_async(sharingQueue, ^{
         [self beginBackgroundUpdateTask];
         bNtwConnected = true;
@@ -732,6 +785,16 @@
        return;
 }
 
+-(void) startBackGroundTask
+{
+    dispatch_async(sharingQueue, ^{
+        bNtwConnected = true;
+        [shrMgrDelegate setShareId:share_id];
+        [self getIdIfRequired];
+        [self mainProcessLoop:true];
+    });
+}
+
 - (void) beginBackgroundUpdateTask
 {
     NSLog(@"Background task started");
@@ -742,7 +805,13 @@
 
 - (void) endBackgroundUpdateTask
 {
-    NSLog(@"Background task ended");
+    stop = true;
+    NSLog(@"Sharing extended background execution ended");
+    if (![self doneBackGroundProcessing])
+    {
+        NSLog(@"Scheduling background task");
+        [shrMgrDelegate scheduleBackGroundTask];
+    }
     [[UIApplication sharedApplication] endBackgroundTask: bgTaskId];
     bgTaskId = UIBackgroundTaskInvalid;
 }
@@ -764,17 +833,22 @@
     long long shareId = [[pArr objectAtIndex:1] longLongValue];
     
     pMsgToSend = [self.pTransl sharePicMetaDataMsg:shareId  name:picUrl picLength:[picData length]  metaStr:picMetaStrR msgLen:&len];
-    if ([self sendMsg:[NSData dataWithBytes:pMsgToSend length:len] upd:false])
+    if ([self sendMsg:[NSData dataWithBytes:pMsgToSend length:len]])
     {
         bNtwConnected = true;
+        NSLog(@"Sent picture metadata msg share_id=%lld picUrl=%@ picLength=%lu metaStr=%@ msgLen=%d %s %d", shareId, picUrl, (unsigned long)[picData length], picMetaStrR, len, __FILE__, __LINE__);
+        ++picMetaIndx;
+        if (picMetaIndx == BUFFER_BOUND)
+            picMetaIndx = 0;
     }
     else
     {
         bNtwConnected = false;
+        NSLog(@"Failed to Sent picture metadata msg share_id=%lld picUrl=%@ picLength=%lu metaStr=%@ msgLen=%d %s %d", shareId, picUrl, (unsigned long)[picData length], picMetaStrR, len, __FILE__, __LINE__);
     }
 
-    bSendPicMetaData = false;
-    NSLog(@"Sent picture metadata msg share_id=%lld picUrl=%@ picLength=%lu metaStr=%@ msgLen=%d %s %d", shareId, picUrl, (unsigned long)[picData length], picMetaStrR, len, __FILE__, __LINE__);
+    
+    
     free(pMsgToSend);
 
 }
@@ -789,6 +863,7 @@
     for (;;)
     {
         NSLog(@"Sending picture at Index %lu", (unsigned long)indx);
+        NSUInteger oldIndx = indx;
         NSData *pPicToSend = [pTransl sharePicMsg:picData dataIndx:&indx];
         
         if (pPicToSend == nil)
@@ -805,11 +880,13 @@
         }
         else if (status == SEND_SUCCESS)
         {
+            gettimeofday(&lastNtwActvtyTime, NULL);
             uploadPicOffset = indx;
         }
         else if (status == SEND_TRY_AGAIN)
         {
-            return false;
+            indx = oldIndx;
+            continue;
         }
     }
     bNtwConnected = true;
@@ -967,6 +1044,7 @@
     {
         if ([pNtwIntf getResp:rcvbuf buflen:RCV_BUF_LEN msglen:&len])
         {
+            gettimeofday(&lastNtwActvtyTime, NULL);
             [pDecoder processMessage:rcvbuf msglen:len];
         }
         else
@@ -977,11 +1055,11 @@
 
 }
 
--(bool) sendMsg:(NSData *)pMsg upd:(bool) upord
+-(bool) sendMsg:(NSData *)pMsg
 {
     if ([pNtwIntf sendMsg:pMsg] == SEND_SUCCESS)
     {
-        
+        gettimeofday(&lastNtwActvtyTime, NULL);
         return true;
     }
     

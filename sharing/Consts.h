@@ -9,7 +9,7 @@
 #ifndef Consts_h
 #define Consts_h
 
-#define BUFFER_BOUND 200
+#define BUFFER_BOUND 800
 #define RCV_BUF_LEN 16384
 #define MSG_AGGR_BUF_LEN 32768
 
@@ -39,6 +39,7 @@
 #define SHOULD_UPLOAD_MSG 20
 #define SHOULD_DOWNLOAD_MSG 21
 
+#define MAX_IDLE_TIME 15
 
 
 #endif /* Consts_h */

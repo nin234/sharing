@@ -39,6 +39,9 @@
 		DB881C791C664A4500A2D0EA /* SHKeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = DB881C781C664A4500A2D0EA /* SHKeychainItemWrapper.m */; };
 		DBD16B371C976C4700052A03 /* AppShrUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD16B361C976C4700052A03 /* AppShrUtil.m */; };
 		DBD16B3C1C98319700052A03 /* InAppPurchase.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD16B3A1C98319700052A03 /* InAppPurchase.m */; };
+		E84B6E8D257C5DA000348B4F /* PicUrlNew.m in Sources */ = {isa = PBXBuildFile; fileRef = E84B6E8C257C5DA000348B4F /* PicUrlNew.m */; };
+		E84B6E92257C5E1600348B4F /* PicMetaDataNew.m in Sources */ = {isa = PBXBuildFile; fileRef = E84B6E91257C5E1600348B4F /* PicMetaDataNew.m */; };
+		E84B6E97257C5E7E00348B4F /* ShareItemNew.m in Sources */ = {isa = PBXBuildFile; fileRef = E84B6E96257C5E7E00348B4F /* ShareItemNew.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -92,6 +95,12 @@
 		DBD16B361C976C4700052A03 /* AppShrUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppShrUtil.m; sourceTree = "<group>"; };
 		DBD16B3A1C98319700052A03 /* InAppPurchase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InAppPurchase.m; sourceTree = "<group>"; };
 		DBD16B3B1C98319700052A03 /* InAppPurchase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InAppPurchase.h; sourceTree = "<group>"; };
+		E84B6E8B257C5DA000348B4F /* PicUrlNew.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PicUrlNew.h; sourceTree = "<group>"; };
+		E84B6E8C257C5DA000348B4F /* PicUrlNew.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PicUrlNew.m; sourceTree = "<group>"; };
+		E84B6E90257C5E1600348B4F /* PicMetaDataNew.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PicMetaDataNew.h; sourceTree = "<group>"; };
+		E84B6E91257C5E1600348B4F /* PicMetaDataNew.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PicMetaDataNew.m; sourceTree = "<group>"; };
+		E84B6E95257C5E7E00348B4F /* ShareItemNew.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShareItemNew.h; sourceTree = "<group>"; };
+		E84B6E96257C5E7E00348B4F /* ShareItemNew.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShareItemNew.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,10 +156,16 @@
 				DB5F3EB71C7005C3003DA1C3 /* NtwIntf.h */,
 				DB5F3EB81C7005C4003DA1C3 /* NtwIntf.m */,
 				3BFE75D91FA17E9F005A4B56 /* PicMetaData.h */,
+				E84B6E90257C5E1600348B4F /* PicMetaDataNew.h */,
+				E84B6E91257C5E1600348B4F /* PicMetaDataNew.m */,
 				3BFE75DA1FA17E9F005A4B56 /* PicMetaData.m */,
 				3BFE75DC1FA2220B005A4B56 /* PicUrl.h */,
+				E84B6E8B257C5DA000348B4F /* PicUrlNew.h */,
+				E84B6E8C257C5DA000348B4F /* PicUrlNew.m */,
 				3BFE75DD1FA2220B005A4B56 /* PicUrl.m */,
 				3BFE75CC1F9FEF18005A4B56 /* ShareItem.h */,
+				E84B6E95257C5E7E00348B4F /* ShareItemNew.h */,
+				E84B6E96257C5E7E00348B4F /* ShareItemNew.m */,
 				3BFE75CD1F9FEF18005A4B56 /* ShareItem.m */,
 				3BFE75CF1F9FF094005A4B56 /* ShareItemDBIntf.h */,
 				3BFE75D01F9FF094005A4B56 /* ShareItemDBIntf.m */,
@@ -244,6 +259,7 @@
 				DB5F3EE61C726E14003DA1C3 /* FriendDetails.m in Sources */,
 				DB881C401C5F0E4A00A2D0EA /* sharing.m in Sources */,
 				3BFE75DE1FA2220B005A4B56 /* PicUrl.m in Sources */,
+				E84B6E8D257C5DA000348B4F /* PicUrlNew.m in Sources */,
 				DB881C481C5F896E00A2D0EA /* MessageTranslator.m in Sources */,
 				3BFE75D11F9FF094005A4B56 /* ShareItemDBIntf.m in Sources */,
 				DB00E5881C8156A400E898F7 /* HomeViewController.m in Sources */,
@@ -257,6 +273,8 @@
 				DBD16B3C1C98319700052A03 /* InAppPurchase.m in Sources */,
 				DB5F3EF01C72C5CA003DA1C3 /* ContactsViewController.m in Sources */,
 				3B4E2887205FF60900968E0E /* RemoteNotificationHandler.m in Sources */,
+				E84B6E97257C5E7E00348B4F /* ShareItemNew.m in Sources */,
+				E84B6E92257C5E1600348B4F /* PicMetaDataNew.m in Sources */,
 				DB5F3EC31C711FA6003DA1C3 /* ShareMgr.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,7 +326,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -353,7 +371,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;

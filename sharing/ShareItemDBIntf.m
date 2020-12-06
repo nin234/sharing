@@ -7,9 +7,9 @@
 //
 
 #import "ShareItemDBIntf.h"
-#import "ShareItem.h"
-#import "PicMetaData.h"
-#import "PicUrl.h"
+#import "ShareItemNew.h"
+#import "PicMetaDataNew.h"
+#import "PicUrlNew.h"
 
 @implementation ShareItemDBIntf
 
@@ -43,12 +43,12 @@
 -(NSMutableDictionary *) refreshItemData
 {
     NSManagedObjectContext *moc = self.managedObjectContext;
-    NSEntityDescription *descr = [NSEntityDescription entityForName:@"ShareItem" inManagedObjectContext:moc];
+    NSEntityDescription *descr = [NSEntityDescription entityForName:@"ShareItemNew" inManagedObjectContext:moc];
     NSFetchRequest *req = [[NSFetchRequest alloc] init];
     [req setEntity:descr];
     NSError *error = nil;
     NSArray *shareItems = [moc executeFetchRequest:req error:&error];
-    for (ShareItem *shareItem in shareItems)
+    for (ShareItemNew *shareItem in shareItems)
     {
         [itemDictonary setObject:shareItem forKey:[NSNumber numberWithInt:shareItem.index]];
     }
@@ -60,12 +60,12 @@
 -(NSMutableDictionary *) refreshPicUrls
 {
     NSManagedObjectContext *moc = self.managedObjectContext;
-    NSEntityDescription *descr = [NSEntityDescription entityForName:@"PicUrl" inManagedObjectContext:moc];
+    NSEntityDescription *descr = [NSEntityDescription entityForName:@"PicUrlNew" inManagedObjectContext:moc];
     NSFetchRequest *req = [[NSFetchRequest alloc] init];
     [req setEntity:descr];
     NSError *error = nil;
     NSArray *picUrls = [moc executeFetchRequest:req error:&error];
-    for (PicUrl *picUrl in picUrls)
+    for (PicUrlNew *picUrl in picUrls)
     {
         [picUrlDictonary setObject:picUrl forKey:[NSNumber numberWithInt:picUrl.index]];
     }
@@ -77,12 +77,12 @@
 -(NSMutableDictionary *) refreshPicMetaData
 {
     NSManagedObjectContext *moc = self.managedObjectContext;
-    NSEntityDescription *descr = [NSEntityDescription entityForName:@"PicMetaData" inManagedObjectContext:moc];
+    NSEntityDescription *descr = [NSEntityDescription entityForName:@"PicMetaDataNew" inManagedObjectContext:moc];
     NSFetchRequest *req = [[NSFetchRequest alloc] init];
     [req setEntity:descr];
     NSError *error = nil;
     NSArray *picMetaDatas = [moc executeFetchRequest:req error:&error];
-    for (PicMetaData *picMetaData in picMetaDatas)
+    for (PicMetaDataNew *picMetaData in picMetaDatas)
     {
         [picMetaDataDictonary setObject:picMetaData forKey:[NSNumber numberWithInt:picMetaData.index]];
     }
@@ -94,17 +94,18 @@
 
 
 
--(void) storeItem : (NSString *) item index:(int)indx upord:(bool) upd
+-(void) storeItem : (NSData *) item index:(int)indx upord:(bool) upd
 {
     NSManagedObjectModel *managedObjectModel =
     [[self.managedObjectContext persistentStoreCoordinator] managedObjectModel];
     NSDictionary *ent = [managedObjectModel entitiesByName];
     printf("entity count %lu\n", (unsigned long)[[ent allKeys] count]);
-    NSEntityDescription *shareItemEntity = [ent objectForKey:@"ShareItem"];
-    ShareItem *shareItem = [[ShareItem alloc] initWithEntity:shareItemEntity insertIntoManagedObjectContext:self.managedObjectContext];
+    NSEntityDescription *shareItemEntity = [ent objectForKey:@"ShareItemNew"];
+    ShareItemNew *shareItem = [[ShareItemNew alloc] initWithEntity:shareItemEntity insertIntoManagedObjectContext:self.managedObjectContext];
     shareItem.value = item;
     shareItem.index = indx;
     shareItem.upord = upd;
+    NSLog(@"Storing item in ShareItemDB item index=%d upord=%d",  indx, upd);
     [itemDictonary setObject:shareItem forKey:[NSNumber numberWithInt:indx]];
     [self saveContext];
     
@@ -112,7 +113,7 @@
 
 -(void) deleteItem : (int) index
 {
-    ShareItem *shareItem = [itemDictonary objectForKey:[NSNumber numberWithInt:index]];
+    ShareItemNew *shareItem = [itemDictonary objectForKey:[NSNumber numberWithInt:index]];
     if (shareItem != nil)
     {
         [self.managedObjectContext deleteObject:shareItem];
@@ -129,8 +130,8 @@
     [[self.managedObjectContext persistentStoreCoordinator] managedObjectModel];
     NSDictionary *ent = [managedObjectModel entitiesByName];
     printf("entity count %lu\n", (unsigned long)[[ent allKeys] count]);
-    NSEntityDescription *picUrlEntity = [ent objectForKey:@"PicUrl"];
-    PicUrl *picUrl = [[PicUrl alloc] initWithEntity:picUrlEntity insertIntoManagedObjectContext:self.managedObjectContext];
+    NSEntityDescription *picUrlEntity = [ent objectForKey:@"PicUrlNew"];
+    PicUrlNew *picUrl = [[PicUrlNew alloc] initWithEntity:picUrlEntity insertIntoManagedObjectContext:self.managedObjectContext];
     picUrl.value = item;
     picUrl.index = indx;
     
@@ -140,7 +141,7 @@
 
 -(void) deletePicUrlData : (int) index
 {
-    PicUrl *picUrl = [picUrlDictonary objectForKey:[NSNumber numberWithInt:index]];
+    PicUrlNew *picUrl = [picUrlDictonary objectForKey:[NSNumber numberWithInt:index]];
     if (picUrl != nil)
     {
         [self.managedObjectContext deleteObject:picUrl];
@@ -156,8 +157,8 @@
     [[self.managedObjectContext persistentStoreCoordinator] managedObjectModel];
     NSDictionary *ent = [managedObjectModel entitiesByName];
     printf("entity count %lu\n", (unsigned long)[[ent allKeys] count]);
-    NSEntityDescription *picMetaDataEntity = [ent objectForKey:@"PicMetaData"];
-    PicMetaData *picMetaDataItem = [[PicMetaData alloc] initWithEntity:picMetaDataEntity insertIntoManagedObjectContext:self.managedObjectContext];
+    NSEntityDescription *picMetaDataEntity = [ent objectForKey:@"PicMetaDataNew"];
+    PicMetaDataNew *picMetaDataItem = [[PicMetaDataNew alloc] initWithEntity:picMetaDataEntity insertIntoManagedObjectContext:self.managedObjectContext];
     picMetaDataItem.value = item;
     picMetaDataItem.index = indx;
     
@@ -168,7 +169,7 @@
 
 -(void) deletePicMetaData : (int) index
 {
-    PicMetaData *picMetaDataItem = [picMetaDataDictonary objectForKey:[NSNumber numberWithInt:index]];
+    PicMetaDataNew *picMetaDataItem = [picMetaDataDictonary objectForKey:[NSNumber numberWithInt:index]];
     if (picMetaDataItem != nil)
     {
         [self.managedObjectContext deleteObject:picMetaDataItem];
@@ -205,7 +206,7 @@
     if (__managedObjectContext != nil) {
         return __managedObjectContext;
     }
-    NSLog(@"getting moc1 for sharing");
+    NSLog(@"getting moc1 for sharing_new");
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
     
     if (coordinator != nil)
@@ -237,7 +238,7 @@
     {
         return __managedObjectModel;
     }
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"sharing" withExtension:@"momd"];
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"sharing_new" withExtension:@"momd"];
     NSLog(@"Setting modelURL to %@", modelURL);
     __managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     return __managedObjectModel;
@@ -258,7 +259,7 @@
     }
     NSLog(@"getting psc1");
     NSError *error = nil;
-    NSString *dbName = @"sharing";
+    NSString *dbName = @"sharing_new";
     NSString *storeUrlPath = [dbName stringByAppendingString:@".sqlite"];
     NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:storeUrlPath];
     

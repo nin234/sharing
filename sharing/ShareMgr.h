@@ -25,6 +25,7 @@
 @optional
 -(void) updateEasyMainLstVwCntrl;
 -(NSURL *) getShareUrl:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName;
+-(void) scheduleBackGroundTask;
 
 @end
 
@@ -40,6 +41,7 @@
     int sendIndx;
     int insrtIndx;
     int picIndx;
+    int picMetaIndx;
     int picInsrtIndx;
     int waitTime;
     NSURL *picSaveUrl;
@@ -56,6 +58,8 @@
     unsigned long long lastIdSentTime;
     unsigned long long lastTokenUpdateSentTime;
     bool bNtwConnected;
+    struct timeval lastNtwActvtyTime;
+    bool stop;
 
 }
 
@@ -66,17 +70,19 @@
 @property (nonatomic, retain) NtwIntf *pNtwIntf;
 @property  (nonatomic, retain) id pTransl;
 @property (nonatomic, retain) id pDecoder;
-@property (nonatomic) bool appActive;
+
 
 
 @property (nonatomic, weak) id<ShareMgrDelegate> shrMgrDelegate;
 @property (nonatomic) bool bSendPic;
 
-@property (nonatomic)  bool bSendPicMetaData;
+
 @property (nonatomic)  bool bUpdateToken;
 @property (nonatomic) NSUInteger uploadPicOffset;
 
 @property (nonatomic)  bool bSendAlert;
+
+@property (nonatomic)  bool bBackGroundMode;
 
 @property (nonatomic, retain) dispatch_queue_t sharingQueue;
 
@@ -112,5 +118,7 @@
 -(void) processShouldUploadMsg:(bool) upload;
 -(void) setNewToken:(NSString *)token;
 -(void) start;
+-(void) startBackGroundTask;
+-(void) stopBackGroundTask;
 
 @end

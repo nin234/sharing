@@ -21,7 +21,7 @@
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
--(void) storeItem : (NSString *) item index:(int)indx upord:(bool) upd;
+-(void) storeItem : (NSData *) item index:(int)indx upord:(bool) upd;
 -(void) deleteItem : (int) index;
 
 -(void) storePicMetaData : (NSString *) item index:(int)indx;

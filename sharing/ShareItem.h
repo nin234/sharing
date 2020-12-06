@@ -10,7 +10,7 @@
 
 @interface ShareItem : NSManagedObject
 
-@property (nonatomic, retain) NSString * value;
+@property (nonatomic, retain) NSData *value;
 @property (nonatomic) bool upord;
 @property (nonatomic) int index;
 
