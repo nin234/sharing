@@ -298,20 +298,20 @@
         NSLog(@"No share Id too early to send getItems");
         return;
     }
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    if (tv.tv_sec - lastPicRcvdTime < 120)
-    {
-        bSendGetItem =true;
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    
+    if ([kvlocal boolForKey:@"ToDownload"] == NO)
         return;
-    }
+    
+    [kvlocal setBool:NO forKey:@"ToDownload"];
+    
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
     
     if (pMsgToSend)
     {
-        [self putMsgInQ:pMsgToSend msgLen:len];
+        [self putMsgInQNoLock:pMsgToSend msgLen:len];
     }
     else
     {
@@ -324,35 +324,6 @@
 
 
 
--(void) getItems:(bool) upord
-{
-    if (!self.share_id)
-    {
-        
-        return;
-    }
-
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    if (tv.tv_sec - lastPicRcvdTime < 120)
-    {
-        bSendGetItem =true;
-        return;
-    }
-    char *pMsgToSend = NULL;
-    int len =0;
-    pMsgToSend = [self.pTransl getItems:self.share_id msgLen:&len];
-    if (pMsgToSend)
-    {
-        [self putMsgInQ:pMsgToSend msgLen:len upd:upord];
-    }
-    else
-    {
-        NSLog(@"Failed to sent getItems upord message null pointer");
-    }
-    
-    return;
-}
 
 -(void) picDoneMsg
 {
@@ -450,6 +421,7 @@
 -(void) stopBackGroundTask
 {
     stop = true;
+    shouldStart = true;
 }
 
 - (instancetype)init
@@ -474,9 +446,9 @@
         lastPicRcvdTime =0;
         lastIdSentTime = 0;
         lastTokenUpdateSentTime = 0;
-        bSendGetItem = false;
         waitTime = 1;
         bBackGroundMode = false;
+        shouldStart = true;
         stop = false;
         
         bSendPic = false;
@@ -638,12 +610,7 @@
         pImgToSend = NULL;
         pImgMetaData = NULL;
         upd = false;
-        if (bSendGetItem)
-        {
-            [self getItemsInLoop];
-            bSendGetItem = false;
-            
-        }
+        [self getItems];
         if (((sendIndx == insrtIndx && picIndx == picInsrtIndx) || pNtwIntf.connecting)
             && bNtwThread)
         {
@@ -774,6 +741,10 @@
 {
     
     dispatch_async(sharingQueue, ^{
+        if (!shouldStart)
+            return;
+        shouldStart = false;
+        stop = false;
         [self beginBackgroundUpdateTask];
         bNtwConnected = true;
         [shrMgrDelegate setShareId:share_id];
@@ -788,6 +759,10 @@
 -(void) startBackGroundTask
 {
     dispatch_async(sharingQueue, ^{
+        if (!shouldStart)
+            return;
+        shouldStart = false;
+        stop = false;
         bNtwConnected = true;
         [shrMgrDelegate setShareId:share_id];
         [self getIdIfRequired];
@@ -806,6 +781,7 @@
 - (void) endBackgroundUpdateTask
 {
     stop = true;
+    shouldStart = true;
     NSLog(@"Sharing extended background execution ended");
     if (![self doneBackGroundProcessing])
     {

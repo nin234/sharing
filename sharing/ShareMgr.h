@@ -54,12 +54,13 @@
     ShareItemDBIntf *pShareDBIntf;
     NSData *picData;
     long long lastPicRcvdTime;
-    bool bSendGetItem;
+   
     unsigned long long lastIdSentTime;
     unsigned long long lastTokenUpdateSentTime;
     bool bNtwConnected;
     struct timeval lastNtwActvtyTime;
     bool stop;
+    bool shouldStart;
 
 }
 
