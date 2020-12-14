@@ -31,10 +31,18 @@
 @synthesize sharingQueue;
 @synthesize bgTaskId;
 @synthesize bBackGroundMode;
+@synthesize nTopUpload;
+@synthesize nTotalFileSize;
 
 -(void) setNewToken:(NSString *)tkn
 {
     tkn = token;
+}
+
+-(void) resetUploadStats
+{
+    nTopUpload = 0;
+    nTotalFileSize = 0;
 }
 
 -(void) initializeTokenUpdate
@@ -247,9 +255,28 @@
 {
     NSLog(@"Sharing picture URL=%@ metaStr=%@ shareId=%lld", picUrl, picMetaStr, shareid);
     NSString *pPicMetaStr = [NSString stringWithFormat:@"%@:::]%lld", picMetaStr, shareid];
+    nTotalFileSize += [self picUrlFileSize:picUrl];
     [self putPicInQ:picUrl metaStr:pPicMetaStr];
+    
     return;
 }
+
+-(long) picUrlFileSize:(NSURL *) picUrl
+{
+    NSNumber *fileSizeValue = nil;
+    NSError *fileSizeError = nil;
+    [picUrl getResourceValue:&fileSizeValue
+                       forKey:NSURLFileSizeKey
+                        error:&fileSizeError];
+    if (fileSizeValue) {
+        NSLog(@"File size of picture  for %@ is %ld", picUrl, [fileSizeValue longValue]);
+    }
+    else {
+        NSLog(@"error getting size for url %@ error was %@", picUrl, fileSizeError);
+    }
+    return [fileSizeValue longValue];
+}
+
 
 -(void) archiveItem:(NSString *) item itemName: (NSString *) name
 {
@@ -857,6 +884,11 @@
         else if (status == SEND_SUCCESS)
         {
             gettimeofday(&lastNtwActvtyTime, NULL);
+            nTopUpload += (indx - oldIndx);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [shrMgrDelegate updateTotalUpload:nTopUpload];
+            
+            });
             uploadPicOffset = indx;
         }
         else if (status == SEND_TRY_AGAIN)
@@ -934,6 +966,7 @@
             }
         }
     }
+    
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
     [kvlocal setInteger:(NSInteger)len forKey:@"PicLen"];
     [kvlocal setInteger:shareId forKey:@"PicShareId"];

@@ -26,6 +26,7 @@
 -(void) updateEasyMainLstVwCntrl;
 -(NSURL *) getShareUrl:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName;
 -(void) scheduleBackGroundTask;
+-(void) updateTotalUpload:(long)uploaded;
 
 @end
 
@@ -61,7 +62,7 @@
     struct timeval lastNtwActvtyTime;
     bool stop;
     bool shouldStart;
-
+  
 }
 
 @property (nonatomic) long long share_id;
@@ -88,10 +89,13 @@
 @property (nonatomic, retain) dispatch_queue_t sharingQueue;
 
 @property (nonatomic) UIBackgroundTaskIdentifier bgTaskId;
+
+@property (nonatomic) long nTopUpload;
+@property (nonatomic) long nTotalFileSize;
 - (void) endBackgroundUpdateTask;
 - (void) beginBackgroundUpdateTask;
 
-
+-(void) resetUploadStats;
 
 @property (nonatomic, retain) NSString * alertMsg;
 
@@ -110,7 +114,7 @@
 
 -(void) sharePicture:(NSURL *)picUrl metaStr:(NSString *)picMetaStr shrId:(long long) share_id;
 -(void) getItems;
--(void) getItems:(bool) upd;
+
 -(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName
                 picLen:(long long) len picOffset:(int)pSoFar;
 -(void) storePicData:(NSData *)picData;
@@ -121,5 +125,6 @@
 -(void) start;
 -(void) startBackGroundTask;
 -(void) stopBackGroundTask;
+
 
 @end
