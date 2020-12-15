@@ -27,6 +27,8 @@
 -(NSURL *) getShareUrl:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName;
 -(void) scheduleBackGroundTask;
 -(void) updateTotalUpload:(long)uploaded;
+-(void) startDownLoadProgressVw;
+-(void) updateTotalDownLoaded:(long)downloaded;
 
 @end
 
@@ -92,6 +94,10 @@
 
 @property (nonatomic) long nTopUpload;
 @property (nonatomic) long nTotalFileSize;
+
+@property (nonatomic) long long nTotalDownLoadSize;
+@property (nonatomic) long long nDownLoadedSoFar;
+
 - (void) endBackgroundUpdateTask;
 - (void) beginBackgroundUpdateTask;
 

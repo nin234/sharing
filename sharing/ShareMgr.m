@@ -33,6 +33,8 @@
 @synthesize bBackGroundMode;
 @synthesize nTopUpload;
 @synthesize nTotalFileSize;
+@synthesize nDownLoadedSoFar;
+@synthesize nTotalDownLoadSize;
 
 -(void) setNewToken:(NSString *)tkn
 {
@@ -44,6 +46,17 @@
     nTopUpload = 0;
     nTotalFileSize = 0;
 }
+
+-(void) setNTotalDownLoadSize:(long long)nTotDwnldBytes
+{
+    nTotalDownLoadSize = nTotDwnldBytes;
+    NSLog(@"Setting total download size=%lld and starting Progress View", nTotalDownLoadSize);
+    nDownLoadedSoFar = 0;
+    dispatch_async(dispatch_get_main_queue(), ^{
+    [shrMgrDelegate startDownLoadProgressVw];
+    });
+}
+
 
 -(void) initializeTokenUpdate
 {
@@ -759,6 +772,8 @@
     else
     {
         NSLog(@"Don't upload picture %s %d",  __FILE__, __LINE__);
+        nTopUpload += [picData length];
+        [self updateTotalUpload];
         [self updatePicIndx];
     }
     
@@ -885,10 +900,7 @@
         {
             gettimeofday(&lastNtwActvtyTime, NULL);
             nTopUpload += (indx - oldIndx);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [shrMgrDelegate updateTotalUpload:nTopUpload];
-            
-            });
+            [self updateTotalUpload];
             uploadPicOffset = indx;
         }
         else if (status == SEND_TRY_AGAIN)
@@ -899,6 +911,14 @@
     }
     bNtwConnected = true;
     return true;
+}
+
+-(void) updateTotalUpload
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [shrMgrDelegate updateTotalUpload:nTopUpload];
+    
+    });
 }
 
 -(void ) setPicDetails:(long long ) shareId picName:(NSString *) name itemName:(NSString *) iName
@@ -926,6 +946,7 @@
     if (picSaveUrl == nil)
     {
         NSLog(@"Cannot obtain picUrl for picName=%@ itemName=%@ shareId=%lld %s %d", name, iName, shareId, __FILE__, __LINE__);
+        [self shouldDownload:shareId picName:name shldDownload:false picLength:len];
         return;
     }
     bool shouldDownLoad = true;
@@ -973,13 +994,23 @@
     [kvlocal setObject:name forKey:@"PicName"];
     [kvlocal setObject:[picSaveUrl path] forKey:@"PicUrl"];
     [kvlocal setInteger:picSoFar forKey:@"PicLenStored"];
-    [self shouldDownload:shareId picName:name shldDownload:shouldDownLoad];
+    [self shouldDownload:shareId picName:name shldDownload:shouldDownLoad picLength:len];
     
     return;
 }
 
--(void) shouldDownload:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld
+-(void) shouldDownload:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld picLength:(long long)pLen
 {
+    if (!shDwnld)
+    {
+        nDownLoadedSoFar += pLen;
+        NSLog (@"Increasing total downloaded size=%lld for picture not downloaded", nDownLoadedSoFar);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [shrMgrDelegate updateTotalDownLoaded:nDownLoadedSoFar];
+        
+        });
+    }
+    
     char *pMsgToSend = NULL;
     int len =0;
     pMsgToSend = [self.pTransl shouldDownload:shareId picName:name shldDownload:shDwnld msgLen:&len];
@@ -1003,7 +1034,12 @@
         [pFilHdl seekToEndOfFile];
         [pFilHdl writeData:picData1];
         picSoFar += [picData1 length];
-        NSLog (@"Storing picData picSoFar=%lld", picSoFar);
+        nDownLoadedSoFar += [picData1 length];
+        NSLog (@"Storing picData picSoFar=%lld total downloaded=%lld", picSoFar, nDownLoadedSoFar);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [shrMgrDelegate updateTotalDownLoaded:nDownLoadedSoFar];
+        
+        });
         NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
         [kvlocal setInteger:picSoFar forKey:@"PicLenStored"];
         struct timeval tv;

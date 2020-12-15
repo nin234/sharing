@@ -39,6 +39,8 @@
 #define SHOULD_UPLOAD_MSG 20
 #define SHOULD_DOWNLOAD_MSG 21
 
+#define TOTAL_PIC_LEN_MSG 1500
+
 #define MAX_IDLE_TIME 15
 
 

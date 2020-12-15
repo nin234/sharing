@@ -234,6 +234,13 @@
         }
         break;
             
+        case TOTAL_PIC_LEN_MSG:
+        {
+            NSLog(@"Received TOTAL_PIC_LEN_MSG  mlen=%zd %s %d",mlen,  __FILE__, __LINE__);
+            bRet = [self processTotalPicLenMessage:buffer msglen:mlen];
+        }
+        break;
+            
         default:
             NSLog(@"Message of type=%d not handled here %s %d", msgTyp, __FILE__, __LINE__);
             bRet = true;
@@ -241,6 +248,16 @@
     }
     
     return bRet;
+}
+
+-(bool) processTotalPicLenMessage:(char *)buffer msglen:(ssize_t)mlen
+{
+    int offset = 2*sizeof(int);
+    long long picTotLen =0;
+    memcpy(&picTotLen, buffer+offset, sizeof(long long));
+    
+    [pShrMgr setNTotalDownLoadSize:picTotLen];
+    return true;
 }
 
 -(bool) processShouldUploadMessage:(char *)buffer msglen:(ssize_t)mlen
@@ -310,8 +327,8 @@
 -(bool) processShareIdMessage:(char *)buffer msglen:(ssize_t)mlen
 {
     int offset = 2*sizeof(int);
-    int shareId =0;
-    memcpy(&shareId, buffer+offset, sizeof(int));
+    long long shareId =0;
+    memcpy(&shareId, buffer+offset, sizeof(long long));
     
     [pShrMgr setShare_id:shareId];
     
