@@ -504,8 +504,7 @@
         maxShareId = [kvlocal integerForKey:@"MaxShareId"];
         if (!maxShareId)
         {
-            maxShareId = 4000;
-            [kvlocal setInteger:maxShareId forKey:@"MaxShareId"];
+            [self setMaxShareId:4000];
         }
     
         /* For testing start*/
