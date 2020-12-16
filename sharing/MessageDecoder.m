@@ -241,6 +241,13 @@
         }
         break;
             
+        case UPDATE_MAX_SHARE_ID_MSG:
+        {
+            NSLog(@"Received UPDATE_MAX_SHARE_ID_MSG  mlen=%zd %s %d",mlen,  __FILE__, __LINE__);
+            bRet = [self processUpdateMaxShareId:buffer msglen:mlen];
+        }
+        break;
+            
         default:
             NSLog(@"Message of type=%d not handled here %s %d", msgTyp, __FILE__, __LINE__);
             bRet = true;
@@ -321,6 +328,19 @@
 -(bool) processStoreIdMessage:(char *)buffer msglen:(ssize_t)mlen
 {
     [pShrMgr storedTrndIdInCloud];
+    return true;
+}
+
+
+
+-(bool) processUpdateMaxShareId:(char *)buffer msglen:(ssize_t)mlen
+{
+    int offset = 2*sizeof(int);
+    long long shareId =0;
+    memcpy(&shareId, buffer+offset, sizeof(long long));
+    
+    [pShrMgr setMaxShareId:shareId];
+    
     return true;
 }
 

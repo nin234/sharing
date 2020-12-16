@@ -133,6 +133,13 @@
 }
 
 
+-(void) setMaxShareId:(long long)maxShId
+{
+    maxShareId = maxShId;
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    NSLog(@"Setting max share Id=%lld", maxShId);
+    [kvlocal setInteger:maxShId forKey:@"MaxShareId"];
+}
 -(void) setShare_id:(long long)shrid
 {
     share_id = shrid;
@@ -500,7 +507,11 @@
             maxShareId = 4000;
             [kvlocal setInteger:maxShareId forKey:@"MaxShareId"];
         }
-        
+    
+        /* For testing start*/
+        //maxShareId = 2400;
+        //[kvlocal setInteger:maxShareId forKey:@"MaxShareId"];
+        /*For testing end*/
         
         bSendPic = false;
         for (int i=0; i < BUFFER_BOUND; ++i)
@@ -792,7 +803,7 @@
 
 -(void) start
 {
-    
+   
     dispatch_async(sharingQueue, ^{
         if (!shouldStart)
             return;
