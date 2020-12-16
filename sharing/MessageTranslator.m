@@ -83,7 +83,7 @@
         pPicName = [name UTF8String];
     }
     namelen = (int)strlen(pPicName) +1;
-    int msglen = 16 + devIdLen + sizeof(int)+ namelen + sizeof(long long);
+    int msglen = 16 + devIdLen + sizeof(int)+ namelen + 2*sizeof(long long);
     char *pGetIdMsg = (char *)malloc(msglen);
     memcpy(pGetIdMsg, &msglen, sizeof(int));
     memcpy(pGetIdMsg+4, &msgid, sizeof(int));
@@ -94,6 +94,9 @@
     long long picShareId = [kvlocal integerForKey:@"PicShareId"];
     int picshidoffset = 20 + devIdLen + namelen;
     memcpy(pGetIdMsg + picshidoffset, &picShareId, sizeof (long long));
+    long long maxShareId = [kvlocal integerForKey:@"MaxShareId"];
+    int maxShareIdOffset = picshidoffset + sizeof(long long);
+    memcpy(pGetIdMsg + maxShareIdOffset, &maxShareId, sizeof(long long));
     *len = msglen;
     return pGetIdMsg;
 }

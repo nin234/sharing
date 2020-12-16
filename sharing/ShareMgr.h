@@ -75,6 +75,7 @@
 @property  (nonatomic, retain) id pTransl;
 @property (nonatomic, retain) id pDecoder;
 
+@property (nonatomic) long long maxShareId;
 
 
 @property (nonatomic, weak) id<ShareMgrDelegate> shrMgrDelegate;

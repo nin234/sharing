@@ -35,6 +35,7 @@
 @synthesize nTotalFileSize;
 @synthesize nDownLoadedSoFar;
 @synthesize nTotalDownLoadSize;
+@synthesize maxShareId;
 
 -(void) setNewToken:(NSString *)tkn
 {
@@ -490,6 +491,16 @@
         bBackGroundMode = false;
         shouldStart = true;
         stop = false;
+        
+        NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+        
+        maxShareId = [kvlocal integerForKey:@"MaxShareId"];
+        if (!maxShareId)
+        {
+            maxShareId = 4000;
+            [kvlocal setInteger:maxShareId forKey:@"MaxShareId"];
+        }
+        
         
         bSendPic = false;
         for (int i=0; i < BUFFER_BOUND; ++i)

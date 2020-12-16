@@ -180,6 +180,9 @@
 {
     if (userName != nil)
     {
+        if (![self isValidShareId:userName])
+            return;
+        
         FriendDetails *frndDet = [[FriendDetails alloc] init];
         frndDet.name  = userName;
         if (nickName != nil)
@@ -192,6 +195,47 @@
     }
     [self.navigationController popViewControllerAnimated:YES];
     return;
+}
+
+-(bool) isValidShareId:(NSString *) userName
+{
+    long long shareId = [userName longLongValue];
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    
+    long long maxShareId = [kvlocal integerForKey:@"MaxShareId"];
+    SHKeychainItemWrapper *kchain =  [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
+    
+    NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
+    long long meShareId = [share_id_str intValue];
+    NSString *errString = @"Invalid share Id";
+    bool validShareId = true;
+    if (meShareId == shareId)
+    {
+        errString = @"Invalid Share Id. Share Id of a Contact cannot be your Share Id";
+        validShareId = false;
+    }
+    else if (shareId < 1000 || shareId > maxShareId)
+    {
+        errString = [NSString stringWithFormat: @"Invalid ShareId. To obtain share Id of a Contact click the ME row on Contacts screen. This will bring up the Contact Details screen with Share Id. For example the Share Id of the App on this iPhone is %lld", meShareId];;
+        validShareId = false;
+    }
+        
+    if (!validShareId)
+    {
+        
+            UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Invalid share Id"
+                                       message:errString
+                                       preferredStyle:UIAlertControllerStyleAlert];
+         
+            UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+           handler:^(UIAlertAction * action) {}];
+         
+            [alert addAction:defaultAction];
+            [self presentViewController:alert animated:YES completion:nil];
+            return false;
+        
+    }
+    return true;
 }
 
 -(void) addFriendInList
@@ -263,7 +307,7 @@
 -(void) loadView
 {
     [super loadView];
-     CGRect mainScrn = [UIScreen mainScreen].applicationFrame;
+    CGRect mainScrn = [UIScreen mainScreen].bounds;
     CGRect tableRect = CGRectMake(0, 50, mainScrn.size.width, 430);
     UITableView *pTVw = [[UITableView alloc] initWithFrame:tableRect style:UITableViewStyleGrouped];
     //[self.view insertSubview:self.pAllItms.tableView atIndex:1];
