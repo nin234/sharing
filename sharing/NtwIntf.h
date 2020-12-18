@@ -32,6 +32,7 @@ typedef NS_ENUM(NSUInteger, SendStatus) {
     bool bOutStreamOpened;
     bool bAddCertInOpen;
     bool bAddCertInHasSpace;
+    long long connectingStartTime;
 }
 
 -(instancetype) init;

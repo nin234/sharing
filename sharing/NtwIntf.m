@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Ninan Thomas. All rights reserved.
 //
 
+#include <sys/time.h>
 #import "NtwIntf.h"
 
 @implementation NtwIntf
@@ -20,9 +21,17 @@
    self = [super init];
     
     useNSStream = true;
+    connectingStartTime = 0;
     [self cleanUpFlags];
     
     return self;
+}
+
+-(void) cleanUp
+{
+    [inputStream close];
+    [outputStream close];
+    [self cleanUpFlags];
 }
 
 -(void) cleanUpFlags
@@ -35,13 +44,28 @@
     bAddCertInHasSpace = false;
 }
 
+-(bool) stillConnecting
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    if (tv.tv_sec - connectingStartTime > 30)
+    {
+        NSLog(@"Didn't connect with in time limit closing and cleaning up");
+        [self cleanUp];
+        return false;
+    }
+    NSLog(@"Still connecting to server message not send");
+    return true;
+}
+
 -(SendStatus) sendMsg:(NSData *)pMsg
 {
     if (!isConnected)
     {
         if (connecting)
         {
-            NSLog(@"Still connecting to server message not send");
+           if ([self stillConnecting])
+               return SEND_FAIL;
         }
         if (![self connect])
         {
@@ -96,9 +120,8 @@
          //NSLog(@"4 Sending message to server length=%lu StreamStatus=%lu %s %d",(unsigned long)len, (unsigned long)status, __FILE__, __LINE__);
         if ([outputStream write:[pMsg bytes] maxLength:[pMsg length]] <= 0)
         {
-            [inputStream close];
-            [outputStream close];
-            [self cleanUpFlags];
+        
+            [self cleanUp];
              NSLog(@"Failed to send message outputStream write failed");
             return SEND_FAIL;
         }
@@ -199,7 +222,10 @@
    bInStreamOpened = false;
      bOutStreamOpened = false;
     connecting = true;
-   
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    connectingStartTime = tv.tv_sec;
+    
     CFStreamCreatePairWithSocketToHost(NULL,
                                        (__bridge CFStringRef)connectAddr,
                                        port,
@@ -366,18 +392,14 @@
         case NSStreamEventErrorOccurred:
         {
             NSLog(@"Received NSStreamEventErrorOccurred: closing and cleaning up");
-            [inputStream close];
-            [outputStream close];
-            [self cleanUpFlags];
+            [self cleanUp];
         }
         break;
         
         case NSStreamEventEndEncountered:
         {
             NSLog(@"Received NSStreamEventEndEncountered: closing and cleaning up");
-            [inputStream close];
-            [outputStream close];
-            [self cleanUpFlags];
+            [self cleanUp];
         }
         break;
         // continued ...
