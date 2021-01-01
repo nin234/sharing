@@ -248,6 +248,13 @@
         }
         break;
             
+        case SHARE_ID_REMOTE_HOST_MSG:
+        {
+            NSLog(@"Received  SHARE_ID_REMOTE_HOST_MSG mlen=%zd %s %d",mlen,  __FILE__, __LINE__);
+            bRet = [self processRemoteHostMessage:buffer msglen:mlen];
+        }
+        break;
+            
         default:
             NSLog(@"Message of type=%d not handled here %s %d", msgTyp, __FILE__, __LINE__);
             bRet = true;
@@ -256,6 +263,7 @@
     
     return bRet;
 }
+
 
 -(bool) processTotalPicLenMessage:(char *)buffer msglen:(ssize_t)mlen
 {
@@ -287,6 +295,18 @@
     NSData *picDat = [NSData dataWithBytes:buffer + header length:msgLen];
     
     [self.pShrMgr storePicData:picDat];
+    return true;
+}
+
+-(bool) processRemoteHostMessage:(char *)buffer msglen:(ssize_t)mlen
+{
+    int hostLen;
+    memcpy(&hostLen,buffer + 2*sizeof(int), sizeof(int));
+    NSString *host = [NSString stringWithCString:(buffer + 3*sizeof(int)) encoding:NSASCIIStringEncoding];
+    int portOffset = 3*sizeof(int) + hostLen;
+    int port;
+    memcpy(&port, buffer + portOffset, sizeof(int));
+    [self.pShrMgr setHostPort:host port:port];
     return true;
 }
 

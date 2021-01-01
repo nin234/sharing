@@ -36,6 +36,7 @@
 @synthesize nDownLoadedSoFar;
 @synthesize nTotalDownLoadSize;
 @synthesize maxShareId;
+@synthesize appId;
 
 -(void) setNewToken:(NSString *)tkn
 {
@@ -472,6 +473,75 @@
     shouldStart = true;
 }
 
+-(void) initializeKeyChainItems
+{
+    kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
+            
+   NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
+
+    if (share_id_str != nil)
+        share_id = [share_id_str intValue];
+    else
+        share_id = 0;
+    
+    NSLog (@"Share id value %lld", share_id);
+    
+    friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
+    if (friendList != nil)
+        NSLog(@"Friendlist %@", friendList);
+    appHostPortArr = [[NSMutableArray alloc] init];
+    NSString *hostPortArr = [kchain objectForKey:(__bridge id)kSecAttrLabel];
+    if (hostPortArr != nil)
+    {
+        NSArray *hp = [hostPortArr componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"#"]];
+        for (id ahp in hp)
+        {
+            NSArray *appHostPort = [ahp componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@";"]];
+            NSUInteger cnt = [appHostPort count];
+            if (cnt == 3)
+            {
+                NSString *app = [appHostPort objectAtIndex:0];
+                if ([app isEqualToString:appId])
+                {
+                    pNtwIntf.connectAddr = [appHostPort objectAtIndex:1];
+                    NSString *port = [appHostPort objectAtIndex:2];
+                    pNtwIntf.port = [port intValue];
+                    NSLog(@"Set connect address=%@ port=%d", pNtwIntf.connectAddr, pNtwIntf.port);
+                    
+                }
+                else
+                {
+                    [appHostPortArr addObject:ahp];
+                    NSLog(@"Added to host port array=%@", ahp);
+                }
+            }
+            else
+            {
+                NSLog(@"Invalid host port format cnt=%lu", (unsigned long)cnt);
+            }
+        }
+    }
+}
+
+-(void) setHostPort:(NSString *) host port:(int) prt
+{
+    NSNumber *portNumb = [NSNumber numberWithInt:prt];
+    
+    NSString  *portStr = [portNumb stringValue];
+    //kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"com.rekhaninan.frndlst"];
+    NSString *hostPort = [NSString stringWithFormat:@"%@;%@;%@", appId, host, portStr];
+    for (id ahp in appHostPortArr)
+    {
+        hostPort = [hostPort stringByAppendingFormat:@"#%@", ahp];
+    }
+    NSLog(@"Adding new remote host port details to key chain %@", hostPort);
+    [kchain setObject:hostPort forKey:(__bridge id)kSecAttrLabel];
+    [pNtwIntf cleanUp];
+    pNtwIntf.connectAddr = host;
+    pNtwIntf.port = prt;
+    NSLog(@"Reset Network interface host=%@ and port=%d", host, prt);
+}
+
 - (instancetype)init
 {
     self = [super init];
@@ -516,20 +586,7 @@
         for (int i=0; i < BUFFER_BOUND; ++i)
             upOrDown[i] = false;
         
-        kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
-                
-       NSString *share_id_str = [kchain objectForKey:(__bridge id)kSecValueData];
-    
-        if (share_id_str != nil)
-            share_id = [share_id_str intValue];
-        else
-            share_id = 0;
-        
-        NSLog (@"Share id value %lld", share_id);
-        
-        friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
-        if (friendList != nil)
-            NSLog(@"Friendlist %@", friendList);
+        [self initializeKeyChainItems];
         
         [self initializeTokenUpdate];
         

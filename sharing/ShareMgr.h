@@ -64,6 +64,7 @@
     struct timeval lastNtwActvtyTime;
     bool stop;
     bool shouldStart;
+    NSMutableArray *appHostPortArr;
   
 }
 
@@ -77,6 +78,7 @@
 
 @property (nonatomic) long long maxShareId;
 
+@property (nonatomic, retain) NSString *appId;
 
 @property (nonatomic, weak) id<ShareMgrDelegate> shrMgrDelegate;
 @property (nonatomic) bool bSendPic;
@@ -132,6 +134,7 @@
 -(void) start;
 -(void) startBackGroundTask;
 -(void) stopBackGroundTask;
+-(void) setHostPort:(NSString *) host port:(int) prt;
 
 
 @end

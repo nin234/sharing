@@ -46,5 +46,6 @@ typedef NS_ENUM(NSUInteger, SendStatus) {
 -(bool) connect;
 -(void) disconnect;
 -(bool) getResp:(char*) buffer buflen:(int) blen msglen:(ssize_t*)len;
+-(void) cleanUp;
 
 @end

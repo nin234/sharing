@@ -22,6 +22,9 @@
     
     useNSStream = true;
     connectingStartTime = 0;
+    connectAddr = nil;
+    connectPort = nil;
+    port = 0;
     [self cleanUpFlags];
     
     return self;
