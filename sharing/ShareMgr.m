@@ -525,6 +525,7 @@
 
 -(void) setHostPort:(NSString *) host port:(int) prt
 {
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
     NSNumber *portNumb = [NSNumber numberWithInt:prt];
     
     NSString  *portStr = [portNumb stringValue];
@@ -540,6 +541,10 @@
     pNtwIntf.connectAddr = host;
     pNtwIntf.port = prt;
     NSLog(@"Reset Network interface host=%@ and port=%d", host, prt);
+    if (share_id)
+    {
+        [kvlocal setBool:YES forKey:@"ToDownload"];
+    }
 }
 
 - (instancetype)init
