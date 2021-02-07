@@ -15,6 +15,7 @@
 @synthesize useNSStream;
 @synthesize port;
 @synthesize connecting;
+@synthesize isConnected;
 
 -(instancetype) init
 {

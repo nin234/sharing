@@ -193,8 +193,11 @@
     gettimeofday(&now, NULL);
     if (lastIdSentTime > 0)
     {
-            if (now.tv_sec < lastIdSentTime + 120)
-            return;
+            if (!pNtwIntf.isConnected)
+            {
+                if (now.tv_sec < lastIdSentTime + 60)
+                    return;
+            }
     }
     lastIdSentTime = now.tv_sec;
     char *pMsgToSend = NULL;
@@ -484,6 +487,7 @@
     else
         share_id = 0;
     
+    
     NSLog (@"Share id value %lld", share_id);
     
     friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
@@ -503,9 +507,9 @@
                 NSString *app = [appHostPort objectAtIndex:0];
                 if ([app isEqualToString:appId])
                 {
-                    pNtwIntf.connectAddr = [appHostPort objectAtIndex:1];
+                   // pNtwIntf.connectAddr = [appHostPort objectAtIndex:1];
                     NSString *port = [appHostPort objectAtIndex:2];
-                    pNtwIntf.port = [port intValue];
+                    //pNtwIntf.port = [port intValue];
                     NSLog(@"Set connect address=%@ port=%d", pNtwIntf.connectAddr, pNtwIntf.port);
                     
                 }
@@ -552,7 +556,7 @@
     self = [super init];
     if (self)
     {
-     //   [self clearShareId];
+    //    [self clearShareId];
         bSendAlert = false;
         pGetIdReq = NULL;
         dataToSend = [[NSCondition alloc] init];

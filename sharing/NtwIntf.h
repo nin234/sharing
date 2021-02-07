@@ -23,7 +23,7 @@ typedef NS_ENUM(NSUInteger, SendStatus) {
 @interface NtwIntf : NSObject <NSStreamDelegate>
 {
     int cfd;
-    bool isConnected;
+   
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
     NSInputStream *inputStream ;
@@ -40,6 +40,7 @@ typedef NS_ENUM(NSUInteger, SendStatus) {
 @property (nonatomic, retain) NSString *connectPort;
 @property(nonatomic) bool useNSStream;
 @property(nonatomic) bool connecting; //either connected or connecting to true
+@property(nonatomic)  bool isConnected;
 @property uint32_t port;
 
 -(SendStatus) sendMsg:(NSData *)pMsg;
