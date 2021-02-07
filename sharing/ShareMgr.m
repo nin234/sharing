@@ -507,9 +507,9 @@
                 NSString *app = [appHostPort objectAtIndex:0];
                 if ([app isEqualToString:appId])
                 {
-                   // pNtwIntf.connectAddr = [appHostPort objectAtIndex:1];
+                    pNtwIntf.connectAddr = [appHostPort objectAtIndex:1];
                     NSString *port = [appHostPort objectAtIndex:2];
-                    //pNtwIntf.port = [port intValue];
+                    pNtwIntf.port = [port intValue];
                     NSLog(@"Set connect address=%@ port=%d", pNtwIntf.connectAddr, pNtwIntf.port);
                     
                 }
