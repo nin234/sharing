@@ -542,6 +542,7 @@
     NSLog(@"Adding new remote host port details to key chain %@", hostPort);
     [kchain setObject:hostPort forKey:(__bridge id)kSecAttrLabel];
     [pNtwIntf cleanUp];
+    lastIdSentTime  = 0;
     pNtwIntf.connectAddr = host;
     pNtwIntf.port = prt;
     NSLog(@"Reset Network interface host=%@ and port=%d", host, prt);
@@ -556,7 +557,7 @@
     self = [super init];
     if (self)
     {
-    //    [self clearShareId];
+    //  [self clearShareId];
         bSendAlert = false;
         pGetIdReq = NULL;
         dataToSend = [[NSCondition alloc] init];
