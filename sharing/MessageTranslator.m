@@ -136,6 +136,20 @@
     
 }
 
+-(char *) getRemoteHostPort:(long long) shareId appName:(int) appId msgLen:(int *) len
+{
+    int msglen =  3*sizeof(int) + sizeof(long long);
+    char *pGetRemoteMsg = (char *) malloc(msglen);
+    
+    int getRemoteMsgId = GET_REMOTE_HOST_MSG;
+    memcpy(pGetRemoteMsg, &msglen, sizeof(int));
+    memcpy(pGetRemoteMsg+sizeof(int), &getRemoteMsgId, sizeof(int));
+    memcpy(pGetRemoteMsg+2*sizeof(int), &appId, sizeof(int));
+    memcpy(pGetRemoteMsg+ 3*sizeof(int), &shareId, sizeof(long long));
+    *len = msglen;
+    return pGetRemoteMsg;
+}
+
 -(char *) storeDeviceToken: (long long) shareId deviceToken:(NSString *)token msgLen:(int *)len
 {
     

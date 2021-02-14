@@ -27,4 +27,6 @@
 -(char *) shouldDownload:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld msgLen:(int *) len;
 -(NSData *) sharePicMsg:(NSData *) picData dataIndx:(NSUInteger *)indx;
 
+-(char *) getRemoteHostPort:(long long) shareId appName:(int) appId msgLen:(int *) len;
+
 @end

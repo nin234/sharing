@@ -59,12 +59,14 @@
     long long lastPicRcvdTime;
    
     unsigned long long lastIdSentTime;
+    unsigned long long lastRemoteHostSentTime;
     unsigned long long lastTokenUpdateSentTime;
     bool bNtwConnected;
     struct timeval lastNtwActvtyTime;
     bool stop;
     bool shouldStart;
     NSMutableArray *appHostPortArr;
+    bool bGetRemoteHostPort;
   
 }
 
@@ -78,7 +80,7 @@
 
 @property (nonatomic) long long maxShareId;
 
-@property (nonatomic, retain) NSString *appId;
+@property  int appId;
 
 @property (nonatomic, weak) id<ShareMgrDelegate> shrMgrDelegate;
 @property (nonatomic) bool bSendPic;

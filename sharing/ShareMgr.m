@@ -90,6 +90,43 @@
     [kvlocal setBool:YES forKey:@"TokenInServ"];
 }
 
+-(void) getRemoteHostPort
+{
+    if (!bGetRemoteHostPort)
+    {
+        return;
+    }
+    
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    if (lastRemoteHostSentTime > 0)
+    {
+        if (now.tv_sec < lastRemoteHostSentTime + 60)
+            return;
+    }
+    
+    
+    
+    
+    char *pMsgToSend = NULL;
+    int len =0;
+    pMsgToSend = [self.pTransl getRemoteHostPort:share_id appName:appId msgLen:&len];
+    
+    NSData *pGetRemotHostReq =  [NSData dataWithBytes:pMsgToSend length:len];
+     if (![self sendMsg:pGetRemotHostReq])
+     {
+                 NSLog (@"Failed to send get Remote Host request");
+     }
+     else
+     {
+         NSLog (@"Successfully send get Remote Host request");
+         pGetIdReq = NULL;
+         lastRemoteHostSentTime = now.tv_sec;
+     }
+   
+    return;
+}
+
 -(void) shareDeviceToken
 {
     char *pMsgToSend = NULL;
@@ -183,6 +220,10 @@
 
 -(void) getIdIfRequired
 {
+    if (bGetRemoteHostPort)
+    {
+        return;
+    }
    
     if (share_id > 0)
     {
@@ -193,13 +234,10 @@
     gettimeofday(&now, NULL);
     if (lastIdSentTime > 0)
     {
-            if (!pNtwIntf.isConnected)
-            {
-                if (now.tv_sec < lastIdSentTime + 60)
-                    return;
-            }
+        if (now.tv_sec < lastIdSentTime + 60)
+            return;
     }
-    lastIdSentTime = now.tv_sec;
+    
     char *pMsgToSend = NULL;
     int len =0;
     
@@ -216,6 +254,7 @@
         {
             NSLog (@"Successfully send get Id request");
             pGetIdReq = NULL;
+            lastIdSentTime = now.tv_sec;
         }
 
     }
@@ -493,54 +532,38 @@
     friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
     if (friendList != nil)
         NSLog(@"Friendlist %@", friendList);
-    appHostPortArr = [[NSMutableArray alloc] init];
-    NSString *hostPortArr = [kchain objectForKey:(__bridge id)kSecAttrLabel];
-    if (hostPortArr != nil)
+    
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    
+    NSString *host = [kvlocal stringForKey:@"Host"];
+    if (host != nil)
     {
-        NSArray *hp = [hostPortArr componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"#"]];
-        for (id ahp in hp)
+        pNtwIntf.connectAddr = host;
+        pNtwIntf.port = (uint32_t)[kvlocal integerForKey:@"Port"];
+        
+        NSLog(@"Set connect address=%@ port=%d", pNtwIntf.connectAddr, pNtwIntf.port);
+        
+    }
+    else
+    {
+        if (share_id)
         {
-            NSArray *appHostPort = [ahp componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@";"]];
-            NSUInteger cnt = [appHostPort count];
-            if (cnt == 3)
-            {
-                NSString *app = [appHostPort objectAtIndex:0];
-                if ([app isEqualToString:appId])
-                {
-                    pNtwIntf.connectAddr = [appHostPort objectAtIndex:1];
-                    NSString *port = [appHostPort objectAtIndex:2];
-                    pNtwIntf.port = [port intValue];
-                    NSLog(@"Set connect address=%@ port=%d", pNtwIntf.connectAddr, pNtwIntf.port);
-                    
-                }
-                else
-                {
-                    [appHostPortArr addObject:ahp];
-                    NSLog(@"Added to host port array=%@", ahp);
-                }
-            }
-            else
-            {
-                NSLog(@"Invalid host port format cnt=%lu", (unsigned long)cnt);
-            }
+            bGetRemoteHostPort = true;
         }
     }
+    
+    
+   
 }
 
 -(void) setHostPort:(NSString *) host port:(int) prt
 {
-    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
-    NSNumber *portNumb = [NSNumber numberWithInt:prt];
     
-    NSString  *portStr = [portNumb stringValue];
-    //kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"com.rekhaninan.frndlst"];
-    NSString *hostPort = [NSString stringWithFormat:@"%@;%@;%@", appId, host, portStr];
-    for (id ahp in appHostPortArr)
-    {
-        hostPort = [hostPort stringByAppendingFormat:@"#%@", ahp];
-    }
-    NSLog(@"Adding new remote host port details to key chain %@", hostPort);
-    [kchain setObject:hostPort forKey:(__bridge id)kSecAttrLabel];
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    [kvlocal setObject:host forKey:@"Host"];
+    [kvlocal setInteger:prt forKey:@"Port"];
+    
+   
     [pNtwIntf cleanUp];
     lastIdSentTime  = 0;
     pNtwIntf.connectAddr = host;
@@ -550,6 +573,7 @@
     {
         [kvlocal setBool:YES forKey:@"ToDownload"];
     }
+    bGetRemoteHostPort = false;
 }
 
 - (instancetype)init
@@ -573,11 +597,13 @@
         uploadPicOffset = 0;
         lastPicRcvdTime =0;
         lastIdSentTime = 0;
+        lastRemoteHostSentTime = 0;
         lastTokenUpdateSentTime = 0;
         waitTime = 1;
         bBackGroundMode = false;
         shouldStart = true;
         stop = false;
+        bGetRemoteHostPort = false;
         
         NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
         
@@ -673,28 +699,7 @@
     
 }
 
--(void ) sendGetIdRequest
-{
-    if (pGetIdReq)
-    {
-        struct timeval now;
-        gettimeofday(&now, NULL);
-        if (now.tv_sec > nextIdReqTime.tv_sec)
-        {
-            if (![self sendMsg:pGetIdReq])
-            {
-                nextIdReqTime.tv_sec = now.tv_sec + tdelta;
-                tdelta *=2;
-                NSLog (@"Failed to send get Id request setting next attempt at %ld", nextIdReqTime.tv_sec);
-            }
-            else
-            {
-                NSLog (@"Successfully send get Id request at %ld", nextIdReqTime.tv_sec);
-                pGetIdReq = NULL;
-            }
-        }
-    }
-}
+
 
 -(void) processItems
 {
@@ -732,6 +737,7 @@
         if (stop)
             break;
         [dataToSend lock];
+        [self getRemoteHostPort];
         [self getIdIfRequired];
         [self shareDeviceToken];
         pMsgToSend = NULL;
