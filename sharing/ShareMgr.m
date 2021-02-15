@@ -132,11 +132,15 @@
 {
     char *pMsgToSend = NULL;
     int len =0;
-    if (share_id == 0)
-        return;
-    
     if (!bUpdateToken)
         return;
+    
+    if (![self canSend])
+    {
+        NSLog(@"No share Id or remote host port too early to send deviceToken");
+        return;
+    }
+   
     
     struct timeval now;
     gettimeofday(&now, NULL);
@@ -208,6 +212,7 @@
     
     [kchain setObject:shridStr forKey:(__bridge id)kSecValueData];
     [kvlocal setBool:NO forKey:@"TokenInServ"];
+    [kvlocal removeObjectForKey:@"Host"];
     [NSThread sleepForTimeInterval:1.0f];
     exit(1);
 }
@@ -614,6 +619,8 @@
         bGetRemoteHostPort = false;
         
         NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+     //   [kvlocal setBool:NO forKey:@"TokenInServ"];
+   //    exit(0);
         
         maxShareId = [kvlocal integerForKey:@"MaxShareId"];
         if (!maxShareId)
