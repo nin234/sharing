@@ -97,6 +97,7 @@
         return;
     }
     
+    
     struct timeval now;
     gettimeofday(&now, NULL);
     if (lastRemoteHostSentTime > 0)
@@ -220,11 +221,7 @@
 
 -(void) getIdIfRequired
 {
-    if (bGetRemoteHostPort)
-    {
-        return;
-    }
-   
+    
     if (share_id > 0)
     {
         return;
@@ -384,9 +381,9 @@
 
 -(void) getItems
 {
-    if (!self.share_id)
+    if (![self canSend])
     {
-        NSLog(@"No share Id too early to send getItems");
+        NSLog(@"No share Id or remote host port too early to send getItems");
         return;
     }
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
@@ -554,6 +551,17 @@
     
     
    
+}
+
+-(bool) canSend
+{
+    if (share_id > 0 && !bGetRemoteHostPort)
+    {
+        return true;
+    }
+    
+    return false;
+        
 }
 
 -(void) setHostPort:(NSString *) host port:(int) prt
