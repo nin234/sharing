@@ -208,7 +208,7 @@
     NSNumber *shrNumb = [NSNumber numberWithLongLong:0];
     
     NSString  *shridStr = [shrNumb stringValue];
-    //kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"com.rekhaninan.frndlst"];
+  
     
     [kchain setObject:shridStr forKey:(__bridge id)kSecValueData];
     [kvlocal setBool:NO forKey:@"TokenInServ"];
@@ -594,7 +594,7 @@
     self = [super init];
     if (self)
     {
-    //  [self clearShareId];
+    // [self clearShareId];
         bSendAlert = false;
         pGetIdReq = NULL;
         dataToSend = [[NSCondition alloc] init];
