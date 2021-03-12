@@ -643,6 +643,7 @@
         
         pShareDBIntf = [[ShareItemDBIntf alloc] init];
         
+        
         [self initializeShareObjs];
         sharingQueue = dispatch_queue_create("sharing", NULL);
     }
@@ -890,7 +891,7 @@
 
 -(void) start
 {
-   
+    [pTransl setAppId:appId];
     dispatch_async(sharingQueue, ^{
         if (!shouldStart)
             return;

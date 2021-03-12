@@ -45,5 +45,14 @@
 #define GET_REMOTE_HOST_MSG 1503
 #define MAX_IDLE_TIME 15
 
+#define GET_SHARE_ID_1_MSG 101
+#define GET_SHARE_ID_RPLY_1_MSG 102
+
+#define OPENHOUSES_ID 0
+#define AUTOSPREE_ID 1
+#define EASYGROCLIST_ID 2
+#define SMARTMSG_ID 3
+#define NSHARELIST_ID 4
+
 
 #endif /* Consts_h */

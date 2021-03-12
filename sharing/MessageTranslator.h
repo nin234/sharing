@@ -11,6 +11,8 @@
 
 @interface MessageTranslator : NSObject
 
+@property (nonatomic) int appId;
+
 -(char *) createIdRequest:(NSString *) transactionId msgLen :(int *) len;
 -(char *) storeTrnIdRequest:(NSString *) transactionId share_id:(long long) shareId msgLen :(int *) len;
 

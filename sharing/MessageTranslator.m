@@ -12,6 +12,8 @@
 
 @implementation MessageTranslator
 
+@synthesize appId;
+
 
 -(char *) getItems:(long long)shareId msgLen:(int *)len
 {
@@ -104,6 +106,19 @@
 
 -(char *) createIdRequest:(NSString *) transactionId msgLen :(int *) len
 {
+    if (appId > SMARTMSG_ID)
+    {
+        return  [self createIdRequestAppId:transactionId msgLen:len];
+    }
+    else
+    {
+       return [self createIdRequestNoAppId:transactionId msgLen:len];
+    }
+    
+}
+
+-(char *) createIdRequestNoAppId:(NSString *) transactionId msgLen :(int *) len
+{
     int tridLen = sizeof(long long);
     long long trid = [transactionId longLongValue];
     int msglen =  tridLen + 8;
@@ -115,6 +130,23 @@
     *len = msglen;
     return pGetIdMsg;
 }
+
+-(char *) createIdRequestAppId:(NSString *) transactionId msgLen :(int *) len
+{
+    int tridLen = sizeof(long long);
+    long long trid = [transactionId longLongValue];
+    int msglen =  tridLen + 12;
+    char *pGetIdMsg = (char *)malloc(msglen);
+    memcpy(pGetIdMsg, &msglen, sizeof(int));
+    memcpy(pGetIdMsg+4, &appId, sizeof(int));
+    int shareMsgId = GET_SHARE_ID_1_MSG;
+    memcpy(pGetIdMsg+8, &shareMsgId, sizeof(int));
+    memcpy(pGetIdMsg + 12, &trid, sizeof(long long));
+    *len = msglen;
+    return pGetIdMsg;
+}
+
+
 
 -(char *) storeTrnIdRequest:(NSString *) transactionId share_id:(long long) shareId msgLen :(int *) len
 {
