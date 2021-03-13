@@ -309,7 +309,37 @@
     return pGetIdMsg;
 }
 
--(char *) updateFriendListRequest: (long long) shareId  msgLen:(int *) len
+-(char *) updateFriendListRequestAppId: (long long) shareId  msgLen:(int *) len
+{
+    if (!shareId)
+        return NULL;
+    SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
+    
+    NSString* friendList = [kchain objectForKey:(__bridge id)kSecAttrComment];
+    if (friendList == nil)
+        return  NULL;
+    const char *pFrndLst = [friendList UTF8String];
+    if (!pFrndLst)
+    {
+        NSLog(@"Cannot encode friendlist");
+        return NULL;
+    }
+    int frndLen = (int) strlen(pFrndLst)+ 1;
+    int msglen = frndLen + 8 + sizeof(long long);
+    char *pStoreFrndMsg = (char *)malloc(msglen);
+    memcpy(pStoreFrndMsg, &msglen, sizeof(int));
+    int storeFrndListMsg = STORE_FRIEND_LIST_1_MSG;
+    memcpy(pStoreFrndMsg + sizeof(int), &storeFrndListMsg, sizeof(int));
+    memcpy(pStoreFrndMsg + 2*sizeof(int), &appId, sizeof(int));
+    int shrIdOffset = 3*sizeof(int);
+    memcpy(pStoreFrndMsg+shrIdOffset, &shareId, sizeof(long long));
+    int frndLstOffset = shrIdOffset + sizeof(long long);
+    memcpy(pStoreFrndMsg+frndLstOffset, pFrndLst, frndLen);
+    *len = msglen;
+    return pStoreFrndMsg;
+}
+
+-(char *) updateFriendListRequestNoAppId: (long long) shareId  msgLen:(int *) len
 {
     if (!shareId)
         return NULL;
@@ -334,6 +364,18 @@
     memcpy(pStoreFrndMsg+2*sizeof(int)+sizeof(long long), pFrndLst, frndLen);
     *len = msglen;
     return pStoreFrndMsg;
+}
+
+-(char *) updateFriendListRequest: (long long) shareId  msgLen:(int *) len
+{
+    if (appId > SMARTMSG_ID)
+    {
+        return [self updateFriendListRequestAppId:shareId msgLen:len];
+    }
+    else
+    {
+        return [self updateFriendListRequestNoAppId:shareId msgLen:len];
+    }
     
 }
 
