@@ -17,7 +17,14 @@
 
 -(char *) getItems:(long long)shareId msgLen:(int *)len
 {
-    return [self getItems:shareId msgLen:len msgId:GET_ITEMS];
+    if (appId > SMARTMSG_ID)
+    {
+        return [self getItemsAppId:shareId msgLen:len msgId:GET_ITEMS_1];
+    }
+    else
+    {
+        return [self getItems:shareId msgLen:len msgId:GET_ITEMS];
+    }
 }
 
 -(char *) picDone:(long long) shareId msgLen:(int *)len
@@ -46,6 +53,64 @@
     return pGetIdMsg;
     
 }
+
+-(char *) getItemsAppId:(long long)shareId msgLen:(int *)len msgId:(int)msgid
+{
+    NSUUID *devId = [[UIDevice currentDevice] identifierForVendor];
+    NSString *devIdStr = [devId UUIDString];
+    const char *pDevIdStr = [devIdStr UTF8String];
+    if (!pDevIdStr)
+    {
+        NSLog(@"Cannot encode devIdStr for getItems");
+    }
+    int devIdLen = (int)strlen(pDevIdStr) +1;
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    NSInteger picStored = [kvlocal integerForKey:@"PicLenStored"];
+    //PicLenStored redundant to be eliminated
+    NSString *picUrl = [kvlocal objectForKey:@"PicUrl"];
+    if (picUrl != nil)
+    {
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:picUrl error:NULL];
+        if (attributes != nil)
+            picStored = [attributes fileSize];
+    }
+    NSInteger picLen = [kvlocal integerForKey:@"PicLen"];
+    int picRemaining = (int) (picLen-picStored);
+    if (picRemaining < 0)
+        picRemaining = 0;
+    NSString *name = [kvlocal objectForKey:@"PicName"];
+    
+    
+    NSFileHandle * pFilHdl = nil;
+    
+        if (pFilHdl == nil)
+        picRemaining = 0;
+    int namelen = 1;
+    const char *pPicName = "NoName";
+    if (name != nil)
+    {
+        pPicName = [name UTF8String];
+    }
+    namelen = (int)strlen(pPicName) +1;
+    int msglen = 16 + devIdLen + sizeof(int)+ namelen + 2*sizeof(long long);
+    char *pGetIdMsg = (char *)malloc(msglen);
+    memcpy(pGetIdMsg, &msglen, sizeof(int));
+    memcpy(pGetIdMsg+4, &msgid, sizeof(int));
+    memcpy(pGetIdMsg+8, &appId, sizeof(int));
+    memcpy(pGetIdMsg + 12, &shareId, sizeof(long long));
+    memcpy(pGetIdMsg+20, pDevIdStr, devIdLen);
+    memcpy(pGetIdMsg+20+devIdLen, &picRemaining, sizeof(int));
+    memcpy(pGetIdMsg+24 + devIdLen, pPicName, namelen);
+    long long picShareId = [kvlocal integerForKey:@"PicShareId"];
+    int picshidoffset = 24 + devIdLen + namelen;
+    memcpy(pGetIdMsg + picshidoffset, &picShareId, sizeof (long long));
+    long long maxShareId = [kvlocal integerForKey:@"MaxShareId"];
+    int maxShareIdOffset = picshidoffset + sizeof(long long);
+    memcpy(pGetIdMsg + maxShareIdOffset, &maxShareId, sizeof(long long));
+    *len = msglen;
+    return pGetIdMsg;
+}
+
 
 -(char *) getItems:(long long)shareId msgLen:(int *)len msgId:(int)msgid
 {
@@ -138,9 +203,9 @@
     int msglen =  tridLen + 12;
     char *pGetIdMsg = (char *)malloc(msglen);
     memcpy(pGetIdMsg, &msglen, sizeof(int));
-    memcpy(pGetIdMsg+4, &appId, sizeof(int));
+    memcpy(pGetIdMsg+8, &appId, sizeof(int));
     int shareMsgId = GET_SHARE_ID_1_MSG;
-    memcpy(pGetIdMsg+8, &shareMsgId, sizeof(int));
+    memcpy(pGetIdMsg+4, &shareMsgId, sizeof(int));
     memcpy(pGetIdMsg + 12, &trid, sizeof(long long));
     *len = msglen;
     return pGetIdMsg;
@@ -183,6 +248,44 @@
 }
 
 -(char *) storeDeviceToken: (long long) shareId deviceToken:(NSString *)token msgLen:(int *)len
+{
+    if (appId > SMARTMSG_ID)
+    {
+       return [self storeDeviceTokenAppId:shareId deviceToken:token msgLen:len];
+    }
+    else
+    {
+        return  [self storeDeviceTokenNoAppId:shareId deviceToken:token msgLen:len];
+    }
+   
+}
+
+-(char *) storeDeviceTokenAppId: (long long) shareId deviceToken:(NSString *)token msgLen:(int *)len
+{
+    
+    const char *devIdStr = "ios";
+    int devIdLen = (int)strlen(devIdStr) +1;
+    const char *pDevTkn = [token UTF8String];
+    if (!pDevTkn)
+    {
+        NSLog(@"Cannot encode device token");
+        return NULL;
+    }
+    int devTknLen = (int)strlen(pDevTkn) + 1;
+    int msglen = devTknLen + devIdLen + 20;
+    char *pGetIdMsg = (char *)malloc(msglen);
+    memcpy(pGetIdMsg, &msglen, sizeof(int));
+    memcpy(pGetIdMsg+8, &appId, sizeof(int));
+    int storeDevTknMsgId = STORE_DEVICE_TKN_1_MSG;
+    memcpy(pGetIdMsg+4, &storeDevTknMsgId, sizeof(int));
+    memcpy(pGetIdMsg+12, &shareId, sizeof(long long));
+    memcpy(pGetIdMsg+20, pDevTkn, devTknLen);
+    memcpy(pGetIdMsg+20+devTknLen, devIdStr, 4);
+    *len = msglen;
+    return pGetIdMsg;
+}
+
+-(char *) storeDeviceTokenNoAppId: (long long) shareId deviceToken:(NSString *)token msgLen:(int *)len
 {
     
     const char *devIdStr = "ios";
