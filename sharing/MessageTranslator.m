@@ -92,7 +92,7 @@
         pPicName = [name UTF8String];
     }
     namelen = (int)strlen(pPicName) +1;
-    int msglen = 16 + devIdLen + sizeof(int)+ namelen + 2*sizeof(long long);
+    int msglen = 20 + devIdLen + sizeof(int)+ namelen + 2*sizeof(long long);
     char *pGetIdMsg = (char *)malloc(msglen);
     memcpy(pGetIdMsg, &msglen, sizeof(int));
     memcpy(pGetIdMsg+4, &msgid, sizeof(int));
@@ -325,7 +325,7 @@
         return NULL;
     }
     int frndLen = (int) strlen(pFrndLst)+ 1;
-    int msglen = frndLen + 8 + sizeof(long long);
+    int msglen = frndLen + 12 + sizeof(long long);
     char *pStoreFrndMsg = (char *)malloc(msglen);
     memcpy(pStoreFrndMsg, &msglen, sizeof(int));
     int storeFrndListMsg = STORE_FRIEND_LIST_1_MSG;
@@ -491,9 +491,51 @@
     
 }
 
+-(char *) shareMsgAppId:(long long) shareId shareList:(NSString *) shareLst  listName: (NSString* ) name msgLen:(int *)len msgId:(int) shareListMsgId
+{
+   
+    const char *pShareLst = [shareLst UTF8String];
+    const char *pName = [name UTF8String];
+    if (!pShareLst || !pName)
+    {
+        NSLog(@"Failed to create shareMsg");
+        return NULL;
+    }
+    int listLen = (int)strlen(pShareLst)+1;
+     int nameLen = (int)strlen(pName) + 1;
+    int msglen = 5*sizeof(int) + nameLen + listLen + sizeof(long long);
+    *len = msglen;
+    char *pStoreLst = (char *)malloc(msglen);
+    memcpy(pStoreLst, &msglen, sizeof(int));
+    memcpy(pStoreLst+sizeof(int), &shareListMsgId, sizeof(int));
+    memcpy(pStoreLst+2*sizeof(int), &appId, sizeof(int));
+    int shareIdOffset = 3*sizeof(int);
+    memcpy(pStoreLst + shareIdOffset, &shareId, sizeof(long long));
+    int namelenoffset = shareIdOffset + sizeof(long long);
+    memcpy(pStoreLst+ namelenoffset, &nameLen, sizeof(int));
+    int listlenoffset = namelenoffset+sizeof(int);
+    memcpy(pStoreLst+listlenoffset, &listLen, sizeof(int));
+    int nameoffset = listlenoffset + sizeof(int);
+    memcpy(pStoreLst+nameoffset, pName, nameLen);
+    int shareoff = nameoffset+nameLen;
+    memcpy(pStoreLst +shareoff, pShareLst, listLen);
+       NSLog(@"shareLst=%@", shareLst);
+    NSLog(@"shareMsg nameLen=%d listLen=%d msglen=%d nameoffset=%d listoffset=%d", nameLen, listLen, msglen, nameoffset, shareoff);
+   
+    return pStoreLst;
+}
+
+
 -(char *) shareItemMsg:(long long) shareId shareList: (NSString *) shareLst listName:(NSString *)name msgLen:(int *)len
 {
-    return [self shareMsg:shareId shareList:shareLst listName:name msgLen:len msgId:SHARE_ITEM_MSG];
+    if (appId > SMARTMSG_ID)
+    {
+        return [self shareMsgAppId:shareId shareList:shareLst listName:name msgLen:len msgId:SHARE_ITEM_1_MSG];
+    }
+    else
+    {
+        return [self shareMsg:shareId shareList:shareLst listName:name msgLen:len msgId:SHARE_ITEM_MSG];
+    }
 }
 
 -(char *) shouldDownload:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld msgLen:(int *) len
