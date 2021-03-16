@@ -233,6 +233,8 @@
     
 }
 
+
+
 -(char *) getRemoteHostPort:(long long) shareId appName:(int) appId msgLen:(int *) len
 {
     int msglen =  3*sizeof(int) + sizeof(long long);
@@ -246,6 +248,8 @@
     *len = msglen;
     return pGetRemoteMsg;
 }
+
+
 
 -(char *) storeDeviceToken: (long long) shareId deviceToken:(NSString *)token msgLen:(int *)len
 {
@@ -381,6 +385,18 @@
 
 -(char *) sharePicMetaDataMsg:(long long) shareId name:(NSURL *)picUrl picLength:(NSUInteger) length metaStr:(NSString *)picMetaStr msgLen:(int *)len
 {
+    if (appId > SMARTMSG_ID)
+    {
+        return [self sharePicMetaDataMsgAppId:shareId name:picUrl picLength:length metaStr:picMetaStr msgLen:len];
+    }
+    else
+    {
+        return [self sharePicMetaDataMsgNoAppId:shareId name:picUrl picLength:length metaStr:picMetaStr msgLen:len];
+    }
+}
+
+-(char *) sharePicMetaDataMsgNoAppId:(long long) shareId name:(NSURL *)picUrl picLength:(NSUInteger) length metaStr:(NSString *)picMetaStr msgLen:(int *)len
+{
     NSArray *pathcomps = [picUrl pathComponents];
     NSString *picName = [pathcomps lastObject];
     NSArray *pArr = [picMetaStr componentsSeparatedByString:@";"];
@@ -424,7 +440,67 @@
 
 }
 
+-(char *) sharePicMetaDataMsgAppId:(long long) shareId name:(NSURL *)picUrl picLength:(NSUInteger) length metaStr:(NSString *)picMetaStr msgLen:(int *)len
+{
+    NSArray *pathcomps = [picUrl pathComponents];
+    NSString *picName = [pathcomps lastObject];
+    NSArray *pArr = [picMetaStr componentsSeparatedByString:@";"];
+    NSUInteger cnt = [pArr count];
+    NSString *objName = [pArr objectAtIndex:cnt-1];
+    NSString *picMetaStr1 = [[NSString alloc] init];
+    for (NSUInteger i=0; i < cnt-1; ++i)
+    {
+        picMetaStr1 = [picMetaStr1 stringByAppendingString:[pArr objectAtIndex:i]];
+        picMetaStr1 = [picMetaStr1 stringByAppendingString:@";"];
+    }
+    picName = [picName stringByAppendingString:@";"];
+    picName = [picName stringByAppendingString:objName];
+    const char *pPicName = [picName UTF8String];
+    const char *pPicMetaStr = [picMetaStr1 UTF8String];
+    int nameLen = (int)strlen(pPicName) + 1;
+    int metaStrLen = (int)strlen(pPicMetaStr)+ 1;
+    int msglen = 6*sizeof(int) + nameLen  + sizeof(long long) + metaStrLen;
+    *len = msglen;
+    
+    int sharePicMetaMsgId = PIC_METADATA_1_MSG;
+    char *pStoreMsg = (char *)malloc(msglen);
+    memcpy(pStoreMsg, &msglen, sizeof(int));
+    memcpy(pStoreMsg+sizeof(int), &sharePicMetaMsgId, sizeof(int));
+    int appIdOffset = 2*sizeof(int);
+    memcpy(pStoreMsg+appIdOffset, &appId, sizeof(int));
+    int shareIdOffset = appIdOffset + sizeof(int);
+    memcpy(pStoreMsg + shareIdOffset, &shareId, sizeof(long long));
+    int namelenoffset = shareIdOffset + sizeof(long long);
+    memcpy(pStoreMsg+ namelenoffset, &nameLen, sizeof(int));
+    
+    int nameoffset = namelenoffset + sizeof(int);
+    memcpy(pStoreMsg + nameoffset, pPicName, nameLen);
+   
+    int lenghtoffset = nameoffset + nameLen;
+    int piclen = (int) length;
+    memcpy(pStoreMsg + lenghtoffset, &piclen, sizeof(int));
+    int metastrlenoffset = lenghtoffset + sizeof(int);
+    memcpy(pStoreMsg + metastrlenoffset, &metaStrLen, sizeof(int));
+    int metastroffset = metastrlenoffset+sizeof(int);
+    memcpy(pStoreMsg+ metastroffset, pPicMetaStr, metaStrLen);
+    
+        return pStoreMsg;
+
+}
+
 -(NSData *) sharePicMsg:(NSData *) picData dataIndx:(NSUInteger *)indx
+{
+    if (appId > SMARTMSG_ID)
+    {
+        return [self sharePicMsgAppId:picData dataIndx:indx];
+    }
+    else
+    {
+        return [self sharePicMsgNoAppId:picData dataIndx:indx];
+    }
+}
+
+-(NSData *) sharePicMsgNoAppId:(NSData *) picData dataIndx:(NSUInteger *)indx
 {
     NSUInteger picLen = [picData length];
     if (*indx >= picLen)
@@ -453,6 +529,35 @@
     
 }
 
+-(NSData *) sharePicMsgAppId:(NSData *) picData dataIndx:(NSUInteger *)indx
+{
+    NSUInteger picLen = [picData length];
+    if (*indx >= picLen)
+        return nil;
+    char buf[MAX_BUF];
+    int msgLen = MAX_BUF;
+    
+    int msgId = PIC_1_MSG;
+    memcpy(buf+sizeof(int), &msgId, sizeof(int));
+    memcpy(buf+2*sizeof(int), &appId, sizeof(int));
+   
+    int spaceInBuf = MAX_BUF - 3*sizeof(int);
+    NSUInteger toSent = picLen - *indx;
+    NSUInteger canSent = spaceInBuf;
+    if (toSent < spaceInBuf)
+        canSent = toSent;
+    NSRange aR;
+    aR.location = *indx;
+    aR.length = canSent;
+    [picData getBytes:buf+3*sizeof(int) range:aR];
+    msgLen = (int)canSent + 3*sizeof(int);
+    memcpy(buf, &msgLen, sizeof(int));
+    NSData *pPicDataChunkToSend = [NSData dataWithBytes:buf length:canSent+3*sizeof(int)];
+    
+    *indx += canSent;
+    return pPicDataChunkToSend ;
+    
+}
 -(char *) shareMsg:(long long) shareId shareList:(NSString *) shareLst  listName: (NSString* ) name msgLen:(int *)len msgId:(int) shareListMsgId
 {
    
@@ -540,6 +645,18 @@
 
 -(char *) shouldDownload:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld msgLen:(int *) len
 {
+    if (appId > SMARTMSG_ID)
+    {
+        return [self shouldDownloadAppId:shareId picName:name shldDownload:shDwnld msgLen:len];
+    }
+    else
+    {
+        return [self shouldDownloadNoAppId:shareId picName:name shldDownload:shDwnld msgLen:len];
+    }
+}
+
+-(char *) shouldDownloadNoAppId:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld msgLen:(int *) len
+{
     const char *pName = [name UTF8String];
     int nameLen = (int)strlen(pName) + 1;
     int msgId = SHOULD_DOWNLOAD_MSG;
@@ -550,6 +667,28 @@
     memcpy(pMsg + 2*sizeof(int), &shareId, sizeof(long long));
     int download = shDwnld? 1:0;
     int dwnldoffset = 2*sizeof(int) + sizeof(long long);
+    memcpy(pMsg + dwnldoffset, &download, sizeof(int));
+    int nameoffset = dwnldoffset + sizeof(int);
+    memcpy(pMsg + nameoffset, pName, nameLen);
+    *len = msglen;
+    return pMsg;
+}
+
+-(char *) shouldDownloadAppId:(long long ) shareId picName:(NSString *) name shldDownload:(bool) shDwnld msgLen:(int *) len
+{
+    const char *pName = [name UTF8String];
+    int nameLen = (int)strlen(pName) + 1;
+    int msgId = SHOULD_DOWNLOAD_1_MSG;
+    int msglen = 24 + nameLen;
+    char *pMsg = (char *)malloc(msglen);
+    memcpy(pMsg, &msglen, sizeof(int));
+    memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+    int appIdOffset = 2*sizeof(int);
+    memcpy(pMsg + appIdOffset, &appId, sizeof(int));
+    int shareIdOffset = appIdOffset + sizeof(int);
+    memcpy(pMsg + shareIdOffset, &shareId, sizeof(long long));
+    int download = shDwnld? 1:0;
+    int dwnldoffset = shareIdOffset + sizeof(long long);
     memcpy(pMsg + dwnldoffset, &download, sizeof(int));
     int nameoffset = dwnldoffset + sizeof(int);
     memcpy(pMsg + nameoffset, pName, nameLen);
