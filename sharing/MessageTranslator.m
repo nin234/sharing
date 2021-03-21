@@ -625,7 +625,7 @@
     int shareoff = nameoffset+nameLen;
     memcpy(pStoreLst +shareoff, pShareLst, listLen);
        NSLog(@"shareLst=%@", shareLst);
-    NSLog(@"shareMsg nameLen=%d listLen=%d msglen=%d nameoffset=%d listoffset=%d", nameLen, listLen, msglen, nameoffset, shareoff);
+    NSLog(@"shareMsgAppId nameLen=%d listLen=%d msglen=%d nameoffset=%d listoffset=%d", nameLen, listLen, msglen, nameoffset, shareoff);
    
     return pStoreLst;
 }
