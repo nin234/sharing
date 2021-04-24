@@ -11,7 +11,7 @@
 
 @implementation AppShrUtil
 
-@synthesize purchased;
+
 @synthesize pShrMgr = _pShrMgr;
 @synthesize window;
 @synthesize tabBarController;
@@ -24,24 +24,16 @@
 @synthesize delegate;
 @synthesize shareViewNavController;
 
--(void) setPurchsdTokens:(NSString *) trid
-{
-    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
-    [kvlocal setBool:YES forKey:@"Purchased"];
-    [kvlocal setObject:trid forKey:@"TransactionId"];
-    
-}
+
 
 -(instancetype) init
 {
     self = [super init];
     if (self)
     {
-        purchased = false;
-        NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
-        BOOL purch = [kvlocal boolForKey:@"Purchased"];
-        if (purch == YES)
-            purchased = true;
+        
+        
+        
         pNotificationHdlr = [[RemoteNotificationHandler alloc] init];
         return self;
     }

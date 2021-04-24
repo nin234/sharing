@@ -7,19 +7,57 @@
 //
 
 #import "InAppPurchase.h"
-
+#include <sys/time.h>
+#import "SHKeychainItemWrapper.h"
+#import "Consts.h"
 
 #define YES_TO_PAY 1
 
 @implementation InAppPurchase
 
-@synthesize delegate;
-@synthesize productId;
+@synthesize appId;
 
 -(void) stop
 {
     [productsRequest cancel];
     return;
+}
+
+-(bool) canContinue:(UIViewController *) vwCntrl
+{
+    if (bPurchased)
+    {
+        return true;
+    }
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    NSNumber *firstUse = [kvlocal objectForKey:@"FirstUseTime"];
+    struct timeval now;
+    gettimeofday(&now, NULL);
+   if ((now.tv_sec - [firstUse longLongValue]) < delta)
+    {
+        return true;
+    }
+    NSString *errString = @"Purchase to continue using Nshare apps. All our Apps EasyGrocList, OpenHouses, nsharelist and AutoSpree can be used with one purchase";
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Purchase"
+                               message:errString
+                               preferredStyle:UIAlertControllerStyleAlert];
+ 
+    UIAlertAction* buyAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+   handler:^(UIAlertAction * action) {
+        SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
+        payment.quantity = 1;
+        NSLog(@"Purchasing subscription");
+        [[SKPaymentQueue defaultQueue] addPayment:payment];
+    }];
+    
+    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
+   handler:^(UIAlertAction * action) {
+    }];
+ 
+    [alert addAction:buyAction];
+    [alert addAction:cancelAction];
+    [vwCntrl presentViewController:alert animated:YES completion:nil];
+    return false;
 }
 
 -(void) showTransactionAsInProgress:(SKPaymentTransaction *) transaction deferred: (BOOL) value
@@ -33,10 +71,7 @@
      [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
     bIgnoreAlertVwClck = true;
     NSLog(@"Transaction failed %@", [transaction.error localizedDescription]);
-    UIAlertView *pAvw = [[UIAlertView alloc] initWithTitle:@"Upgrade failed" message:[transaction.error localizedDescription] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     
-    [pAvw show];
-
     return;
 }
 
@@ -46,7 +81,8 @@
     NSLog(@"Purchased  %@ %@", transaction.originalTransaction.transactionIdentifier, transaction.payment.productIdentifier);
     if ([transaction.payment.productIdentifier isEqualToString:productId])
     {
-        [delegate setPurchsd:transaction.transactionIdentifier];
+       
+        [self setPurchased];
     }
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
     return;
@@ -57,11 +93,9 @@
     NSLog(@"Restored the transaction %@ %@", transaction.originalTransaction.transactionIdentifier, transaction.payment.productIdentifier);
     if ([transaction.payment.productIdentifier isEqualToString:productId])
     {
-        [delegate setPurchsd:transaction.transactionIdentifier];
+        
+        [self setPurchased];
         bIgnoreAlertVwClck = true;
-        UIAlertView *pAvw = [[UIAlertView alloc] initWithTitle:@"Success" message:@"Restored feature to add unlimited number of items" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-    
-        [pAvw show];
 
     }
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
@@ -100,9 +134,43 @@
     }
     return;
 }
+
+-(NSString *) getProductId:(int) appId
+{
+    switch (appId) {
+        case EASYGROCLIST_ID:
+        {
+            productId = @"com.rekhaninan.easygroclist_yearly";
+            delta = 3600*24*30;
+            //delta = 20;
+            return productId;
+        }
+        break;
+            
+        case NSHARELIST_ID:
+        {
+            productId = @"com.rekhaninan.nsharelist_yearly";
+            delta = 3600*24*30;
+            //delta = 20;
+            return productId;
+        }
+        break;
+            
+        default:
+            break;
+    }
+    
+    NSLog(@"Cannot find productId for appId=%d", appId);
+    
+    return @"Invalid app";
+}
+
 -(InAppPurchase *) init
 {
     self = [super init];
+    bRestore = false;
+    productId = [self getProductId:appId];
+    
     NSSet * productIdentifiers = [NSSet setWithObjects:
                                   productId, nil];
     productsRequest = [[SKProductsRequest alloc]
@@ -110,51 +178,61 @@
     productsRequest.delegate = self;
     
     bIgnoreAlertVwClck = false;
+    
+    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
+    NSNumber *firstUse = [kvlocal objectForKey:@"FirstUseTime"];
+    if (firstUse == nil)
+    {
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        [kvlocal setObject:[NSNumber numberWithLongLong:now.tv_sec] forKey:@"FirstUseTime"];
+        firstUseTime = now.tv_sec;
+        bRestore = true;
+    
+        
+    }
+    else
+    {
+        firstUseTime = [firstUse longLongValue];
+    }
+    
+    SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
+    
+    NSString *purchased = [kchain objectForKey:(__bridge id)kSecAttrLabel];
+    bPurchased = false;
+    if (purchased == nil)
+    {
+        bPurchased = false;
+    }
+    else if ([purchased isEqualToString:@"YES"])
+    {
+        bPurchased = true;
+    }
+        
+        
+    [self start:true];
     return self;
     
+}
+
+-(void) setPurchased
+{
+    bPurchased = true;
+    SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
+    [kchain setObject:@"YES" forKey:(__bridge id)kSecAttrLabel];
 }
 
 -(void) start :(bool) purchase
 {
     bPurchase = purchase;
-    [productsRequest start];   
+    if (!bPurchased)
+    {
+        [productsRequest start];
+    }
+   // [productsRequest start];
 }
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (bIgnoreAlertVwClck)
-    {
-        NSLog(@"Ignoring  alertview click");
-        bIgnoreAlertVwClck = false;
-        return;
-    }
-    
-    NSLog(@"Clicked button at index %ld", (long)buttonIndex);
-    switch (buttonIndex)
-    {
-        case YES_TO_PAY:
-        {
-            SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
-            payment.quantity = 1;
-            if (bPurchase)
-            {
-                NSLog(@"Purchasing unlock");
-                [[SKPaymentQueue defaultQueue] addPayment:payment];
-            }
-            else
-            {
-                 NSLog(@"Restoring unlock");
-                [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
-            }
-        }
-        break;
-            
-        default:
-            NSLog(@"Customer refused to pay for upgrade");
-        break;
-    }
-    return;
-}
+
 
 - (void)productsRequest:(SKProductsRequest *)request
      didReceiveResponse:(SKProductsResponse *)response
@@ -173,21 +251,21 @@
         //assumption here is that there is only one product in the response as we have requested
         //for only one product
         product = result;
-        NSString* messageStr;
-        if (bPurchase)
-            messageStr =[NSString stringWithFormat:@"Purchase %@", result.localizedDescription];
-        else
-            messageStr = [NSString stringWithFormat:@"Restore %@", result.localizedDescription];
-        UIAlertView *pAvw = [[UIAlertView alloc] initWithTitle:result.localizedTitle message:[messageStr stringByAppendingFormat:@" for %@", formattedString] delegate:self cancelButtonTitle:@"NO" otherButtonTitles:@"YES", nil];
         
-        [pAvw show];
+        
+    }
+    
+    if (bRestore)
+    {
+        NSLog(@"Restoring completed app purchases");
+        [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
     }
     
     for (NSString *invalid in response.invalidProductIdentifiers)
     {
         NSLog(@"Invalid product identifiers %@", invalid);
     }
-    NSLog(@"Cancelling products request");
+    
    
     return;
 }

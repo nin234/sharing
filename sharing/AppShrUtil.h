@@ -24,7 +24,7 @@
     RemoteNotificationHandler *pNotificationHdlr;
 }
 
-@property bool purchased;
+
 @property (nonatomic, retain) ShareMgr *pShrMgr;
 @property (nonatomic, retain) UIWindow *window;
 @property (nonatomic, retain)  UITabBarController  *tabBarController;
@@ -39,7 +39,7 @@
 
 @property (nonatomic, weak) id<AppShrUtilDelegate> delegate;
 
--(void) setPurchsdTokens:(NSString *)trid;
+
 -(void) registerForRemoteNotifications;
 -(void) didRegisterForRemoteNotification:(NSData *)deviceToken;
 -(void) showShareView;

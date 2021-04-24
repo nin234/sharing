@@ -10,12 +10,6 @@
 #import <StoreKit/StoreKit.h>
 #import <UIKit/UIKit.h>
 
-@protocol InAppPurchaseDelegate <NSObject>
-
-@required
--(void) setPurchsd:(NSString *)trid;
-
-@end
 
 @interface InAppPurchase : NSObject<UIAlertViewDelegate, SKProductsRequestDelegate, SKPaymentTransactionObserver>
 {
@@ -23,11 +17,19 @@
     SKProductsRequest *productsRequest;
     bool bIgnoreAlertVwClck;
     bool bPurchase;
+    
+    bool bPurchased;
+    int delta;
+    unsigned long long firstUseTime;
+    bool bRestore;
+    NSString *productId;
 }
 
 -(void) start:(bool) purchase;
-@property(nonatomic, weak) id<InAppPurchaseDelegate> delegate;
-@property (nonatomic, strong) NSString *productId;
+
+@property (nonatomic) int appId;
+
 -(void) stop;
+-(bool) canContinue:(UIViewController *) vwCntrl;
 
 @end
