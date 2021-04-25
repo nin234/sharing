@@ -23,6 +23,8 @@
     unsigned long long firstUseTime;
     bool bRestore;
     NSString *productId;
+    bool bInited;
+    bool bPurchasing;
 }
 
 -(void) start:(bool) purchase;

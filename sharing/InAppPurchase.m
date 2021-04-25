@@ -25,15 +25,23 @@
 
 -(bool) canContinue:(UIViewController *) vwCntrl
 {
-    if (bPurchased)
+    if (!bInited)
     {
         return true;
     }
-    NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
-    NSNumber *firstUse = [kvlocal objectForKey:@"FirstUseTime"];
+    
+    if (bPurchased || bPurchasing)
+    {
+        return true;
+    }
+   
+    if (product == nil)
+    {
+        return true;
+    }
     struct timeval now;
     gettimeofday(&now, NULL);
-   if ((now.tv_sec - [firstUse longLongValue]) < delta)
+   if ((now.tv_sec - firstUseTime) < delta)
     {
         return true;
     }
@@ -48,6 +56,7 @@
         payment.quantity = 1;
         NSLog(@"Purchasing subscription");
         [[SKPaymentQueue defaultQueue] addPayment:payment];
+        bPurchasing = true;
     }];
     
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
@@ -70,6 +79,7 @@
 {
      [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
     bIgnoreAlertVwClck = true;
+    bPurchasing = false;
     NSLog(@"Transaction failed %@", [transaction.error localizedDescription]);
     
     return;
@@ -81,7 +91,6 @@
     NSLog(@"Purchased  %@ %@", transaction.originalTransaction.transactionIdentifier, transaction.payment.productIdentifier);
     if ([transaction.payment.productIdentifier isEqualToString:productId])
     {
-       
         [self setPurchased];
     }
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
@@ -93,10 +102,8 @@
     NSLog(@"Restored the transaction %@ %@", transaction.originalTransaction.transactionIdentifier, transaction.payment.productIdentifier);
     if ([transaction.payment.productIdentifier isEqualToString:productId])
     {
-        
         [self setPurchased];
         bIgnoreAlertVwClck = true;
-
     }
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
     return;
@@ -128,6 +135,7 @@
                 break;
             default:
                 // For debugging
+                bPurchasing = false;
                 NSLog(@"Unexpected transaction state %@", @(transaction.transactionState));
                 break;
         }
@@ -151,6 +159,24 @@
         {
             productId = @"com.rekhaninan.nsharelist_yearly";
             delta = 3600*24*30;
+           // delta = 100;
+            return productId;
+        }
+        break;
+            
+        case OPENHOUSES_ID:
+        {
+            productId = @"com.rekhaninan.openhouses_yearly";
+            delta = 3600*24*7;
+            //delta = 20;
+            return productId;
+        }
+        break;
+            
+        case AUTOSPREE_ID:
+        {
+            productId = @"com.rekhaninan.autospree_yearly";
+            delta = 3600*24*7;
             //delta = 20;
             return productId;
         }
@@ -168,17 +194,11 @@
 -(InAppPurchase *) init
 {
     self = [super init];
+    bInited = false;
     bRestore = false;
     productId = [self getProductId:appId];
     
-    NSSet * productIdentifiers = [NSSet setWithObjects:
-                                  productId, nil];
-    productsRequest = [[SKProductsRequest alloc]
-                                          initWithProductIdentifiers:productIdentifiers];
-    productsRequest.delegate = self;
-    
-    bIgnoreAlertVwClck = false;
-    
+    bPurchasing = false;
     NSUserDefaults* kvlocal = [NSUserDefaults standardUserDefaults];
     NSNumber *firstUse = [kvlocal objectForKey:@"FirstUseTime"];
     if (firstUse == nil)
@@ -188,13 +208,28 @@
         [kvlocal setObject:[NSNumber numberWithLongLong:now.tv_sec] forKey:@"FirstUseTime"];
         firstUseTime = now.tv_sec;
         bRestore = true;
-    
+        return self;
         
     }
     else
     {
         firstUseTime = [firstUse longLongValue];
     }
+    
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    if ((now.tv_sec - firstUseTime) < delta - 1800) //if ((now.tv_sec - firstUseTime) < delta - 50) (test)
+    {
+        return self;
+    }
+    
+    NSSet * productIdentifiers = [NSSet setWithObjects:
+                                  productId, nil];
+    productsRequest = [[SKProductsRequest alloc]
+                                          initWithProductIdentifiers:productIdentifiers];
+    productsRequest.delegate = self;
+    
+    bIgnoreAlertVwClck = false;
     
     SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
     
@@ -207,16 +242,19 @@
     else if ([purchased isEqualToString:@"YES"])
     {
         bPurchased = true;
+        NSLog(@"App is subscribed");
     }
         
-        
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
     [self start:true];
+    bInited = true;
     return self;
     
 }
 
 -(void) setPurchased
 {
+    bPurchasing = false;
     bPurchased = true;
     SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
     [kchain setObject:@"YES" forKey:(__bridge id)kSecAttrLabel];
@@ -225,11 +263,13 @@
 -(void) start :(bool) purchase
 {
     bPurchase = purchase;
+    
     if (!bPurchased)
     {
+        NSLog(@"Starting products request");
         [productsRequest start];
     }
-   // [productsRequest start];
+//    [productsRequest start];
 }
 
 
