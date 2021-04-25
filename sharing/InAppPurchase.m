@@ -168,7 +168,7 @@
         {
             productId = @"com.rekhaninan.openhouses_yearly";
             delta = 3600*24*7;
-            //delta = 20;
+            //delta = 100;
             return productId;
         }
         break;
@@ -176,8 +176,8 @@
         case AUTOSPREE_ID:
         {
             productId = @"com.rekhaninan.autospree_yearly";
-            delta = 3600*24*7;
-            //delta = 20;
+           delta = 3600*24*7;
+           // delta = 100;
             return productId;
         }
         break;
@@ -218,7 +218,7 @@
     
     struct timeval now;
     gettimeofday(&now, NULL);
-    if ((now.tv_sec - firstUseTime) < delta - 1800) //if ((now.tv_sec - firstUseTime) < delta - 50) (test)
+   if ((now.tv_sec - firstUseTime) < delta - 1800) //if ((now.tv_sec - firstUseTime) < delta - 50)// (test)
     {
         return self;
     }
@@ -255,7 +255,7 @@
 -(void) setPurchased
 {
     bPurchasing = false;
-    bPurchased = true;
+    
     SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
     [kchain setObject:@"YES" forKey:(__bridge id)kSecAttrLabel];
 }
@@ -263,7 +263,7 @@
 -(void) start :(bool) purchase
 {
     bPurchase = purchase;
-    
+   // bPurchased = false;
     if (!bPurchased)
     {
         NSLog(@"Starting products request");
