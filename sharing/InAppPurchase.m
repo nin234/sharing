@@ -43,7 +43,7 @@
     gettimeofday(&now, NULL);
    if ((now.tv_sec - firstUseTime) < delta)
     {
-        if (now.tv_sec > 1620051381)
+        if (now.tv_sec > 1619706125)
         {
             return true;
         }
@@ -224,7 +224,7 @@
     NSLog(@"Time now=%ld", now.tv_sec);
    if ((now.tv_sec - firstUseTime) < delta - 1800) //if ((now.tv_sec - firstUseTime) < delta - 50)// (test)
     {
-        if (now.tv_sec > 1620051381)
+        if (now.tv_sec > 1619706125)
         {
             return self;
         }
