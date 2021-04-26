@@ -43,7 +43,10 @@
     gettimeofday(&now, NULL);
    if ((now.tv_sec - firstUseTime) < delta)
     {
-        return true;
+        if (now.tv_sec > 1620051381)
+        {
+            return true;
+        }
     }
     NSString *errString = @"Purchase to continue using Nshare apps. All our Apps EasyGrocList, OpenHouses, nsharelist and AutoSpree can be used with one purchase";
     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Purchase"
@@ -218,9 +221,13 @@
     
     struct timeval now;
     gettimeofday(&now, NULL);
+    NSLog(@"Time now=%ld", now.tv_sec);
    if ((now.tv_sec - firstUseTime) < delta - 1800) //if ((now.tv_sec - firstUseTime) < delta - 50)// (test)
     {
-        return self;
+        if (now.tv_sec > 1620051381)
+        {
+            return self;
+        }
     }
     
     NSSet * productIdentifiers = [NSSet setWithObjects:
