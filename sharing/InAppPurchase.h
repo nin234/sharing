@@ -16,22 +16,24 @@
     SKProduct *product;
     SKProductsRequest *productsRequest;
     bool bIgnoreAlertVwClck;
-    bool bPurchase;
+   
     
     bool bPurchased;
     int delta;
     unsigned long long firstUseTime;
     bool bRestore;
     NSString *productId;
-    bool bInited;
     bool bPurchasing;
 }
 
--(void) start:(bool) purchase;
+-(void) start;
 
 @property (nonatomic) int appId;
 
 -(void) stop;
 -(bool) canContinue:(UIViewController *) vwCntrl;
+
+-(void) buy;
+-(void) restore;
 
 @end

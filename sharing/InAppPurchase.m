@@ -25,10 +25,6 @@
 
 -(bool) canContinue:(UIViewController *) vwCntrl
 {
-    if (!bInited)
-    {
-        return true;
-    }
     
     if (bPurchased || bPurchasing)
     {
@@ -43,32 +39,9 @@
     gettimeofday(&now, NULL);
    if ((now.tv_sec - firstUseTime) < delta)
     {
-        if (now.tv_sec > 1619706125)
-        {
-            return true;
-        }
+        return true;
     }
-    NSString *errString = @"Purchase to continue using Nshare apps. All our Apps EasyGrocList, OpenHouses, nsharelist and AutoSpree can be used with one purchase";
-    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Purchase"
-                               message:errString
-                               preferredStyle:UIAlertControllerStyleAlert];
- 
-    UIAlertAction* buyAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-   handler:^(UIAlertAction * action) {
-        SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
-        payment.quantity = 1;
-        NSLog(@"Purchasing subscription");
-        [[SKPaymentQueue defaultQueue] addPayment:payment];
-        bPurchasing = true;
-    }];
     
-    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
-   handler:^(UIAlertAction * action) {
-    }];
- 
-    [alert addAction:buyAction];
-    [alert addAction:cancelAction];
-    [vwCntrl presentViewController:alert animated:YES completion:nil];
     return false;
 }
 
@@ -197,7 +170,7 @@
 -(InAppPurchase *) init
 {
     self = [super init];
-    bInited = false;
+   
     bRestore = false;
     productId = [self getProductId:appId];
     
@@ -222,21 +195,9 @@
     struct timeval now;
     gettimeofday(&now, NULL);
     NSLog(@"Time now=%ld", now.tv_sec);
-   if ((now.tv_sec - firstUseTime) < delta - 1800) //if ((now.tv_sec - firstUseTime) < delta - 50)// (test)
-    {
-        if (now.tv_sec > 1619706125)
-        {
-            return self;
-        }
-    }
+   
     
-    NSSet * productIdentifiers = [NSSet setWithObjects:
-                                  productId, nil];
-    productsRequest = [[SKProductsRequest alloc]
-                                          initWithProductIdentifiers:productIdentifiers];
-    productsRequest.delegate = self;
     
-    bIgnoreAlertVwClck = false;
     
     SHKeychainItemWrapper *kchain = [[SHKeychainItemWrapper alloc] initWithIdentifier:@"SharingData" accessGroup:@"3JEQ693MKL.com.rekhaninan.frndlst"];
     
@@ -252,9 +213,6 @@
         NSLog(@"App is subscribed");
     }
         
-    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
-    [self start:true];
-    bInited = true;
     return self;
     
 }
@@ -267,9 +225,20 @@
     [kchain setObject:@"YES" forKey:(__bridge id)kSecAttrLabel];
 }
 
--(void) start :(bool) purchase
+-(void) start
 {
-    bPurchase = purchase;
+    if (bPurchased)
+    {
+        return;
+    }
+    NSSet * productIdentifiers = [NSSet setWithObjects:
+                                  productId, nil];
+    productsRequest = [[SKProductsRequest alloc]
+                                          initWithProductIdentifiers:productIdentifiers];
+    productsRequest.delegate = self;
+    
+    bIgnoreAlertVwClck = false;
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
    // bPurchased = false;
     if (!bPurchased)
     {
@@ -280,6 +249,29 @@
 }
 
 
+-(void) buy
+{
+    if (bPurchased || bPurchasing)
+    {
+        return;
+    }
+    SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
+    payment.quantity = 1;
+    NSLog(@"Purchasing subscription");
+    [[SKPaymentQueue defaultQueue] addPayment:payment];
+    bPurchasing = true;
+}
+
+-(void) restore
+{
+    if (bPurchased || bPurchasing)
+    {
+    //    return;
+    }
+    NSLog(@"Restoring subscription");
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+    bPurchasing = true;
+}
 
 - (void)productsRequest:(SKProductsRequest *)request
      didReceiveResponse:(SKProductsResponse *)response
