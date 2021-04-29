@@ -266,7 +266,7 @@
 {
     if (bPurchased || bPurchasing)
     {
-    //    return;
+        return;
     }
     NSLog(@"Restoring subscription");
     [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
