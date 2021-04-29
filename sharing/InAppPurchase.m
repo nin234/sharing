@@ -25,7 +25,7 @@
 
 -(bool) canContinue:(UIViewController *) vwCntrl
 {
-    
+   
     if (bPurchased || bPurchasing)
     {
         return true;
@@ -41,6 +41,7 @@
     {
         return true;
     }
+    
     
     return false;
 }
@@ -245,7 +246,7 @@
         NSLog(@"Starting products request");
         [productsRequest start];
     }
-//    [productsRequest start];
+   // [productsRequest start];
 }
 
 
