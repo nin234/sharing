@@ -17,6 +17,7 @@
 
 @synthesize appId;
 
+
 -(void) stop
 {
     [productsRequest cancel];
@@ -58,7 +59,18 @@
     bIgnoreAlertVwClck = true;
     bPurchasing = false;
     NSLog(@"Transaction failed %@", [transaction.error localizedDescription]);
-    
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Failue"
+                                                                   message:@"Failed to complete transaction"
+                               preferredStyle:UIAlertControllerStyleAlert];
+ 
+    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+   handler:^(UIAlertAction * action) {}];
+ 
+    [alert addAction:defaultAction];
+    if (viewCntrl != nil)
+    {
+        [viewCntrl presentViewController:alert animated:YES completion:nil];
+    }
     return;
 }
 
@@ -71,6 +83,15 @@
         [self setPurchased];
     }
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Success"
+                                                                   message:@"Congratulations. You are subscribed to Nshare apps"
+                               preferredStyle:UIAlertControllerStyleAlert];
+ 
+    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+   handler:^(UIAlertAction * action) {}];
+ 
+    [alert addAction:defaultAction];
+    [viewCntrl presentViewController:alert animated:YES completion:nil];
     return;
 }
 
@@ -83,6 +104,15 @@
         bIgnoreAlertVwClck = true;
     }
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Restored subscription"
+                                                                   message:@"Successfully restored purchases to Nshare Apps"
+                               preferredStyle:UIAlertControllerStyleAlert];
+ 
+    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+   handler:^(UIAlertAction * action) {}];
+ 
+    [alert addAction:defaultAction];
+    [viewCntrl presentViewController:alert animated:YES completion:nil];
     return;
 }
 
@@ -145,7 +175,7 @@
         {
             productId = @"com.rekhaninan.openhouses_yearly";
             delta = 3600*24*7;
-            //delta = 100;
+           // delta = 100;
             return productId;
         }
         break;
@@ -171,7 +201,7 @@
 -(InAppPurchase *) init
 {
     self = [super init];
-   
+    viewCntrl = nil;
     bRestore = false;
     productId = [self getProductId:appId];
     
@@ -213,7 +243,8 @@
         bPurchased = true;
         NSLog(@"App is subscribed");
     }
-        
+   // bPurchased = false;
+    [self start];
     return self;
     
 }
@@ -226,12 +257,27 @@
     [kchain setObject:@"YES" forKey:(__bridge id)kSecAttrLabel];
 }
 
+-(void) startProductRequest
+{
+    if (bPurchased)
+    {
+        return;
+    }
+    if (product != nil)
+    {
+        return;
+    }
+    NSLog(@"Starting products request");
+    [productsRequest start];
+}
+
 -(void) start
 {
     if (bPurchased)
     {
         return;
     }
+    
     NSSet * productIdentifiers = [NSSet setWithObjects:
                                   productId, nil];
     productsRequest = [[SKProductsRequest alloc]
@@ -240,22 +286,47 @@
     
     bIgnoreAlertVwClck = false;
     [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
-   // bPurchased = false;
-    if (!bPurchased)
-    {
+    
         NSLog(@"Starting products request");
         [productsRequest start];
-    }
+   
    // [productsRequest start];
 }
 
 
--(void) buy
+-(void) buy:(UIViewController *)vwCntrl
 {
+    viewCntrl = vwCntrl;
+    bool bFailed = false;
+    NSString *errString = @"You have already bought subscription. Thank you";
+    
+    
+    if (product == nil)
+    {
+        bFailed = true;
+        errString = @"Failed to buy subscription. Try again later";
+    }
+    
     if (bPurchased || bPurchasing)
     {
-        return;
+        bFailed = true;
+        errString = @"You have already bought subscription. Thank you";
     }
+    
+    
+       if (bFailed)
+       {
+        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Failed to buy"
+                                   message:errString
+                                   preferredStyle:UIAlertControllerStyleAlert];
+     
+        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+       handler:^(UIAlertAction * action) {}];
+     
+        [alert addAction:defaultAction];
+        [vwCntrl presentViewController:alert animated:YES completion:nil];
+           return;
+       }
     SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
     payment.quantity = 1;
     NSLog(@"Purchasing subscription");
@@ -263,10 +334,27 @@
     bPurchasing = true;
 }
 
--(void) restore
+-(void) restore:(UIViewController *) vwCntrl
 {
+    viewCntrl = vwCntrl;
+    bool bFailed = false;
+    NSString *errString = @"You have already bought subscription. Thank you";
     if (bPurchased || bPurchasing)
     {
+        bFailed = true;
+        
+    }
+    if (bFailed)
+    {
+     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Failed to restore"
+                                message:errString
+                                preferredStyle:UIAlertControllerStyleAlert];
+  
+     UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+    handler:^(UIAlertAction * action) {}];
+  
+     [alert addAction:defaultAction];
+     [vwCntrl presentViewController:alert animated:YES completion:nil];
         return;
     }
     NSLog(@"Restoring subscription");

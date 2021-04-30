@@ -24,6 +24,7 @@
     bool bRestore;
     NSString *productId;
     bool bPurchasing;
+    UIViewController *viewCntrl;
 }
 
 -(void) start;
@@ -33,7 +34,8 @@
 -(void) stop;
 -(bool) canContinue:(UIViewController *) vwCntrl;
 
--(void) buy;
--(void) restore;
 
+-(void) buy:(UIViewController *) vwCntrl;
+-(void) restore:(UIViewController *) vwCntrl;
+-(void) startProductRequest;
 @end
