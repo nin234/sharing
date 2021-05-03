@@ -215,7 +215,7 @@
         [kvlocal setObject:[NSNumber numberWithLongLong:now.tv_sec] forKey:@"FirstUseTime"];
         firstUseTime = now.tv_sec;
         bRestore = true;
-        return self;
+       
         
     }
     else
